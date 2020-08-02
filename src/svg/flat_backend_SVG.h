@@ -154,10 +154,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_ClearClip
 /*
  * Class:     flat_backend_SVG
  * Method:    PathBegin
- * Signature: (JI)V
+ * Signature: (JII)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_PathBegin
-  (JNIEnv *, jclass, jlong, jint);
+  (JNIEnv *, jclass, jlong, jint, jint);
 
 /*
  * Class:     flat_backend_SVG

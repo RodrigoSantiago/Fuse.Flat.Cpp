@@ -143,6 +143,7 @@ int fv__flush(fvContext* ctx) {
         ctx->bInd = 0;
         return offSet;
     } else {
+        std::cout << "nothing to flush" << std::endl;
         return 0;
     }
 }
@@ -161,10 +162,14 @@ void fv__commit(fvContext* ctx) {
 
     fvPaint drawpaint = ctx->paint;
 
-    drawpaint.size = (unsigned  long) ctx->eInd;
+    drawpaint.size = (unsigned long) ctx->eInd;
 
     if (ctx->op == TEXT) {
-        drawpaint.edgeAA = (ctx->op << 2u) | ((ctx->font->sdf ? 1u : 0u) << 1u) | 0u;//(ctx->aa ? 1u : 0u);
+        drawpaint.edgeAA = (ctx->op                  << 4) |
+                           (ctx->wr                  << 3) |
+                           ((ctx->convex ? 1 : 0)    << 2) |
+                           ((ctx->font->sdf ? 1 : 0) << 1) |
+                           (0)                     /*<< 0*/;
 
         if (drawpaint.type == 0) {
             drawpaint.type = 3;
@@ -174,7 +179,11 @@ void fv__commit(fvContext* ctx) {
         }
         drawpaint.image1 = ctx->font->imageID;
     } else {
-        drawpaint.edgeAA = (ctx->op << 2u) | (0u << 1u) | (ctx->aa ? 1u : 0u);
+        drawpaint.edgeAA = (ctx->op                 << 4) |
+                           (ctx->wr                 << 3) |
+                           ((ctx->convex ? 1 : 0)   << 2) |
+                           (0                       << 1) |
+                           (ctx->aa ? 1 : 0)/*      << 0*/;
         drawpaint.image1 = 0;
     }
 
@@ -495,6 +504,9 @@ fvContext* fvCreate() {
     ctx->fontSpacing = 1;
     ctx->paint = {};
     ctx->op = NOONE;
+    ctx->wr = EVEN_ODD;
+    ctx->aa = 1;
+    ctx->convex = 0;
     ctx->transform[0] = 1.0f;
     ctx->transform[1] = 0.0f;
     ctx->transform[2] = 0.0f;
@@ -587,8 +599,9 @@ void fvClearClip(fvContext* ctx, int clip) {
     renderClearClip(ctx->rCtx, clip);
 }
 
-void fvPathBegin(fvContext* ctx, fvPathOp op) {
+void fvPathBegin(fvContext* ctx, fvPathOp op, fvWindingRule wr) {
     ctx->op = op;
+    ctx->wr = wr;
     ctx->lt = -1;
     ctx->bInd = ctx->vInd;
     ctx->mInd = ctx->vInd;
@@ -697,14 +710,32 @@ void fvPathEnd(fvContext* ctx) {
 
         fv__assert(ctx, 0, (ctx->vInd - ctx->bInd) / 2);
 
-        ctx->eInd += triangulate(ctx->vtx, ctx->bInd, ctx->shapes, ctx->sInd, ctx->elements, ctx->eInd);
+        // ctx->eInd += triangulate(ctx->vtx, ctx->bInd, ctx->shapes, ctx->sInd, ctx->elements, ctx->eInd);
+
+        int src = ctx->bInd / 2;
+        int pid = src;
+        int shapesCount = ctx->sInd;
+        for (int i = 0; i < shapesCount; i++) {
+            int len = ctx->shapes[i] / 2;
+            if (i == 0) {
+                for (int j = 1; j < len - 1; j++) {
+                    fv__triangle(ctx, src, pid + j, j == len - 1 ? pid : pid + j + 1);
+                }
+            } else {
+                for (int j = 0; j < len; j++) {
+                    fv__triangle(ctx, src, pid + j, j == len - 1 ? pid : pid + j + 1);
+                }
+            }
+            pid += len;
+        }
     }
 
     fv__commit(ctx);
 }
 
 void fvRect(fvContext* ctx, float x, float y, float width, float height) {
-    fvPathBegin(ctx, fvPathOp::FILL);
+    fvPathBegin(ctx, fvPathOp::FILL, fvWindingRule::EVEN_ODD);
+    ctx->convex = 1;
 
     fv__assert(ctx, 4, 2);
 
@@ -721,7 +752,9 @@ void fvRect(fvContext* ctx, float x, float y, float width, float height) {
 }
 
 void fvEllipse(fvContext* ctx, float x, float y, float width, float height) {
-    fvPathBegin(ctx, fvPathOp::FILL);
+    fvPathBegin(ctx, fvPathOp::FILL, fvWindingRule::EVEN_ODD);
+    ctx->convex = 1;
+
     float points = fv__maxscale(ctx->transform) * sqrt(width*width + height*height);
     points = (ceil)((points < 64 ? 64 : points > 256 ? 256 : points) / 4.0f);
     int n = (int) points;
@@ -744,7 +777,9 @@ void fvEllipse(fvContext* ctx, float x, float y, float width, float height) {
 }
 
 void fvRoundRect(fvContext* ctx, float x, float y, float width, float height, float c1, float c2, float c3, float c4) {
-    fvPathBegin(ctx, fvPathOp::FILL);
+    fvPathBegin(ctx, fvPathOp::FILL, fvWindingRule::EVEN_ODD);
+    ctx->convex = 1;
+
     fv__assert(ctx, 40, 39);
 
     int el = (ctx->vInd / 2);

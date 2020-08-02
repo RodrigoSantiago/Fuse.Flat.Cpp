@@ -240,9 +240,10 @@ void renderBegin(void *data, unsigned int width, unsigned int height) {
     glBindBuffer(GL_UNIFORM_BUFFER, ctx->ubo);
 
     glDisable(GL_MULTISAMPLE);
+    glDisable(GL_DEPTH_TEST);
 
     glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
     glStencilMask(0xFF);
 
@@ -273,7 +274,9 @@ void renderEnd(void *data) {
 }
 
 void renderClearClip(void* data, int clip) {
-    glClearStencil(clip ? 0x00 : 0x01);
+    glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    glClearStencil(clip ? 0x00 : 0x80);
     glClear(GL_STENCIL_BUFFER_BIT);
 }
 
@@ -299,11 +302,15 @@ void renderFlush(void *data,
                           i * sizeof(fvPaint) + sizeof(unsigned long) * 4,
                           sizeof(fvPaint) - sizeof(unsigned long) * 4);
         fvPaint &p = paints[i];
-        int op = (int) (p.edgeAA >> 2);
+        int aa = (int) ((p.edgeAA & 0x1));
+        int sd = (int) ((p.edgeAA & 0x2) >> 1);
+        int cv = (int) ((p.edgeAA & 0x4) >> 2);
+        int wr = (int) ((p.edgeAA & 0x8) >> 3);
+        int op = (int) (p.edgeAA >> 4);
 
         // Antialiasing
-        if (ctx->aa != ((p.edgeAA & 1) == 1)) {
-            ctx->aa = ((p.edgeAA & 1) == 1);
+        if (ctx->aa != aa) {
+            ctx->aa = aa;
             if (ctx->aa) {
                 glEnable(GL_MULTISAMPLE);
             } else {
@@ -311,12 +318,21 @@ void renderFlush(void *data,
             }
         }
 
-        if (op == CLIP || op == UNCLIP) {
+        if (op == CLIP) {
             glColorMask(0, 0, 0, 0);
             glUniform1i(ctx->stcID, 1);
-            glStencilFunc(GL_ALWAYS, op == CLIP ? 0x00 : 0x01, 0xFF);
-            render__triangles(pos, p.size - pos);
+            glStencilFunc(GL_ALWAYS, 0x80, 0x80);
 
+            if (cv) {
+                glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+                render__triangles(pos, p.size - pos);
+            } else {
+                glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
+                render__triangles(pos, p.size - pos);
+            }
+
+            glStencilFunc(GL_EQUAL, 0, 0xFF);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             glColorMask(1, 1, 1, 1);
             glUniform1i(ctx->stcID, 0);
         } else {
@@ -329,8 +345,8 @@ void renderFlush(void *data,
             if (ctx->image1 != p.image1) {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, ctx->image1 = p.image1);
-                if (ctx->sdf != ((p.edgeAA & 2) == 2)) {
-                    ctx->sdf = ((p.edgeAA & 2) == 2);
+                if (ctx->sdf != sd) {
+                    ctx->sdf = sd;
                     if (ctx->sdf) {
                         glUniform1i(ctx->sdfID, 1);
                     } else {
@@ -339,21 +355,61 @@ void renderFlush(void *data,
                 }
             }
 
-            if (op == FILL || op == TEXT) {
-                glStencilFunc(GL_EQUAL, 0x01, 0xFF);
+            if (op == TEXT || (op == FILL && cv)) {
                 render__triangles(pos, p.size - pos);
+            } else if (op == FILL) {
+
+                if (wr == EVEN_ODD) {
+                    // Even-Odd
+
+                    glUniform1i(ctx->stcID, 1);
+                    glColorMask(0, 0, 0, 0);
+                    glStencilFunc(GL_NOTEQUAL, 0x00, 0xFF);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
+                    render__triangles(pos, p.size - pos);
+
+                    glUniform1i(ctx->stcID, 0);
+                    glColorMask(1, 1, 1, 1);
+                    glStencilFunc(GL_EQUAL, 0x7F, 0xFF);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
+                    render__triangles(pos, p.size - pos);
+                } else {
+                    // Non-Zero
+
+                    glUniform1i(ctx->stcID, 1);
+                    glColorMask(0, 0, 0, 0);
+                    glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, 0x00, 0xFF);
+                    glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
+                    glStencilFuncSeparate(GL_BACK, GL_NOTEQUAL, 0x00, 0xFF);
+                    glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR_WRAP);
+                    glStencilMask(0x7F);
+                    render__triangles(pos, p.size - pos);
+
+                    glUniform1i(ctx->stcID, 0);
+                    glColorMask(1, 1, 1, 1);
+                    glStencilFunc(GL_LESS, 0x80, 0xFF);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+                    glStencilMask(0xFF);
+                    render__triangles(pos, p.size - pos);
+                }
+
+                glStencilFunc(GL_EQUAL, 0, 0xFF);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             } else if (op == STROKE) {
                 glUniform1i(ctx->stcID, 1);
                 glColorMask(0, 0, 0, 0);
-                glStencilFunc(GL_EQUAL, 0x01, 0xFF);
-                glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+                glStencilFunc(GL_EQUAL, 0x00, 0x03);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                 render__triangles(pos, p.size - pos);
 
                 glUniform1i(ctx->stcID, 0);
                 glColorMask(1, 1, 1, 1);
-                glStencilFunc(GL_LESS, 0x01, 0xFF);
-                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+                glStencilFunc(GL_EQUAL, 0x03, 0x03);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                 render__triangles(pos, p.size - pos);
+
+                glStencilFunc(GL_EQUAL, 0, 0xFF);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             }
         }
 

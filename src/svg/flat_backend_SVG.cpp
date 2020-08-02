@@ -140,12 +140,14 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_ClearClip(JNIEnv * jEnv, jclass jCl
 //---------------------------
 //           Paths
 //---------------------------
-JNIEXPORT void JNICALL Java_flat_backend_SVG_PathBegin(JNIEnv * jEnv, jclass jClass, jlong context, jint type) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_PathBegin(JNIEnv * jEnv, jclass jClass, jlong context, jint type, jint rule) {
     fvPathOp op = type == 0 ? fvPathOp::FILL :
                   type == 1 ? fvPathOp::STROKE :
-                  type == 2 ? fvPathOp::CLIP :
-                  type == 3 ? fvPathOp::UNCLIP : fvPathOp::TEXT;
-    fvPathBegin((fvContext*)context, op);
+                  type == 2 ? fvPathOp::CLIP : fvPathOp::TEXT;
+
+    fvWindingRule wr = rule == 0 ? fvWindingRule::EVEN_ODD : fvWindingRule::NON_ZERO;
+
+    fvPathBegin((fvContext*)context, op, wr);
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_MoveTo(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y) {
     fvPathMoveTo((fvContext *) context, x, y);

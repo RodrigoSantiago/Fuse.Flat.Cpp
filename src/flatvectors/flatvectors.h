@@ -14,7 +14,7 @@ enum fvJoin {
 };
 
 enum fvPathOp {
-    NOONE, FILL, STROKE, CLIP, UNCLIP, TEXT
+    NOONE, CONVEX, FILL, STROKE, CLIP, TEXT
 };
 
 enum fvVAlign {
@@ -25,9 +25,13 @@ enum fvHAlign {
     LEFT, CENTER, RIGHT
 };
 
+enum fvWindingRule {
+    EVEN_ODD, NON_ZERO
+};
+
 typedef struct fvPaint {
     unsigned long int size;
-    unsigned long int edgeAA;   //[paint][sdf][aa]
+    unsigned long int edgeAA;   //[paint][winding][convex][sdf][aa]
     unsigned long int image0;
     unsigned long int image1;
     float type;                 // [0] - Color, [1] - Image, [2] - Colored-Image, [3] - Text
@@ -97,6 +101,8 @@ typedef struct fvContext {
 
     // Path Tesselation
     fvPathOp op;
+    fvWindingRule wr;
+    int convex; // Simple convex shape
     int mInd;   // Move index
 
     // Stroke
@@ -150,7 +156,7 @@ void fvSetTransform(fvContext* context, float m00, float m10, float m01, float m
 
 void fvClearClip(fvContext* context, int clip);
 
-void fvPathBegin(fvContext* context, fvPathOp op);
+void fvPathBegin(fvContext* context, fvPathOp op, fvWindingRule wr);
 
 void fvPathMoveTo(fvContext* context, float x, float y);
 
