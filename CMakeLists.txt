@@ -28,6 +28,7 @@ set(SOURCE_FILES
         src/flatvectors/triangulate.cpp
         src/flatvectors/utf8.cpp)
 
-add_library(Flat SHARED ${SOURCE_FILES})
+#add_library(Flat SHARED ${SOURCE_FILES})
+add_executable(Flat ${SOURCE_FILES} main.cpp)
 
 target_link_libraries(Flat opengl32 gdi32 glfw3.a)

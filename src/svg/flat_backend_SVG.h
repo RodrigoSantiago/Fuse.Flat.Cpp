@@ -58,10 +58,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetAntiAlias
 /*
  * Class:     flat_backend_SVG
  * Method:    SetStroke
- * Signature: (JFIIF)V
+ * Signature: (JFIIF[FF)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetStroke
-  (JNIEnv *, jclass, jlong, jfloat, jint, jint, jfloat);
+  (JNIEnv *, jclass, jlong, jfloat, jint, jint, jfloat, jfloatArray, jfloat);
 
 /*
  * Class:     flat_backend_SVG

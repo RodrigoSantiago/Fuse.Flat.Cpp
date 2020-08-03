@@ -491,12 +491,16 @@ void fv__curvestroke(void* data, double x, double y) {
     if (fv__equals(x, y, ctx->cx, ctx->cy)) {
         ctx->cp = 3;
     } else {
-        fv__linestroke(ctx, ctx->cp == 0, ctx->cx, ctx->cy, (float) x, (float) y,
-                       ctx->cp == 3 ? JOIN_ROUND :
-                       (ctx->cp == 2 ? JOIN_ROUND : ctx->stroker.join));
-        ctx->cp = 2;
-        ctx->cx = (float) x;
-        ctx->cy = (float) y;
+        if (ctx->stroker.dash != 0) {
+
+        } else {
+            fv__linestroke(ctx, ctx->cp == 0, ctx->cx, ctx->cy, (float) x, (float) y,
+                           ctx->cp == 3 ? JOIN_ROUND :
+                           (ctx->cp == 2 ? JOIN_ROUND : ctx->stroker.join));
+            ctx->cp = 2;
+            ctx->cx = (float) x;
+            ctx->cy = (float) y;
+        }
     }
 }
 
@@ -509,6 +513,122 @@ void fv__curvepoint(void* data, double x, double y) {
     fv__vertex(ctx, (float) x, (float) y);
     ctx->cx = (float) x;
     ctx->cy = (float) y;
+}
+
+void fv__dashmove(fvContext* ctx, float x, float y) {
+    ctx->phaseFill = 1;
+    ctx->phaseIndex = 0;
+
+    float amount = ctx->stroker.dashPhase;
+    while(amount > ctx->stroker.dash[ctx->phaseIndex]) {
+        amount -= ctx->stroker.dash[ctx->phaseIndex];
+        if (++ctx->phaseIndex >= ctx->stroker.dashCount) ctx->phaseIndex = 0;
+        ctx->phaseFill = !ctx->phaseFill;
+    }
+    ctx->phaseNext = ctx->stroker.dash[ctx->phaseIndex] - amount;
+
+    ctx->open = false;
+    ctx->sft = 0;
+    ctx->px = x;
+    ctx->py = y;
+    ctx->dSx = x;
+    ctx->dSy = y;
+    ctx->startFill = ctx->phaseFill;
+}
+
+void fv__dashline(fvContext* ctx, float x, float y) {
+    if (ctx->sft == 0) {
+        ctx->sft = 1;
+        ctx->sfx = x;
+        ctx->sfy = y;
+    }
+
+    double vx = x - ctx->px;
+    double vy = y - ctx->py;
+    double len = sqrt(vx * vx + vy * vy);
+    if (len < 0.001) {
+        ctx->dashCommand = 0;
+        if (!ctx->open) fvPathMoveTo(ctx, ctx->px, ctx->py);
+        fvPathLineTo(ctx, x, y);
+        ctx->open = true;
+        ctx->dashCommand = 1;
+        return;
+    }
+    vx /= len;
+    vy /= len;
+
+    float prevX = ctx->px;
+    float prevY = ctx->py;
+    double cLen = 0;
+    while (len > ctx->phaseNext) {
+        cLen += ctx->phaseNext;
+        float nx = (float) (ctx->px + vx * cLen);
+        float ny = (float) (ctx->py + vy * cLen);
+        if (ctx->phaseFill) {
+            ctx->dashCommand = 0;
+            if (!ctx->open) fvPathMoveTo(ctx, prevX, prevY);
+            fvPathLineTo(ctx, nx, ny);
+
+            if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+                fv__linecap(ctx);
+            }
+            ctx->ft = 0;
+            ctx->lt = -1;
+            ctx->bInd = ctx->vInd;
+            ctx->mInd = ctx->vInd;
+
+            ctx->open = false;
+            ctx->dashCommand = 1;
+        }
+        prevX = nx;
+        prevY = ny;
+        len -= ctx->phaseNext;
+
+        if (++ctx->phaseIndex >= ctx->stroker.dashCount) ctx->phaseIndex = 0;
+        ctx->phaseNext = ctx->stroker.dash[ctx->phaseIndex];
+        ctx->phaseFill = !ctx->phaseFill;
+    }
+    if (len > 0.001) {
+        ctx->phaseNext -= len;
+        if (ctx->phaseFill) {
+            ctx->dashCommand = 0;
+            if (!ctx->open) fvPathMoveTo(ctx, prevX, prevY);
+            fvPathLineTo(ctx, x, y);
+            ctx->open = true;
+            ctx->dashCommand = 1;
+        }
+    }
+    ctx->px = x;
+    ctx->py = y;
+}
+
+void fv__dashclose(fvContext* ctx) {
+    fv__dashline(ctx, ctx->dSx, ctx->dSy);
+    if (ctx->phaseFill && ctx->startFill) {
+        // fv__linejoincap(ctx, ctx->dSx, ctx->dSy);
+
+        if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+            fv__linecap(ctx);
+        }
+        float _px1, _sx1, _py1, _sy1, _px2, _sx2, _py2, _sy2;
+        fv__expandline(ctx->stroker.width, ctx->dSx, ctx->dSy, ctx->sfx, ctx->sfy, _px1, _py1, _px2, _py2, _sx1, _sy1, _sx2, _sy2);
+        fv__linejoin(ctx, ctx->dSx, ctx->dSy, _px1, _sx1, _py1, _sy1, _px2, _sx2, _py2, _sy2, ctx->stroker.join);
+    }
+    ctx->ft = 0;
+    ctx->lt = -1;
+    ctx->bInd = ctx->vInd;
+    ctx->mInd = ctx->vInd;
+    ctx->open = false;
+}
+
+void fv__dashend(fvContext* ctx) {
+    if (ctx->open) {
+        ctx->dashCommand = 0;
+        fvPathEnd(ctx);
+        ctx->dashCommand = 1;
+    } else {
+        fv__commit(ctx);
+    }
 }
 
 fvContext* fvCreate() {
@@ -531,7 +651,7 @@ fvContext* fvCreate() {
     ctx->transform[4] = 0.0f;
     ctx->transform[5] = 0.0f;
 
-    ctx->stroker = {1, CAP_BUTT, JOIN_MITER, 10};
+    ctx->stroker = {1, CAP_BUTT, JOIN_MITER, 10, 0, 0, 0};
     ctx->mt2 = (ctx->stroker.width * ctx->stroker.miterLimit / 2) * (ctx->stroker.width * ctx->stroker.miterLimit / 2);
 
     ctx->lt = -1;
@@ -599,6 +719,9 @@ void fvSetPaint(fvContext* ctx, fvPaint paint) {
 }
 
 void fvSetStroker(fvContext* ctx, fvStroker stroker) {
+    if (ctx->stroker.dash != 0) {
+        free(ctx->stroker.dash);
+    }
     ctx->stroker = stroker;
     ctx->mt2 = (ctx->stroker.width * ctx->stroker.miterLimit / 2) * (ctx->stroker.width * ctx->stroker.miterLimit / 2);
 }
@@ -623,12 +746,22 @@ void fvPathBegin(fvContext* ctx, fvPathOp op, fvWindingRule wr) {
     ctx->bInd = ctx->vInd;
     ctx->mInd = ctx->vInd;
     ctx->sInd = 0;
+
+    if (ctx->op == STROKE) {
+        ctx->dashCommand = ctx->stroker.dash != 0;
+        ctx->phaseIndex = 0;
+        ctx->phaseNext = 0;
+        ctx->phaseFill = 1;
+        ctx->open = false;
+    }
 }
 
 void fvPathMoveTo(fvContext* ctx, float x, float y) {
     ctx->mx = x;
     ctx->my = y;
-    if (ctx->op == STROKE) {
+    if (ctx->op == STROKE && ctx->dashCommand) {
+        fv__dashmove(ctx, x, y);
+    } else if (ctx->op == STROKE) {
         if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
             fv__linecap(ctx);
         }
@@ -653,7 +786,9 @@ void fvPathMoveTo(fvContext* ctx, float x, float y) {
 void fvPathLineTo(fvContext* ctx, float x, float y) {
     if (fv__equals(x, y, ctx->lx, ctx->ly)) return;
 
-    if (ctx->op == STROKE) {
+    if (ctx->op == STROKE && ctx->dashCommand) {
+        fv__dashline(ctx, x, y);
+    } else if (ctx->op == STROKE) {
         fv__linestroke(ctx, ctx->lt == 0, ctx->lx, ctx->ly, x, y, ctx->stroker.join);
     } else {
         fv__assert(ctx, 1, 0);
@@ -698,7 +833,9 @@ void fvPathCubicTo(fvContext* ctx, float cx1, float cy1, float cx2, float cy2, f
 }
 
 void fvPathClose(fvContext* ctx) {
-    if (ctx->op == STROKE) {
+    if (ctx->op == STROKE && ctx->dashCommand) {
+        fv__dashclose(ctx);
+    } else if (ctx->op == STROKE) {
         fvPathLineTo(ctx, ctx->mx, ctx->my);
         if (ctx->mInd != ctx->vInd) {
             fv__linejoincap(ctx, ctx->mx, ctx->my);
@@ -716,6 +853,8 @@ void fvPathClose(fvContext* ctx) {
 void fvPathEnd(fvContext* ctx) {
     if (ctx->op == TEXT) {
 
+    } else if (ctx->op == STROKE && ctx->dashCommand) {
+        fv__dashend(ctx);
     } else if (ctx->op == STROKE) {
         if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
             fv__linecap(ctx);

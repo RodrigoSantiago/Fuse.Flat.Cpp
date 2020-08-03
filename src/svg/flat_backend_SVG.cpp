@@ -40,10 +40,30 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetAntiAlias(JNIEnv * jEnv, jclass 
     fvAntiAlias((fvContext*) context, enabled == 1 ? 1 : 0);
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetStroke(JNIEnv * jEnv, jclass jClass, jlong context, jfloat width, jint cap, jint join, jfloat mitter) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetStroke(JNIEnv * jEnv, jclass jClass, jlong context, jfloat width, jint cap, jint join, jfloat mitter, jfloatArray dash, jfloat dashPhase) {
     fvCap _cap = cap == 0 ? fvCap::CAP_BUTT : cap == 1 ? fvCap::CAP_SQUARE : fvCap::CAP_ROUND;
     fvJoin _join = join == 0 ? fvJoin::JOIN_BEVEL : join == 1 ? fvJoin::JOIN_MITER : fvJoin::JOIN_ROUND;
-    fvSetStroker((fvContext *) context, {width, _cap, _join, mitter});
+    int dashCount = 0;
+    float* dashArr = 0;
+    if (dash != 0) {
+        float *_dash = (float *) jEnv->GetPrimitiveArrayCritical(dash, 0);
+        dashCount = jEnv->GetArrayLength(dash);
+        dashArr = (float*) malloc(dashCount * sizeof(float));
+        memcpy(dashArr, _dash, dashCount * sizeof(float));
+        jEnv->ReleasePrimitiveArrayCritical(dash, _dash,0);
+
+        float limit = 0;
+        for (int i = 0; i < dashCount; ++i) {
+            limit += dashArr[i];
+        }
+        if (dashCount % 2 == 1) limit *= 2;
+        if (dashPhase > 0) {
+            dashPhase = dashPhase - ((int)(dashPhase / limit) * limit);
+        } else {
+            dashPhase = limit - ((-dashPhase) - ((int)((-dashPhase) / limit) * limit));
+        }
+    }
+    fvSetStroker((fvContext *) context, {width, _cap, _join, mitter, dashPhase, dashCount, dashArr});
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintColor(JNIEnv * jEnv, jclass jClass, jlong context, jint color) {

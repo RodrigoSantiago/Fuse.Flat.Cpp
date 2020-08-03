@@ -52,6 +52,10 @@ typedef struct fvStroker {
     fvCap cap;
     fvJoin join;
     float miterLimit;
+
+    float dashPhase;
+    int dashCount;
+    float* dash;
 } fvStroker;
 
 typedef struct fvGlyph {
@@ -114,6 +118,9 @@ typedef struct fvContext {
     float lt, lx, ly;   // last operation
     float ft, fx, fy;   // first pos move operation [cap]
     float mx, my;       // move x move y
+
+    float phaseNext, px, py, dSx, dSy, sft, sfx, sfy;
+    int phaseIndex, phaseFill, open, dashCommand, startFill;
 
     int MPAINT;         // Max paints count
     int MSHAPE;         // Max shapes per path
