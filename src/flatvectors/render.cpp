@@ -11,12 +11,16 @@ const char *vertexSource =
         "layout (location = 0) in vec2 iPos;\n"
         "layout (location = 1) in vec2 iTex;\n"
         "uniform vec2 view;\n"
+        "uniform mat3 mat;\n"
         "out vec2 oPos;\n"
         "out vec2 oTex;\n"
         "void main() {\n"
         "   oPos = iPos;\n"
         "   oTex = iTex;\n"
-        "	gl_Position = vec4(iPos.x * 2.0 / view.x - 1.0, 1.0 - iPos.y * 2.0 / view.y, 0, 1);\n"
+        "   vec2 pos;"
+        "   pos.x = iPos.x * mat[0][0] + iPos.y * mat[0][2] + mat[1][1];\n"
+        "   pos.y = iPos.x * mat[0][1] + iPos.y * mat[1][0] + mat[1][2];\n"
+        "	gl_Position = vec4(pos.x * 2.0 / view.x - 1.0, 1.0 - pos.y * 2.0 / view.y, 0, 1);\n"
         "}\0";
 
 const char *fragmentSource =
@@ -105,7 +109,7 @@ typedef struct fvGLData {
     GLuint image0, image1;
 
     GLuint shader;
-    GLint viewID, texID, fntID, sdfID, stcID;
+    GLint viewID, matID, texID, fntID, sdfID, stcID;
 
     int aa, sdf;
     unsigned int width, height;
@@ -160,6 +164,7 @@ void* renderCreate() {
     GLuint paintIndex = glGetUniformBlockIndex(ctx->shader, "Paint");
     glUniformBlockBinding(ctx->shader, paintIndex, 0);
     ctx->viewID = glGetUniformLocation(ctx->shader, "view");
+    ctx->matID = glGetUniformLocation(ctx->shader, "mat");
     ctx->texID = glGetUniformLocation(ctx->shader, "tex");
     ctx->fntID = glGetUniformLocation(ctx->shader, "fnt");
     ctx->sdfID = glGetUniformLocation(ctx->shader, "sdf");
@@ -182,30 +187,34 @@ void renderAlloc(void * data, int paint, int element, int vertex) {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    if (ctx->vertex != vertex || ctx->element != element) {
+    glBindVertexArray(ctx->vao);
+
+    // Vertices + UVs
+    if (ctx->vertex != vertex) {
         ctx->vertex = vertex;
-        ctx->element = element;
 
-        glBindVertexArray(ctx->vao);
-
-        // Vertices + UVs
         glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo);
         glBufferData(GL_ARRAY_BUFFER, vertex * sizeof(float) * 2, NULL, GL_STATIC_DRAW);
-
-        // Elements
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, element * sizeof(short), NULL, GL_STATIC_DRAW);
-
-        // pos
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) 0);
-        glEnableVertexAttribArray(0);
-
-        // uv
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) (vertex * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        glBindVertexArray(0);
     }
+
+    // Elements
+    if (ctx->element != element) {
+        ctx->element = element;
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, element * sizeof(int), NULL, GL_STATIC_DRAW);
+
+    }
+
+    // pos
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+
+    // uv
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) (vertex * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
 }
 
 void renderDestroy(void *data) {
@@ -230,6 +239,7 @@ void renderBegin(void *data, unsigned int width, unsigned int height) {
 
     glUseProgram(ctx->shader);
     glUniform2f(ctx->viewID, width, height);
+    // glUniformMatrix3fv(ctx->matID, 1, 0, *);
     glUniform1i(ctx->texID, 0);
     glUniform1i(ctx->fntID, 1);
     glUniform1i(ctx->sdfID, 0);
@@ -281,26 +291,30 @@ void renderClearClip(void* data, int clip) {
 }
 
 void render__triangles(int pos, int length) {
-    glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_SHORT, (void*) (pos * sizeof(short)));
+    glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int)));
 }
 
 void renderFlush(void *data,
                  fvPaint *paints, int pSize,
-                 short* elements, int eSize,
+                 int* elements, int eSize,
                  float *vtx, float *uvs, int vSize) {
     fvGLData* ctx = (fvGLData*) data;
 
     glBufferSubData(GL_UNIFORM_BUFFER, 0, pSize * sizeof(fvPaint), paints);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, eSize * sizeof(short), elements);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, eSize * sizeof(int), elements);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vSize * sizeof(float), vtx);
     glBufferSubData(GL_ARRAY_BUFFER, ctx->vertex * sizeof(float), vSize * sizeof(float), uvs);
 
+    const int offset = (sizeof(unsigned long) * 4) + sizeof(float[12]);
     GLsizei pos = 0;
     for (int i = 0; i < pSize; i++) {
         // Exclude size, antealiasing and images info
         glBindBufferRange(GL_UNIFORM_BUFFER, 0, ctx->ubo,
-                          i * sizeof(fvPaint) + sizeof(unsigned long) * 4,
-                          sizeof(fvPaint) - sizeof(unsigned long) * 4);
+                i * sizeof(fvPaint) + offset,
+                    sizeof(fvPaint) - offset);
+
+        glUniformMatrix3fv(ctx->matID, 1, 0, paints[i].mat);
+
         fvPaint &p = paints[i];
         int aa = (int) ((p.edgeAA & 0x1));
         int sd = (int) ((p.edgeAA & 0x2) >> 1);

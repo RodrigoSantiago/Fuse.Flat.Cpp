@@ -105,7 +105,7 @@ int fv__realloc(fvContext* ctx, int paint, int shape, int element, int vertex) {
         int n = ctx->MELEMENT == 0 ? 1 : ctx->MELEMENT;
         while (n < element) n *= 2;
         ctx->MELEMENT = n;
-        ctx->elements = (short *) realloc(ctx->elements, n * sizeof(short));
+        ctx->elements = (int *) realloc(ctx->elements, n * sizeof(int));
     }
     if (ctx->MVERTEX < vertex) {
         int n = ctx->MVERTEX == 0 ? 1 : ctx->MVERTEX;
@@ -116,6 +116,16 @@ int fv__realloc(fvContext* ctx, int paint, int shape, int element, int vertex) {
     }
 
     if (ctx->paints == 0 || ctx->shapes == 0 || ctx->elements == 0 || ctx->vtx == 0 || ctx->uvs == 0) {
+        free(ctx->paints);
+        free(ctx->shapes);
+        free(ctx->elements);
+        free(ctx->vtx);
+        free(ctx->uvs);
+        ctx->paints = 0;
+        ctx->shapes = 0;
+        ctx->elements = 0;
+        ctx->vtx = 0;
+        ctx->uvs = 0;
         return 0;
     } else {
         renderAlloc(ctx->rCtx, paint, element, vertex);
@@ -129,7 +139,7 @@ int fv__flush(fvContext* ctx) {
 
         int offSet = (ctx->_vInd) / 2;
         for (int i = ctx->_eInd; i < ctx->eInd; i++) {
-            ctx->elements[i - ctx->_eInd] = (short) (ctx->elements[i] - offSet);
+            ctx->elements[i - ctx->_eInd] = (ctx->elements[i] - offSet);
         }
         memmove(&ctx->vtx[0], &ctx->vtx[ctx->_vInd], (ctx->vInd - ctx->_vInd) * sizeof(float));
         memmove(&ctx->uvs[0], &ctx->uvs[ctx->_vInd], (ctx->vInd - ctx->_vInd) * sizeof(float));
@@ -143,19 +153,11 @@ int fv__flush(fvContext* ctx) {
         ctx->bInd = 0;
         return offSet;
     } else {
-        std::cout << "nothing to flush" << std::endl;
-        return 0;
+        return -1;
     }
 }
 
 void fv__commit(fvContext* ctx) {
-    // TODO - TRANSFER TO VERTEX SHADER !!!
-    for (int i = ctx->bInd; i < ctx->vInd; i += 2) {
-        float x = ctx->vtx[i], y = ctx->vtx[i + 1];
-        ctx->vtx[i] = x * ctx->transform[0] + y * ctx->transform[2] + ctx->transform[4];
-        ctx->vtx[i + 1] = x * ctx->transform[1] + y * ctx->transform[3] + ctx->transform[5];
-    }
-
     if (ctx->pInd + 1 >= ctx->MPAINT) {
         fv__flush(ctx);
     }
@@ -187,6 +189,10 @@ void fv__commit(fvContext* ctx) {
         drawpaint.image1 = 0;
     }
 
+    for (int i = 0; i < 6; i++) {
+        drawpaint.mat[i] = ctx->transform[i];
+    }
+
     fv__multiply(drawpaint.colorMat, ctx->transform);
     fv__inverse(drawpaint.colorMat, drawpaint.colorMat);
     fv__affineToMat4(drawpaint.colorMat, drawpaint.colorMat);
@@ -205,7 +211,13 @@ void fv__commit(fvContext* ctx) {
 
 int fv__assert(fvContext* ctx, int vertex, int element) {
     if (ctx->vInd + vertex * 2 >= ctx->MVERTEX || ctx->eInd + element * 3 >= ctx->MELEMENT) {
-        return fv__flush(ctx);
+        int offSet = fv__flush(ctx);
+        if (offSet == -1) {
+            fv__realloc(ctx, ctx->MPAINT, ctx->MSHAPE, ctx->MELEMENT + element, ctx->MVERTEX + vertex);
+            return 0;
+        } else {
+            return offSet;
+        }
     } else {
         return 0;
     }
@@ -213,8 +225,9 @@ int fv__assert(fvContext* ctx, int vertex, int element) {
 
 int fv__vertex(fvContext* ctx, float x, float y) {
     if (ctx->vInd + 2 >= ctx->MVERTEX) {
-        fv__flush(ctx);
-        std::cout << "flat:invalid flush vertex" << std::endl;
+        if (fv__flush(ctx) == -1) {
+            fv__realloc(ctx, ctx->MPAINT, ctx->MSHAPE, ctx->MELEMENT, ctx->MVERTEX + 2);
+        }
     }
 
     ctx->vtx[ctx->vInd] = x;
@@ -226,8 +239,9 @@ int fv__vertex(fvContext* ctx, float x, float y) {
 
 void fv__text_vertex(fvContext* ctx, float x, float y, float u, float v) {
     if (ctx->vInd + 2 >= ctx->MVERTEX) {
-        fv__flush(ctx);
-        std::cout << "flat:invalid flush text vertex" << std::endl;
+        if (fv__flush(ctx) == -1) {
+            fv__realloc(ctx, ctx->MPAINT, ctx->MSHAPE, ctx->MELEMENT, ctx->MVERTEX + 2);
+        }
     }
 
     ctx->vtx[ctx->vInd] = x;
@@ -240,15 +254,18 @@ void fv__text_vertex(fvContext* ctx, float x, float y, float u, float v) {
 void fv__triangle(fvContext* ctx, int e01, int e02, int e03) {
     if (ctx->eInd + 3 >= ctx->MELEMENT) {
         int offSet = fv__flush(ctx);
-        e01 -= offSet;
-        e02 -= offSet;
-        e03 -= offSet;
-        std::cout << "flat:invalid flush elements" << std::endl;
+        if (offSet == -1) {
+            fv__realloc(ctx, ctx->MPAINT, ctx->MSHAPE, ctx->MELEMENT + 3, ctx->MVERTEX);
+        } else {
+            e01 -= offSet;
+            e02 -= offSet;
+            e03 -= offSet;
+        }
     }
 
-    ctx->elements[ctx->eInd] = (short) e01;
-    ctx->elements[ctx->eInd + 1] = (short) e02;
-    ctx->elements[ctx->eInd + 2] = (short) e03;
+    ctx->elements[ctx->eInd] = e01;
+    ctx->elements[ctx->eInd + 1] = e02;
+    ctx->elements[ctx->eInd + 2] = e03;
     ctx->eInd += 3;
 }
 

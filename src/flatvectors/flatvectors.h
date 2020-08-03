@@ -34,6 +34,8 @@ typedef struct fvPaint {
     unsigned long int edgeAA;   //[paint][winding][convex][sdf][aa]
     unsigned long int image0;
     unsigned long int image1;
+    float mat[12];
+
     float type;                 // [0] - Color, [1] - Image, [2] - Colored-Image, [3] - Text
     float joinType;             // Round / Bevel
     float cycleType;            // Keep / Loop / Reflect
@@ -127,7 +129,7 @@ typedef struct fvContext {
     int sInd, bInd;         // shade index, begin vertex index
 
     // Elements
-    short* elements;
+    int* elements;
     int eInd,_eInd;         // element index, element commited index
 
     // Vertexes

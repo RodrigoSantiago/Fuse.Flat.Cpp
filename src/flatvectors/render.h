@@ -21,7 +21,7 @@ void renderClearClip(void* data, int clip);
 
 void renderFlush(void *data,
                  fvPaint *paints, int pSize,
-                 short* elements, int eSize,
+                 int* elements, int eSize,
                  float *vtx, float *uvs, int vSize);
 
 unsigned long renderCreateFontTexture(void* data, int width, int height);
