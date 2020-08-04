@@ -29,13 +29,8 @@ enum fvWindingRule {
     EVEN_ODD, NON_ZERO
 };
 
-typedef struct fvPaint {
-    unsigned long int size;
-    unsigned long int edgeAA;   //[paint][winding][convex][sdf][aa]
-    unsigned long int image0;
-    unsigned long int image1;
-    float mat[12];
-
+typedef struct fvUniform {
+    // Buffer
     float type;                 // [0] - Color, [1] - Image, [2] - Colored-Image, [3] - Text
     float joinType;             // Round / Bevel
     float cycleType;            // Keep / Loop / Reflect
@@ -45,6 +40,16 @@ typedef struct fvPaint {
     float shape[4];             // Extent[0,1], Radius [2], Feather [3]
     float stops[16];
     float colors[64];
+} fvUniform;
+
+typedef struct fvPaint {
+    unsigned long int size;
+    unsigned long int edgeAA;   //[paint][winding][convex][sdf][aa]
+    unsigned long int image0;
+    unsigned long int image1;
+    float mat[12];
+
+    fvUniform uniform;
 } fvPaint;
 
 typedef struct fvStroker {
@@ -129,6 +134,7 @@ typedef struct fvContext {
 
     // Paints
     fvPaint* paints;
+    char* uniforms;
     int pInd;               // paint index
 
     // Triangulation

@@ -9,6 +9,8 @@
 
 void* renderCreate();
 
+int renderAlign();
+
 void renderAlloc(void* data, int paint, int element, int vertex);
 
 void renderDestroy(void *data);
@@ -20,7 +22,7 @@ void renderEnd(void *data);
 void renderClearClip(void* data, int clip);
 
 void renderFlush(void *data,
-                 fvPaint *paints, int pSize,
+                 fvPaint *paints, void* uniforms, int pSize,
                  int* elements, int eSize,
                  float *vtx, float *uvs, int vSize);
 

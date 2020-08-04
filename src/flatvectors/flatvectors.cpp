@@ -94,6 +94,7 @@ int fv__realloc(fvContext* ctx, int paint, int shape, int element, int vertex) {
         while (n < paint) n *= 2;
         ctx->MPAINT = n;
         ctx->paints = (fvPaint *) realloc(ctx->paints, n * sizeof(fvPaint));
+        ctx->uniforms = (char *) realloc(ctx->uniforms, n * renderAlign());
     }
     if (ctx->MSHAPE < shape) {
         int n = ctx->MSHAPE == 0 ? 1 : ctx->MSHAPE;
@@ -115,8 +116,10 @@ int fv__realloc(fvContext* ctx, int paint, int shape, int element, int vertex) {
         ctx->uvs = (float *) realloc(ctx->uvs, n * sizeof(float));
     }
 
-    if (ctx->paints == 0 || ctx->shapes == 0 || ctx->elements == 0 || ctx->vtx == 0 || ctx->uvs == 0) {
+    if (ctx->paints == 0 || ctx->uniforms == 0 || ctx->shapes == 0 ||
+            ctx->elements == 0 || ctx->vtx == 0 || ctx->uvs == 0) {
         free(ctx->paints);
+        free(ctx->uniforms);
         free(ctx->shapes);
         free(ctx->elements);
         free(ctx->vtx);
@@ -135,7 +138,8 @@ int fv__realloc(fvContext* ctx, int paint, int shape, int element, int vertex) {
 
 int fv__flush(fvContext* ctx) {
     if (ctx->pInd > 0) {
-        renderFlush(ctx->rCtx, ctx->paints, ctx->pInd, ctx->elements, ctx->_eInd, ctx->vtx, ctx->uvs, ctx->_vInd);
+        renderFlush(ctx->rCtx, ctx->paints, ctx->uniforms, ctx->pInd,
+                ctx->elements, ctx->_eInd, ctx->vtx, ctx->uvs, ctx->_vInd);
 
         int offSet = (ctx->_vInd) / 2;
         for (int i = ctx->_eInd; i < ctx->eInd; i++) {
@@ -173,11 +177,11 @@ void fv__commit(fvContext* ctx) {
                            ((ctx->font->sdf ? 1 : 0) << 1) |
                            (0)                     /*<< 0*/;
 
-        if (drawpaint.type == 0) {
-            drawpaint.type = 3;
+        if (drawpaint.uniform.type == 0) {
+            drawpaint.uniform.type = 3;
         }
-        if (drawpaint.type == 1) {
-            drawpaint.type = 2;
+        if (drawpaint.uniform.type == 1) {
+            drawpaint.uniform.type = 2;
         }
         drawpaint.image1 = ctx->font->imageID;
     } else {
@@ -193,15 +197,17 @@ void fv__commit(fvContext* ctx) {
         drawpaint.mat[i] = ctx->transform[i];
     }
 
-    fv__multiply(drawpaint.colorMat, ctx->transform);
-    fv__inverse(drawpaint.colorMat, drawpaint.colorMat);
-    fv__affineToMat4(drawpaint.colorMat, drawpaint.colorMat);
+    fv__multiply(drawpaint.uniform.colorMat, ctx->transform);
+    fv__inverse(drawpaint.uniform.colorMat, drawpaint.uniform.colorMat);
+    fv__affineToMat4(drawpaint.uniform.colorMat, drawpaint.uniform.colorMat);
 
-    fv__multiply(drawpaint.imageMat, ctx->transform);
-    fv__inverse(drawpaint.imageMat, drawpaint.imageMat);
-    fv__affineToMat4(drawpaint.imageMat, drawpaint.imageMat);
+    fv__multiply(drawpaint.uniform.imageMat, ctx->transform);
+    fv__inverse(drawpaint.uniform.imageMat, drawpaint.uniform.imageMat);
+    fv__affineToMat4(drawpaint.uniform.imageMat, drawpaint.uniform.imageMat);
 
     ctx->paints[ctx->pInd] = drawpaint;
+    memcpy(&ctx->uniforms[ctx->pInd * renderAlign()], &drawpaint.uniform, sizeof(fvUniform));
+
     ctx->pInd++;
     ctx->_vInd = ctx->vInd;
     ctx->_eInd = ctx->eInd;
@@ -746,6 +752,7 @@ void fvPathBegin(fvContext* ctx, fvPathOp op, fvWindingRule wr) {
     ctx->bInd = ctx->vInd;
     ctx->mInd = ctx->vInd;
     ctx->sInd = 0;
+    ctx->convex = 0;
 
     if (ctx->op == STROKE) {
         ctx->dashCommand = ctx->stroker.dash != 0;
@@ -873,7 +880,7 @@ void fvPathEnd(fvContext* ctx) {
         int shapesCount = ctx->sInd;
         for (int i = 0; i < shapesCount; i++) {
             int len = ctx->shapes[i] / 2;
-            if (i == 0) {
+            /*if (i == 0) {
                 for (int j = 1; j < len - 1; j++) {
                     fv__triangle(ctx, src, pid + j, j == len - 1 ? pid : pid + j + 1);
                 }
@@ -881,6 +888,9 @@ void fvPathEnd(fvContext* ctx) {
                 for (int j = 0; j < len; j++) {
                     fv__triangle(ctx, src, pid + j, j == len - 1 ? pid : pid + j + 1);
                 }
+            }*/
+            for (int j = 1; j < len - 1; j++) {
+                fv__triangle(ctx, pid, pid + j, pid + j + 1);
             }
             pid += len;
         }
@@ -1163,37 +1173,37 @@ void fv__identity(float* t) {
 
 fvPaint fvColorPaint(long color) {
     fvPaint p = fvImagePaint(0, 0, color);
-    p.type = 0;
+    p.uniform.type = 0;
     return p;
 }
 
 fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
     fvPaint p{};
-    p.type = 1;
+    p.uniform.type = 1;
     p.image0 = imageID;
     p.image1 = 0;
     if (affineImg != 0) {
         for (int i = 0; i < 6; i++) {
-            p.imageMat[i] = affineImg[i];
+            p.uniform.imageMat[i] = affineImg[i];
         }
     } else {
-        fv__identity(p.imageMat);
+        fv__identity(p.uniform.imageMat);
     }
 
-    fv__identity(p.colorMat);
+    fv__identity(p.uniform.colorMat);
 
-    p.shape[0] = 0;
-    p.shape[1] = 0;
-    p.shape[2] = 0;
-    p.shape[3] = 0;
+    p.uniform.shape[0] = 0;
+    p.uniform.shape[1] = 0;
+    p.uniform.shape[2] = 0;
+    p.uniform.shape[3] = 0;
 
-    p.stopCount = 0;
-    p.joinType = 0;
-    p.colors[0] = ((color >> 24) & 0xFF) / 255.f;
-    p.colors[1] = ((color >> 16) & 0xFF) / 255.f;
-    p.colors[2] = ((color >> 8) & 0xFF) / 255.f;
-    p.colors[3] = ((color >> 0) & 0xFF) / 255.f;
-    p.cycleType = 0;
+    p.uniform.stopCount = 0;
+    p.uniform.joinType = 0;
+    p.uniform.colors[0] = ((color >> 24) & 0xFF) / 255.f;
+    p.uniform.colors[1] = ((color >> 16) & 0xFF) / 255.f;
+    p.uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
+    p.uniform.colors[3] = ((color >> 0) & 0xFF) / 255.f;
+    p.uniform.cycleType = 0;
     p.edgeAA = 0;
 
     return p;
@@ -1201,33 +1211,33 @@ fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
 
 fvPaint fvLinearGradientPaint(float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p = fvLinearGradientImagePaint(0, 0, affine, x1, y1, x2, y2, count, stops, colors, cycleMethod);
-    p.type = 0;
+    p.uniform.type = 0;
     return p;
 }
 
 fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float rOut, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p = fvRadialGradientImagePaint(0, 0, affine, x, y, rIn, rOut, count, stops, colors, cycleMethod);
-    p.type = 0;
+    p.uniform.type = 0;
     return p;
 }
 
 fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p = fvBoxGradientImagePaint(0, 0, affine, x, y, w, h, r, f, count, stops, colors, cycleMethod);
-    p.type = 0;
+    p.uniform.type = 0;
     return p;
 }
 
 fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p{};
-    p.type = 1;
+    p.uniform.type = 1;
     p.image0 = imageID;
     p.image1 = 0;
     if (affineImg != 0) {
         for (int i = 0; i < 6; i++) {
-            p.imageMat[i] = affineImg[i];
+            p.uniform.imageMat[i] = affineImg[i];
         }
     } else {
-        fv__identity(p.imageMat);
+        fv__identity(p.uniform.imageMat);
     }
 
     float dx, dy, d;
@@ -1244,29 +1254,29 @@ fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, floa
         dy = 1;
     }
 
-    p.colorMat[0] = dy;
-    p.colorMat[1] = -dx;
-    p.colorMat[2] = dx;
-    p.colorMat[3] = dy;
-    p.colorMat[4] = x1 - dx * large;
-    p.colorMat[5] = y1 - dy * large;
-    fv__multiply(p.colorMat, affine);
+    p.uniform.colorMat[0] = dy;
+    p.uniform.colorMat[1] = -dx;
+    p.uniform.colorMat[2] = dx;
+    p.uniform.colorMat[3] = dy;
+    p.uniform.colorMat[4] = x1 - dx * large;
+    p.uniform.colorMat[5] = y1 - dy * large;
+    fv__multiply(p.uniform.colorMat, affine);
 
-    p.shape[0] = large;
-    p.shape[1] = large + d * 0.5f;
-    p.shape[2] = 0.0f;
-    p.shape[3] = d < 1.0f ? 1.0f : d;
+    p.uniform.shape[0] = large;
+    p.uniform.shape[1] = large + d * 0.5f;
+    p.uniform.shape[2] = 0.0f;
+    p.uniform.shape[3] = d < 1.0f ? 1.0f : d;
 
-    p.stopCount = count - 1;
-    p.joinType = 0;
+    p.uniform.stopCount = count - 1;
+    p.uniform.joinType = 0;
     for (int i = 0; i < count; i++) {
-        p.stops[i] = stops[i];
-        p.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
-        p.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
-        p.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
-        p.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
+        p.uniform.stops[i] = stops[i];
+        p.uniform.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
     }
-    p.cycleType = cycleMethod;
+    p.uniform.cycleType = cycleMethod;
     p.edgeAA = 0;
 
     return p;
@@ -1274,43 +1284,43 @@ fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, floa
 
 fvPaint fvRadialGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x, float y, float rIn, float rOut, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p{};
-    p.type = 1;
+    p.uniform.type = 1;
     p.image0 = imageID;
     p.image1 = 0;
     if (affineImg != 0) {
         for (int i = 0; i < 6; i++) {
-            p.imageMat[i] = affineImg[i];
+            p.uniform.imageMat[i] = affineImg[i];
         }
     } else {
-        fv__identity(p.imageMat);
+        fv__identity(p.uniform.imageMat);
     }
 
     float r = (rIn+rOut)*0.5f;
     float f = (rOut-rIn);
 
-    p.colorMat[0] = 1.0f;
-    p.colorMat[1] = 0.0f;
-    p.colorMat[2] = 0.0f;
-    p.colorMat[3] = 1.0f;
-    p.colorMat[4] = x;
-    p.colorMat[5] = y;
-    fv__multiply(p.colorMat, affine);
+    p.uniform.colorMat[0] = 1.0f;
+    p.uniform.colorMat[1] = 0.0f;
+    p.uniform.colorMat[2] = 0.0f;
+    p.uniform.colorMat[3] = 1.0f;
+    p.uniform.colorMat[4] = x;
+    p.uniform.colorMat[5] = y;
+    fv__multiply(p.uniform.colorMat, affine);
 
-    p.shape[0] = r;
-    p.shape[1] = r;
-    p.shape[2] = r;
-    p.shape[3] = f < 1.0f ? 1.0f : f;
+    p.uniform.shape[0] = r;
+    p.uniform.shape[1] = r;
+    p.uniform.shape[2] = r;
+    p.uniform.shape[3] = f < 1.0f ? 1.0f : f;
 
-    p.stopCount = count - 1;
-    p.joinType = 0;
+    p.uniform.stopCount = count - 1;
+    p.uniform.joinType = 0;
     for (int i = 0; i < count; i++) {
-        p.stops[i] = stops[i];
-        p.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
-        p.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
-        p.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
-        p.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
+        p.uniform.stops[i] = stops[i];
+        p.uniform.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
     }
-    p.cycleType = cycleMethod;
+    p.uniform.cycleType = cycleMethod;
     p.edgeAA = 0;
 
     return p;
@@ -1318,40 +1328,40 @@ fvPaint fvRadialGradientImagePaint(unsigned long imageID, float* affineImg, floa
 
 fvPaint fvBoxGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p{};
-    p.type = 1;
+    p.uniform.type = 1;
     p.image0 = imageID;
     p.image1 = 0;
     if (affineImg != 0) {
         for (int i = 0; i < 6; i++) {
-            p.imageMat[i] = affineImg[i];
+            p.uniform.imageMat[i] = affineImg[i];
         }
     } else {
-        fv__identity(p.imageMat);
+        fv__identity(p.uniform.imageMat);
     }
 
-    p.colorMat[0] = 1.0f;
-    p.colorMat[1] = 0.0f;
-    p.colorMat[2] = 0.0f;
-    p.colorMat[3] = 1.0f;
-    p.colorMat[4] = x + w * 0.5f;
-    p.colorMat[5] = y + h * 0.5f;
-    fv__multiply(p.colorMat, affine);
+    p.uniform.colorMat[0] = 1.0f;
+    p.uniform.colorMat[1] = 0.0f;
+    p.uniform.colorMat[2] = 0.0f;
+    p.uniform.colorMat[3] = 1.0f;
+    p.uniform.colorMat[4] = x + w * 0.5f;
+    p.uniform.colorMat[5] = y + h * 0.5f;
+    fv__multiply(p.uniform.colorMat, affine);
 
-    p.shape[0] = w * 0.5f;
-    p.shape[1] = h * 0.5f;
-    p.shape[2] = r;
-    p.shape[3] = f < 1.0f ? 1.0f : f;
+    p.uniform.shape[0] = w * 0.5f;
+    p.uniform.shape[1] = h * 0.5f;
+    p.uniform.shape[2] = r;
+    p.uniform.shape[3] = f < 1.0f ? 1.0f : f;
 
-    p.stopCount = count - 1;
-    p.joinType = 0;
+    p.uniform.stopCount = count - 1;
+    p.uniform.joinType = 0;
     for (int i = 0; i < count; i++) {
-        p.stops[i] = stops[i];
-        p.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
-        p.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
-        p.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
-        p.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
+        p.uniform.stops[i] = stops[i];
+        p.uniform.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
+        p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
     }
-    p.cycleType = cycleMethod;
+    p.uniform.cycleType = cycleMethod;
     p.edgeAA = 0;
 
     return p;
