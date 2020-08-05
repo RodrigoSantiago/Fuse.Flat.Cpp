@@ -107,6 +107,7 @@ typedef struct fvContext {
     float transform[6];
     float fontScale;
     float fontSpacing;
+    float fontBlur;
     int width, height;
     int aa;
 
@@ -218,6 +219,8 @@ void fvSetFont(fvContext* context, fvFont* font);
 void fvSetFontScale(fvContext* context, float scale);
 
 void fvSetFontSpacing(fvContext* context, float spacing);
+
+void fvSetFontBlur(fvContext* context, float blur);
 
 int fvText(fvContext* context, const char* str, int strLen, float x, float y, float maxWidth, fvHAlign hAlign, fvVAlign vAlign);
 

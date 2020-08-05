@@ -645,6 +645,7 @@ fvContext* fvCreate() {
     ctx->font = NULL;
     ctx->fontScale = 1;
     ctx->fontSpacing = 1;
+    ctx->fontBlur = 1;
     ctx->paint = {};
     ctx->op = NOONE;
     ctx->wr = EVEN_ODD;
@@ -1088,7 +1089,13 @@ void fvSetFontSpacing(fvContext* ctx, float spacing) {
     ctx->fontSpacing = spacing;
 }
 
+void fvSetFontBlur(fvContext* ctx, float blur) {
+    ctx->fontBlur = blur;
+}
+
 int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float maxWidth, fvHAlign hAlign, fvVAlign vAlign) {
+    fvPathBegin(ctx, fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
+
     fvFont *font = ctx->font;
     maxWidth = ceil(maxWidth);
 
@@ -1157,6 +1164,8 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
             ctx->vtx[j * 2] -= offset;
         }
     }
+
+    fvPathEnd(ctx);
     return p;
 }
 

@@ -162,8 +162,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_ClearClip(JNIEnv * jEnv, jclass jCl
 //---------------------------
 JNIEXPORT void JNICALL Java_flat_backend_SVG_PathBegin(JNIEnv * jEnv, jclass jClass, jlong context, jint type, jint rule) {
     fvPathOp op = type == 0 ? fvPathOp::FILL :
-                  type == 1 ? fvPathOp::STROKE :
-                  type == 2 ? fvPathOp::CLIP : fvPathOp::TEXT;
+                  type == 1 ? fvPathOp::STROKE : fvPathOp::CLIP;
 
     fvWindingRule wr = rule == 0 ? fvWindingRule::EVEN_ODD : fvWindingRule::NON_ZERO;
 
