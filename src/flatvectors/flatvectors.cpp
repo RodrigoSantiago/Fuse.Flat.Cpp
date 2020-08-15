@@ -171,11 +171,12 @@ void fv__commit(fvContext* ctx) {
     drawpaint.size = (unsigned long) ctx->eInd;
 
     if (ctx->op == TEXT) {
-        drawpaint.edgeAA = (ctx->op                  << 4) |
-                           (ctx->wr                  << 3) |
-                           ((ctx->convex ? 1 : 0)    << 2) |
-                           ((ctx->font->sdf ? 1 : 0) << 1) |
-                           (0)                     /*<< 0*/;
+        drawpaint.paintOp = ctx->op;
+        drawpaint.winding = ctx->wr;
+        drawpaint.convex = ctx->convex;
+        drawpaint.sdf = ctx->font->sdf;
+        drawpaint.aa = 0;
+        drawpaint.uniform.extra[2] = ctx->fontBlur;
 
         if (drawpaint.uniform.type == 0) {
             drawpaint.uniform.type = 3;
@@ -185,11 +186,12 @@ void fv__commit(fvContext* ctx) {
         }
         drawpaint.image1 = ctx->font->imageID;
     } else {
-        drawpaint.edgeAA = (ctx->op                 << 4) |
-                           (ctx->wr                 << 3) |
-                           ((ctx->convex ? 1 : 0)   << 2) |
-                           (0                       << 1) |
-                           (ctx->aa ? 1 : 0)/*      << 0*/;
+        drawpaint.paintOp = ctx->op;
+        drawpaint.winding = ctx->wr;
+        drawpaint.convex = ctx->convex;
+        drawpaint.sdf = 0;
+        drawpaint.aa = ctx->aa;
+        drawpaint.uniform.extra[2] = 1;
         drawpaint.image1 = 0;
     }
 
@@ -1213,7 +1215,12 @@ fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
     p.uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
     p.uniform.colors[3] = ((color >> 0) & 0xFF) / 255.f;
     p.uniform.cycleType = 0;
-    p.edgeAA = 0;
+
+    p.paintOp = fvPathOp::NOONE;
+    p.winding = fvWindingRule::EVEN_ODD;
+    p.convex = 0;
+    p.sdf = 0;
+    p.aa = 0;
 
     return p;
 }
@@ -1286,7 +1293,12 @@ fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, floa
         p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
     }
     p.uniform.cycleType = cycleMethod;
-    p.edgeAA = 0;
+
+    p.paintOp = fvPathOp::NOONE;
+    p.winding = fvWindingRule::EVEN_ODD;
+    p.convex = 0;
+    p.sdf = 0;
+    p.aa = 0;
 
     return p;
 }
@@ -1330,7 +1342,12 @@ fvPaint fvRadialGradientImagePaint(unsigned long imageID, float* affineImg, floa
         p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
     }
     p.uniform.cycleType = cycleMethod;
-    p.edgeAA = 0;
+
+    p.paintOp = fvPathOp::NOONE;
+    p.winding = fvWindingRule::EVEN_ODD;
+    p.convex = 0;
+    p.sdf = 0;
+    p.aa = 0;
 
     return p;
 }
@@ -1371,7 +1388,12 @@ fvPaint fvBoxGradientImagePaint(unsigned long imageID, float* affineImg, float* 
         p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
     }
     p.uniform.cycleType = cycleMethod;
-    p.edgeAA = 0;
+
+    p.paintOp = fvPathOp::NOONE;
+    p.winding = fvWindingRule::EVEN_ODD;
+    p.convex = 0;
+    p.sdf = 0;
+    p.aa = 0;
 
     return p;
 }

@@ -32,6 +32,7 @@ const char *fragmentSource =
         "    mat3 colorMat;\n"
         "    mat3 imageMat;\n"
         "    vec4 shape;\n"
+        "    vec4 extra;\n"
         "    vec4 stops[4];\n"
         "    vec4 colors[16];\n"
         "};\n"
@@ -84,14 +85,15 @@ const char *fragmentSource =
         "        float a = color.a + texel.a * (1 - color.a);\n"
         "        if (data[0] >= 2) {\n"
         "            if (sdf == 1) {\n"
-        "                float d = texture(fnt, oTex).r - 0.5;\n"
+        "                float r = texture(fnt, oTex).r;"
+        "                    float d = (r - 0.5) * 2;\n"
         //"                float width = d / fwidth(d);"
         //"                a = a * clamp(width + 0.5, 0.0, 1.0);\n"
-        "                ivec2 sz = textureSize(fnt, 0);"
-        "                float dx = dFdx(oTex.x) * sz.x;\n"
-        "                float dy = dFdy(oTex.y) * sz.y;\n"
-        "                float toPixels = 8.0 * inversesqrt(dx * dx + dy * dy);"
-        "                a = a * clamp(d * toPixels + 0.5, 0.0, 1.0);"
+        "                    ivec2 sz = textureSize(fnt, 0);"
+        "                    float dx = dFdx(oTex.x) * sz.x;\n"
+        "                    float dy = dFdy(oTex.y) * sz.y;\n"
+        "                    float toPixels = 8.0 * inversesqrt(dx * dx + dy * dy);"
+        "                    a = a * clamp((d * toPixels + 0.5)*extra[2] + r*(1-extra[2]), 0.0, 1.0);"
         "            } else {\n"
         "                a = a * texture(fnt, oTex).r;\n"
         "            }\n"
@@ -328,11 +330,11 @@ void renderFlush(void *data,
         glUniformMatrix3fv(ctx->matID, 1, 0, paints[i].mat);
 
         fvPaint &p = paints[i];
-        int aa = (int) ((p.edgeAA & 0x1));
-        int sd = (int) ((p.edgeAA & 0x2) >> 1);
-        int cv = (int) ((p.edgeAA & 0x4) >> 2);
-        int wr = (int) ((p.edgeAA & 0x8) >> 3);
-        int op = (int) (p.edgeAA >> 4);
+        int aa = p.aa;
+        int sd = p.sdf;
+        int cv = p.convex;
+        int wr = p.winding;
+        int op = p.paintOp;
 
         // Antialiasing
         if (ctx->aa != aa) {

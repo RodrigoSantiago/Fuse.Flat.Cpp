@@ -38,13 +38,21 @@ typedef struct fvUniform {
     float colorMat[12];
     float imageMat[12];
     float shape[4];             // Extent[0,1], Radius [2], Feather [3]
+    float extra[4];             // Focus[0,1], Blur [2], *** [3]
     float stops[16];
     float colors[64];
 } fvUniform;
 
 typedef struct fvPaint {
     unsigned long int size;
-    unsigned long int edgeAA;   //[paint][winding][convex][sdf][aa]
+
+    fvWindingRule winding;
+    fvPathOp paintOp;
+
+    int aa;
+    int sdf;
+    int convex;
+
     unsigned long int image0;
     unsigned long int image1;
     float mat[12];

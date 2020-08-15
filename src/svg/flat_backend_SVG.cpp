@@ -283,6 +283,9 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontScale(JNIEnv * jEnv, jclass 
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontSpacing(JNIEnv * jEnv, jclass jClass, jlong context, jfloat spacing) {
     fvSetFontSpacing((fvContext*) context, spacing);
 }
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontBlur(JNIEnv * jEnv, jclass jClass, jlong context, jfloat blur) {
+    fvSetFontBlur((fvContext*) context, blur);
+}
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawText(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jstring characters, jfloat maxWidth, jint hAlign, jint vAlign) {
     fvHAlign ha = hAlign == 0 ? fvHAlign::LEFT :
                   hAlign == 1 ? fvHAlign::CENTER : fvHAlign::RIGHT;

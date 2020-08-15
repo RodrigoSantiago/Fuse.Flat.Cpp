@@ -377,6 +377,14 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontSpacing
 
 /*
  * Class:     flat_backend_SVG
+ * Method:    SetFontBlur
+ * Signature: (JF)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontBlur
+  (JNIEnv *, jclass, jlong, jfloat);
+
+/*
+ * Class:     flat_backend_SVG
  * Method:    DrawText
  * Signature: (JFFLjava/lang/String;FII)I
  */
