@@ -4,7 +4,6 @@
 #include "flatvectors.h"
 #include "render.h"
 #include "curves.h"
-#include "triangulate.h"
 #include "utf8.h"
 #include "font.h"
 #include <string.h>
@@ -176,13 +175,12 @@ void fv__commit(fvContext* ctx) {
         drawpaint.convex = ctx->convex;
         drawpaint.sdf = ctx->font->sdf;
         drawpaint.aa = 0;
-        drawpaint.uniform.extra[2] = ctx->fontBlur;
+        drawpaint.uniform.extra[3] = ctx->fontBlur;
 
         if (drawpaint.uniform.type == 0) {
-            drawpaint.uniform.type = 3;
-        }
-        if (drawpaint.uniform.type == 1) {
             drawpaint.uniform.type = 2;
+        } else if (drawpaint.uniform.type == 1) {
+            drawpaint.uniform.type = 3;
         }
         drawpaint.image1 = ctx->font->imageID;
     } else {
@@ -191,7 +189,7 @@ void fv__commit(fvContext* ctx) {
         drawpaint.convex = ctx->convex;
         drawpaint.sdf = 0;
         drawpaint.aa = ctx->aa;
-        drawpaint.uniform.extra[2] = 1;
+        drawpaint.uniform.extra[3] = 1;
         drawpaint.image1 = 0;
     }
 
@@ -1183,8 +1181,32 @@ void fv__identity(float* t) {
 }
 
 fvPaint fvColorPaint(long color) {
-    fvPaint p = fvImagePaint(0, 0, color);
+    fvPaint p{};
     p.uniform.type = 0;
+    p.image0 = 0;
+    p.image1 = 0;
+    fv__identity(p.uniform.imageMat);
+    fv__identity(p.uniform.colorMat);
+
+    p.uniform.shape[0] = 0;
+    p.uniform.shape[1] = 0;
+    p.uniform.shape[2] = 0;
+    p.uniform.shape[3] = 0;
+
+    p.uniform.stopCount = 0;
+    p.uniform.joinType = 0;
+    p.uniform.colors[0] = ((color >> 24) & 0xFF) / 255.f;
+    p.uniform.colors[1] = ((color >> 16) & 0xFF) / 255.f;
+    p.uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
+    p.uniform.colors[3] = ((color >> 0) & 0xFF) / 255.f;
+    p.uniform.cycleType = 0;
+
+    p.paintOp = fvPathOp::NOONE;
+    p.winding = fvWindingRule::EVEN_ODD;
+    p.convex = 0;
+    p.sdf = 0;
+    p.aa = 0;
+
     return p;
 }
 
@@ -1226,35 +1248,11 @@ fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
 }
 
 fvPaint fvLinearGradientPaint(float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod) {
-    fvPaint p = fvLinearGradientImagePaint(0, 0, affine, x1, y1, x2, y2, count, stops, colors, cycleMethod);
-    p.uniform.type = 0;
-    return p;
-}
-
-fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float rOut, int count, float* stops, long* colors, int cycleMethod) {
-    fvPaint p = fvRadialGradientImagePaint(0, 0, affine, x, y, rIn, rOut, count, stops, colors, cycleMethod);
-    p.uniform.type = 0;
-    return p;
-}
-
-fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod) {
-    fvPaint p = fvBoxGradientImagePaint(0, 0, affine, x, y, w, h, r, f, count, stops, colors, cycleMethod);
-    p.uniform.type = 0;
-    return p;
-}
-
-fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p{};
-    p.uniform.type = 1;
-    p.image0 = imageID;
+    p.uniform.type = 0;
+    p.image0 = 0;
     p.image1 = 0;
-    if (affineImg != 0) {
-        for (int i = 0; i < 6; i++) {
-            p.uniform.imageMat[i] = affineImg[i];
-        }
-    } else {
-        fv__identity(p.uniform.imageMat);
-    }
+    fv__identity(p.uniform.imageMat);
 
     float dx, dy, d;
     const float large = 1e5;
@@ -1303,18 +1301,12 @@ fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, floa
     return p;
 }
 
-fvPaint fvRadialGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x, float y, float rIn, float rOut, int count, float* stops, long* colors, int cycleMethod) {
+fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float rOut, float fx, float fy, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p{};
-    p.uniform.type = 1;
-    p.image0 = imageID;
+    p.uniform.type = 0;
+    p.image0 = 0;
     p.image1 = 0;
-    if (affineImg != 0) {
-        for (int i = 0; i < 6; i++) {
-            p.uniform.imageMat[i] = affineImg[i];
-        }
-    } else {
-        fv__identity(p.uniform.imageMat);
-    }
+    fv__identity(p.uniform.imageMat);
 
     float r = (rIn+rOut)*0.5f;
     float f = (rOut-rIn);
@@ -1349,21 +1341,21 @@ fvPaint fvRadialGradientImagePaint(unsigned long imageID, float* affineImg, floa
     p.sdf = 0;
     p.aa = 0;
 
+    p.uniform.extra[0] = fx;
+    p.uniform.extra[1] = fy;
+    if (fx < -0.0001 || fx > 0.0001 || fy < -0.0001 || fy > 0.0001) {
+        p.uniform.extra[2] = 1;
+    }
+
     return p;
 }
 
-fvPaint fvBoxGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod) {
+fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod) {
     fvPaint p{};
-    p.uniform.type = 1;
-    p.image0 = imageID;
+    p.uniform.type = 0;
+    p.image0 = 0;
     p.image1 = 0;
-    if (affineImg != 0) {
-        for (int i = 0; i < 6; i++) {
-            p.uniform.imageMat[i] = affineImg[i];
-        }
-    } else {
-        fv__identity(p.uniform.imageMat);
-    }
+    fv__identity(p.uniform.imageMat);
 
     p.uniform.colorMat[0] = 1.0f;
     p.uniform.colorMat[1] = 0.0f;

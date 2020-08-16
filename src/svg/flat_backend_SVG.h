@@ -82,10 +82,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintLinearGradient
 /*
  * Class:     flat_backend_SVG
  * Method:    SetPaintRadialGradient
- * Signature: (J[FFFFFI[F[II)V
+ * Signature: (J[FFFFFFFI[F[II)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintRadialGradient
-  (JNIEnv *, jclass, jlong, jfloatArray, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
+  (JNIEnv *, jclass, jlong, jfloatArray, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
 
 /*
  * Class:     flat_backend_SVG
@@ -102,30 +102,6 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintBoxGradient
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage
   (JNIEnv *, jclass, jlong, jint, jfloatArray, jint);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    SetPaintImageLinearGradient
- * Signature: (JI[F[FFFFFI[F[II)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImageLinearGradient
-  (JNIEnv *, jclass, jlong, jint, jfloatArray, jfloatArray, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    SetPaintImageRadialGradient
- * Signature: (JI[F[FFFFFI[F[II)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImageRadialGradient
-  (JNIEnv *, jclass, jlong, jint, jfloatArray, jfloatArray, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    SetPaintImageBoxGradient
- * Signature: (JI[F[FFFFFFFI[F[II)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImageBoxGradient
-  (JNIEnv *, jclass, jlong, jint, jfloatArray, jfloatArray, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
 
 /*
  * Class:     flat_backend_SVG

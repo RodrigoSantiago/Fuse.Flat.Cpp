@@ -80,11 +80,11 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintLinearGradient(JNIEnv * jEn
     jEnv->ReleasePrimitiveArrayCritical(stops, _stops, 0);
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintRadialGradient(JNIEnv * jEnv, jclass jClass, jlong context, jfloatArray affine, jfloat x1, jfloat y1, jfloat rIn, jfloat rOut, jint count, jfloatArray stops, jintArray colors, jint cycleMethod) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintRadialGradient(JNIEnv * jEnv, jclass jClass, jlong context, jfloatArray affine, jfloat x1, jfloat y1, jfloat rIn, jfloat rOut, jfloat fx, jfloat fy, jint count, jfloatArray stops, jintArray colors, jint cycleMethod) {
     float* _stops = (float*) jEnv->GetPrimitiveArrayCritical(stops, 0);
     long* _colors = (long*) jEnv->GetPrimitiveArrayCritical(colors, 0);
     float* _affine = (float*) jEnv->GetPrimitiveArrayCritical(affine, 0);
-    fvSetPaint((fvContext *) context, fvRadialGradientPaint(_affine, x1, y1, rIn, rOut, count, _stops, _colors, cycleMethod));
+    fvSetPaint((fvContext *) context, fvRadialGradientPaint(_affine, x1, y1, rIn, rOut, fx, fy, count, _stops, _colors, cycleMethod));
     jEnv->ReleasePrimitiveArrayCritical(affine, _affine, 0);
     jEnv->ReleasePrimitiveArrayCritical(colors, _colors, 0);
     jEnv->ReleasePrimitiveArrayCritical(stops, _stops, 0);
@@ -106,41 +106,6 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage(JNIEnv * jEnv, jclass
     jEnv->ReleasePrimitiveArrayCritical(affineImg, _affineImg, 0);
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImageLinearGradient(JNIEnv * jEnv, jclass jClass, jlong context, jint imageID, jfloatArray affineImg, jfloatArray affine, jfloat x1, jfloat y1, jfloat x2, jfloat y2, jint count, jfloatArray stops, jintArray colors, jint cycleMethod) {
-    float* _stops = (float*) jEnv->GetPrimitiveArrayCritical(stops, 0);
-    long* _colors = (long*) jEnv->GetPrimitiveArrayCritical(colors, 0);
-    float* _affineImg = (float*) jEnv->GetPrimitiveArrayCritical(affineImg, 0);
-    float* _affine = (float*) jEnv->GetPrimitiveArrayCritical(affine, 0);
-    fvSetPaint((fvContext *) context, fvLinearGradientImagePaint(imageID, _affineImg, _affine, x1, y1, x2, y2, count, _stops, _colors, cycleMethod));
-    jEnv->ReleasePrimitiveArrayCritical(affine, _affine, 0);
-    jEnv->ReleasePrimitiveArrayCritical(affineImg, _affineImg, 0);
-    jEnv->ReleasePrimitiveArrayCritical(colors, _colors, 0);
-    jEnv->ReleasePrimitiveArrayCritical(stops, _stops, 0);
-}
-
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImageRadialGradient(JNIEnv * jEnv, jclass jClass, jlong context, jint imageID, jfloatArray affineImg, jfloatArray affine, jfloat x1, jfloat y1, jfloat rIn, jfloat rOut, jint count, jfloatArray stops, jintArray colors, jint cycleMethod) {
-    float* _stops = (float*) jEnv->GetPrimitiveArrayCritical(stops, 0);
-    long* _colors = (long*) jEnv->GetPrimitiveArrayCritical(colors, 0);
-    float* _affineImg = (float*) jEnv->GetPrimitiveArrayCritical(affineImg, 0);
-    float* _affine = (float*) jEnv->GetPrimitiveArrayCritical(affine, 0);
-    fvSetPaint((fvContext *) context, fvRadialGradientImagePaint(imageID, _affineImg, _affine, x1, y1, rIn, rOut, count, _stops, _colors, cycleMethod));
-    jEnv->ReleasePrimitiveArrayCritical(affine, _affine, 0);
-    jEnv->ReleasePrimitiveArrayCritical(affineImg, _affineImg, 0);
-    jEnv->ReleasePrimitiveArrayCritical(colors, _colors, 0);
-    jEnv->ReleasePrimitiveArrayCritical(stops, _stops, 0);
-}
-
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImageBoxGradient(JNIEnv * jEnv, jclass jClass, jlong context, jint imageID, jfloatArray affineImg, jfloatArray affine, jfloat x, jfloat y, jfloat width, jfloat height, jfloat corners, jfloat blur, jint count, jfloatArray stops, jintArray colors, jint cycleMethod) {
-    float* _stops = (float*) jEnv->GetPrimitiveArrayCritical(stops, 0);
-    long* _colors = (long*) jEnv->GetPrimitiveArrayCritical(colors, 0);
-    float* _affineImg = (float*) jEnv->GetPrimitiveArrayCritical(affineImg, 0);
-    float* _affine = (float*) jEnv->GetPrimitiveArrayCritical(affine, 0);
-    fvSetPaint((fvContext *) context, fvBoxGradientImagePaint(imageID, _affineImg, _affine, x, y, width, height, corners, blur, count, _stops, _colors, cycleMethod));
-    jEnv->ReleasePrimitiveArrayCritical(affine, _affine, 0);
-    jEnv->ReleasePrimitiveArrayCritical(affineImg, _affineImg, 0);
-    jEnv->ReleasePrimitiveArrayCritical(colors, _colors, 0);
-    jEnv->ReleasePrimitiveArrayCritical(stops, _stops, 0);
-}
 //---------------------------
 //         Transforms
 //---------------------------

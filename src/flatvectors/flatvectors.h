@@ -31,14 +31,14 @@ enum fvWindingRule {
 
 typedef struct fvUniform {
     // Buffer
-    float type;                 // [0] - Color, [1] - Image, [2] - Colored-Image, [3] - Text
+    float type;                 // [0] - Color|Grad, [1] - Color + Image, [2] - Text + Color, [3] - Text + Color + Image
     float joinType;             // Round / Bevel
-    float cycleType;            // Keep / Loop / Reflect
+    float cycleType;            // Clamp / Cycle / Reflect
     float stopCount;            // 0 -- 16
     float colorMat[12];
     float imageMat[12];
     float shape[4];             // Extent[0,1], Radius [2], Feather [3]
-    float extra[4];             // Focus[0,1], Blur [2], *** [3]
+    float extra[4];             // Focus[0,1], Blur [2], Active Focus [3]
     float stops[16];
     float colors[64];
 } fvUniform;
@@ -242,14 +242,8 @@ fvPaint fvImagePaint(unsigned long imageID, float* affine, long color);
 
 fvPaint fvLinearGradientPaint(float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod);
 
-fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float rOut, int count, float* stops, long* colors, int cycleMethod);
+fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float rOut, float fx, float fy, int count, float* stops, long* colors, int cycleMethod);
 
 fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod);
-
-fvPaint fvLinearGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod);
-
-fvPaint fvRadialGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x, float y, float rIn, float rOut, int count, float* stops, long* colors, int cycleMethod);
-
-fvPaint fvBoxGradientImagePaint(unsigned long imageID, float* affineImg, float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod);
 
 #endif //FLATVECTORS_FLATVECTORS_H
