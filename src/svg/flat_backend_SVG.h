@@ -375,6 +375,15 @@ JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawText
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawTextBuffer
   (JNIEnv *, jclass, jlong, jfloat, jfloat, jobject, jint, jint, jfloat, jint, jint);
 
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    ReadImage
+ * Signature: ([B[I)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_ReadImage
+  (JNIEnv * jEnv, jclass, jbyteArray, jintArray);
+
 #ifdef __cplusplus
 }
 #endif

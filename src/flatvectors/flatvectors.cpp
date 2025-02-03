@@ -197,11 +197,11 @@ void fv__commit(fvContext* ctx) {
         drawpaint.mat[i] = ctx->transform[i];
     }
 
-    fv__multiply(drawpaint.uniform.colorMat, ctx->transform);
+    //fv__multiply(drawpaint.uniform.colorMat, ctx->transform);
     fv__inverse(drawpaint.uniform.colorMat, drawpaint.uniform.colorMat);
     fv__affineToMat4(drawpaint.uniform.colorMat, drawpaint.uniform.colorMat);
 
-    fv__multiply(drawpaint.uniform.imageMat, ctx->transform);
+    //fv__multiply(drawpaint.uniform.imageMat, ctx->transform);
     fv__inverse(drawpaint.uniform.imageMat, drawpaint.uniform.imageMat);
     fv__affineToMat4(drawpaint.uniform.imageMat, drawpaint.uniform.imageMat);
 

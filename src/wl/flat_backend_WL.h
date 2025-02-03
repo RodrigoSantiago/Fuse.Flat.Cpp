@@ -74,6 +74,14 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetVsync
 
 /*
  * Class:     flat_backend_WL
+ * Method:    PostEmptyEvent
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_WL_PostEmptyEvent
+        (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_WL
  * Method:    SetFullscreen
  * Signature: (JZ)V
  */

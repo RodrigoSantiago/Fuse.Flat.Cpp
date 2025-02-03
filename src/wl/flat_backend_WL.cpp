@@ -254,6 +254,9 @@ JNIEXPORT jlong JNICALL Java_flat_backend_WL_WindowCreate(JNIEnv * jEnv, jclass,
 
     loadGlad = true;
 
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
+    glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
+
     glfwSetWindowPosCallback(window, WindowPosCallback);
     glfwSetWindowSizeCallback(window, WindowSizeCallback);
     glfwSetWindowCloseCallback(window, WindowCloseCallback);
@@ -296,6 +299,10 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_HandleEvents(JNIEnv * jEnv, jclass j
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetVsync(JNIEnv * jEnv, jclass jClass, jint vsync) {
     glfwSwapInterval(vsync);
+}
+
+JNIEXPORT void JNICALL Java_flat_backend_WL_PostEmptyEvent(JNIEnv * jEnv, jclass jClass) {
+    glfwPostEmptyEvent();
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetFullscreen(JNIEnv * jEnv, jclass jClass, jlong win, jboolean fullscreen) {

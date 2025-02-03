@@ -9,6 +9,8 @@
 
 #include "flatvectors.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 //---------------------------
 //         Context
 //---------------------------
@@ -270,4 +272,33 @@ JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawTextBuffer(JNIEnv * jEnv, jclas
                   vAlign == 2 ? fvVAlign::BASELINE : fvVAlign::BOTTOM;
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
     return fvText((fvContext*) context, chars, length, x, y, maxWidth, ha, va);
+}
+JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_ReadImage(JNIEnv * jEnv, jclass jClass, jbyteArray data, jintArray imageData) {
+    jbyte *imageBytes = jEnv->GetByteArrayElements(data, NULL);
+    jsize imageSize = jEnv->GetArrayLength(data);
+
+    int width, height, nrChannels;
+
+    unsigned char *imageDataBuffer = stbi_load_from_memory((unsigned char *)imageBytes, imageSize, &width, &height, &nrChannels, 4);
+
+    if (imageDataBuffer == NULL) {
+        jEnv->ReleaseByteArrayElements(data, imageBytes, JNI_ABORT);
+        return NULL;
+    }
+
+    jint imageInfo[3];
+    imageInfo[0] = width;
+    imageInfo[1] = height;
+    imageInfo[2] = nrChannels;
+
+    jEnv->SetIntArrayRegion(imageData, 0, 3, imageInfo);
+
+    jbyteArray imageArray = jEnv->NewByteArray(width * height * 4);
+    jEnv->SetByteArrayRegion(imageArray, 0, width * height * 4, (jbyte *)imageDataBuffer);
+
+    stbi_image_free(imageDataBuffer);
+
+    jEnv->ReleaseByteArrayElements(data, imageBytes, JNI_ABORT);
+
+    return imageArray;
 }
