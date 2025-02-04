@@ -692,6 +692,16 @@ void fvDestroy(fvContext* ctx) {
     free(ctx);
 }
 
+bool fvIsDebugMode = false;
+
+void fvSetDebug(bool debug) {
+    fvIsDebugMode = debug;
+}
+
+bool fvIsDebug() {
+    return fvIsDebugMode;
+}
+
 void fvBegin(fvContext* ctx, int width, int height) {
     ctx->width = width;
     ctx->height = height;
@@ -979,29 +989,43 @@ void fvRoundRect(fvContext* ctx, float x, float y, float width, float height, fl
     fv__commit(ctx);
 }
 
-fvFont* fvFontCreate(void* data, long length, float size, int sdf) {
+void* fvFontLoad(void* data, long int length, float size, int sdf) {
     return fontCreate(data, length, size, sdf);
 }
 
+void fvFontUnload(void* ctx) {
+    fontDestroy(ctx);
+}
+
+fvFont* fvFontCreate(void* ctx) {
+    fvFont* ft = (fvFont*) malloc(sizeof(fvFont));
+    fontGetData(ctx, ft);
+    return ft;
+}
+
 void fvFontDestroy(fvFont* font) {
-    fontDestroy(font);
+    if (font->imageID != 0) {
+        renderDestroyFontTexture(font->imageID);
+    }
+    free(font->renderState);
+    free(font);
 }
 
-void fvFontLoadGlyphs(fvFont* font, const char* str, int strLen) {
-    fontLoadGlyphs(font, str, strLen);
+void fvFontLoadGlyphs(void* ctx, const char* str, int strLen, int state) {
+    fontLoadGlyphs(ctx, str, strLen, state);
 }
 
-void fvFontLoadAllGlyphs(fvFont* font) {
-    fontLoadAllGlyphs(font);
+void fvFontLoadAllGlyphs(void* ctx) {
+    fontLoadAllGlyphs(ctx);
 }
 
-int fvFontGetGlyphs(fvFont* font, const char* str, int strLen, float* info) {
+int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info) {
     int i = 0, f = 0, index = 0, count;
     unsigned long chr = 0, prev = 0;
     while (utf8loop(str, strLen, i, chr)) {
-        fvGlyph& glyph = fontGlyph(font, chr);
+        fvGlyph& glyph = fontGlyph(ctx, chr);
         if (glyph.enabled) {
-            info[index++] = f ? fontKerning(font, prev, chr) : 0;
+            info[index++] = f ? fontKerning(ctx, prev, chr) : 0;
             info[index++] = glyph.enabled;
             info[index++] = glyph.advance;
 
@@ -1020,14 +1044,11 @@ int fvFontGetGlyphs(fvFont* font, const char* str, int strLen, float* info) {
     return count;
 }
 
-void fvFontGetMetrics(fvFont* font, float* ascender, float* descender, float* height, float* lineGap) {
-    if (ascender != 0) *ascender = font->ascent;
-    if (descender != 0) *descender = font->descent;
-    if (height != 0) *height = font->height;
-    if (lineGap != 0) *lineGap = font->lineGap;
+void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap) {
+    fontGetMetrics(ctx, ascender, descender, height, lineGap);
 }
 
-float fvFontGetTextWidth(fvFont* font, const char* str, int strLen, float scale, float spacing) {
+float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float scale, float spacing) {
     float scl = scale * spacing;
 
     float w = 0;
@@ -1035,9 +1056,9 @@ float fvFontGetTextWidth(fvFont* font, const char* str, int strLen, float scale,
     unsigned long chr = 0, prev = 0;
     while (utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
-            fvGlyph &glyph = fontGlyph(font, chr);
+            fvGlyph &glyph = fontGlyph(ctx, chr);
             if (glyph.enabled) {
-                w += ceil((glyph.advance + (f ? fontKerning(font, prev, chr) : 0)) * scl);
+                w += ceil((glyph.advance + (f ? fontKerning(ctx, prev, chr) : 0)) * scl);
                 prev = chr;
                 f = 1;
             }
@@ -1046,7 +1067,7 @@ float fvFontGetTextWidth(fvFont* font, const char* str, int strLen, float scale,
     return w;
 }
 
-int fvFontGetOffset(fvFont* font, const char* str, int strLen, float scale, float spacing, float x, int half) {
+int fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float spacing, float x, int half) {
     float scl = scale * spacing;
 
     float w = 0;
@@ -1054,9 +1075,9 @@ int fvFontGetOffset(fvFont* font, const char* str, int strLen, float scale, floa
     unsigned long chr = 0, pchr = 0;
     while (utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
-            fvGlyph &glyph = fontGlyph(font, chr);
+            fvGlyph &glyph = fontGlyph(ctx, chr);
             if (glyph.enabled) {
-                float advance = ceil((glyph.advance + (f ? fontKerning(font, pchr, chr) : 0)) * scl);
+                float advance = ceil((glyph.advance + (f ? fontKerning(ctx, pchr, chr) : 0)) * scl);
                 if (!half && w + advance > x) {
                     return pi;
                 } else if (w + advance / 2 > x) {
@@ -1118,9 +1139,9 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
     unsigned long chr = 0, prev = 0;
     while (utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
-            fvGlyph &glyph = fontGlyphRendered(font, chr);
+            fvGlyph &glyph = fontGlyphRendered(font->fCtx, font, chr);
             if (glyph.enabled) {
-                float kern = (f ? fontKerning(font, prev, chr) : 0);
+                float kern = (f ? fontKerning(font->fCtx, prev, chr) : 0);
                 float advance = ceil((glyph.advance + kern) * (scl * spc));
                 if (maxWidth > 0 && floor(x + advance - start) > maxWidth) {
                     break;

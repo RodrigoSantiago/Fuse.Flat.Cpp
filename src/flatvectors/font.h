@@ -7,18 +7,22 @@
 
 #include <flatvectors.h>
 
-fvFont* fontCreate(const void* data, long int length, float size, int sdf);
+void* fontCreate(const void* data, long int length, float size, int sdf);
 
-void fontDestroy(fvFont* data);
+void fontDestroy(void* ctx);
 
-void fontLoadGlyphs(fvFont* font, const char* str, int strLen);
+void fontGetData(void* ctx, fvFont* ft);
 
-void fontLoadAllGlyphs(fvFont* font);
+void fontLoadGlyphs(void* ctx, const char* str, int strLen, int state);
 
-fvGlyph& fontGlyph(fvFont*, long);
+void fontLoadAllGlyphs(void* ctx);
 
-fvGlyph& fontGlyphRendered(fvFont*, long);
+void fontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap);
 
-float fontKerning(fvFont*, long, long);
+fvGlyph& fontGlyph(void* ctx, long unicode);
+
+fvGlyph& fontGlyphRendered(void* ctx, fvFont* ft, long unicode);
+
+float fontKerning(void* ctx, long unicode1, long unicode2);
 
 #endif //FLATVECTORS_FONT_H

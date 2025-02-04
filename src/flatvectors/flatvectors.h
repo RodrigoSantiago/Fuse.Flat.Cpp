@@ -73,7 +73,6 @@ typedef struct fvStroker {
 
 typedef struct fvGlyph {
     int enabled;
-    int rendered;
     float advance;
 
     float x;
@@ -93,7 +92,8 @@ typedef struct fvFont {
 
     // Properties
     unsigned long imageID;
-    int iw, ih;
+    int imageState;
+    int* renderState;
 
     int sdf;
     float size;
@@ -164,6 +164,10 @@ fvContext* fvCreate();
 
 void fvDestroy(fvContext* context);
 
+void fvSetDebug(bool debug);
+
+bool fvIsDebug();
+
 void fvBegin(fvContext* context, int width, int height);
 
 void fvFlush(fvContext* context);
@@ -203,21 +207,25 @@ void fvRoundRect(fvContext* context, float x, float y, float width, float height
 //
 //-----------------------------------------
 
-fvFont* fvFontCreate(void* data, long int length, float size, int sdf);
+void* fvFontLoad(void* data, long int length, float size, int sdf);
+
+void fvFontUnload(void* ctx);
+
+fvFont* fvFontCreate(void* ctx);
 
 void fvFontDestroy(fvFont* font);
 
-void fvFontLoadGlyphs(fvFont* font, const char* str, int strLen);
+void fvFontLoadGlyphs(void* ctx, const char* str, int strLen, int state);
 
-void fvFontLoadAllGlyphs(fvFont* font);
+void fvFontLoadAllGlyphs(void* ctx);
 
-int fvFontGetGlyphs(fvFont* font, const char* str, int strLen, float* info);
+int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info);
 
-void fvFontGetMetrics(fvFont* font, float* ascender, float* descender, float* height, float* lineGap);
+void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap);
 
-float fvFontGetTextWidth(fvFont* font, const char* str, int strLen, float size, float spacing);
+float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float size, float spacing);
 
-int fvFontGetOffset(fvFont* font, const char* str, int strLen, float size, float spacing, float x, int half);
+int fvFontGetOffset(void* ctx, const char* str, int strLen, float size, float spacing, float x, int half);
 //-----------------------------------------
 //
 //-----------------------------------------

@@ -38,6 +38,7 @@ const char *fragmentSource =
         "};\n"
         "uniform int stc;\n"
         "uniform int sdf;\n"
+        "uniform int dbg;\n"
         "uniform sampler2D tex;\n"
         "uniform sampler2D fnt;\n"
         "in vec2 oPos;\n"
@@ -104,7 +105,9 @@ const char *fragmentSource =
         "        }\n"
         "        float a = color.a + texel.a * (1 - color.a);\n"
         "        if (data[0] > 1) {\n"
-        "            if (sdf == 1) {\n"
+        "            if (dbg == 1) {\n"
+        "                a = 1;\n"
+        "            } else if (sdf == 1) {\n"
         "                float r = texture(fnt, oTex).r;"
         "                float d = (r - 0.5) * 2;\n"
         "                ivec2 sz = textureSize(fnt, 0);"
@@ -130,7 +133,7 @@ typedef struct fvGLData {
     GLuint image0, image1;
 
     GLuint shader;
-    GLint viewID, matID, texID, fntID, sdfID, stcID;
+    GLint viewID, matID, texID, fntID, sdfID, stcID, dbgID;
 
     int aa, sdf;
     unsigned int width, height;
@@ -190,6 +193,7 @@ void* renderCreate() {
     ctx->fntID = glGetUniformLocation(ctx->shader, "fnt");
     ctx->sdfID = glGetUniformLocation(ctx->shader, "sdf");
     ctx->stcID = glGetUniformLocation(ctx->shader, "stc");
+    ctx->dbgID = glGetUniformLocation(ctx->shader, "dbg");
     ctx->width = 0;
     ctx->height = 0;
 
@@ -276,6 +280,7 @@ void renderBegin(void *data, unsigned int width, unsigned int height) {
     glUniform1i(ctx->fntID, 1);
     glUniform1i(ctx->sdfID, 0);
     glUniform1i(ctx->stcID, 0);
+    glUniform1i(ctx->dbgID, fvIsDebug());
 
     glBindVertexArray(ctx->vao);
 

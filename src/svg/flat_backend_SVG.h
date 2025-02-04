@@ -23,6 +23,15 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_Create
 JNIEXPORT void JNICALL Java_flat_backend_SVG_Destroy
   (JNIEnv *, jclass, jlong);
 
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    SetDebug
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetDebug
+  (JNIEnv *, jclass, jboolean);
+
 /*
  * Class:     flat_backend_SVG
  * Method:    BeginFrame
@@ -209,11 +218,35 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_RoundRect
 
 /*
  * Class:     flat_backend_SVG
- * Method:    FontCreate
+ * Method:    FontLoad
  * Signature: ([BFI)J
  */
-JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontCreate
-  (JNIEnv *, jclass, jbyteArray, jfloat, jint);
+JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontLoad
+        (JNIEnv *, jclass, jbyteArray, jfloat, jint);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontUnload
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload
+        (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontPaintCreate
+ * Signature: (J)V
+ */
+JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontPaintDestroy
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontPaintDestroy
+        (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_SVG
@@ -226,18 +259,18 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadAllGlyphs
 /*
  * Class:     flat_backend_SVG
  * Method:    FontLoadGlyphs
- * Signature: (JLjava/lang/String;)V
+ * Signature: (JLjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadGlyphs
-  (JNIEnv *, jclass, jlong, jstring);
+  (JNIEnv *, jclass, jlong, jstring, jint);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    FontLoadGlyphsBuffer
- * Signature: (JLjava/nio/Buffer;II)V
+ * Signature: (JLjava/nio/Buffer;III)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadGlyphsBuffer
-  (JNIEnv *, jclass, jlong, jobject, jint, jint);
+  (JNIEnv *, jclass, jlong, jobject, jint, jint, jint);
 
 /*
  * Class:     flat_backend_SVG
@@ -318,14 +351,6 @@ JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetOffset
  */
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetOffsetBuffer
   (JNIEnv *, jclass, jlong, jobject, jint, jint, jfloat, jfloat, jfloat, jboolean);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    FontDestroy
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontDestroy
-  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_SVG
