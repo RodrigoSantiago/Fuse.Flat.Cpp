@@ -29,6 +29,11 @@ enum fvWindingRule {
     EVEN_ODD, NON_ZERO
 };
 
+typedef struct fvPoint {
+    int x;
+    int y;
+} fvPoint;
+
 typedef struct fvUniform {
     // Buffer
     float type;                 // [0] - Color|Grad, [1] - Color + Image, [2] - Text + Color, [3] - Text + Color + Image
@@ -43,6 +48,53 @@ typedef struct fvUniform {
     float colors[64];
 } fvUniform;
 
+typedef struct fvGlyph {
+    int enabled;
+    float advance;
+
+    float x;
+    float y;
+    float w;
+    float h;
+} fvGlyph;
+
+typedef struct fvCell {
+    int id;
+    int w;
+    int h;
+} fvCell;
+
+typedef struct fvPack {
+    int cellWidth;
+    int cellHeight;
+    int width;
+    int height;
+    int widthCount;
+    int heightCount;
+    int minX;
+    int minY;
+    fvCell* matrix;
+} fvPack;
+
+typedef struct fvFont {
+    // Font Context
+    void* fCtx;
+
+    // Properties
+    fvPack* pack;
+    unsigned long imageID;
+    int imageWidth, imageHeight;
+    fvPoint* renderState;
+
+    int sdf;
+    float size;
+    float height;
+    float ascent;
+    float descent;
+    float lineGap;
+
+} fvFont;
+
 typedef struct fvPaint {
     unsigned long int size;
 
@@ -50,11 +102,10 @@ typedef struct fvPaint {
     fvPathOp paintOp;
 
     int aa;
-    int sdf;
     int convex;
+    fvFont* font;
 
     unsigned long int image0;
-    unsigned long int image1;
     float mat[12];
 
     fvUniform uniform;
@@ -70,39 +121,6 @@ typedef struct fvStroker {
     int dashCount;
     float* dash;
 } fvStroker;
-
-typedef struct fvGlyph {
-    int enabled;
-    float advance;
-
-    float x;
-    float y;
-    float w;
-    float h;
-
-    float u;
-    float v;
-    float u2;
-    float v2;
-} fvGlyph;
-
-typedef struct fvFont {
-    // Font Context
-    void* fCtx;
-
-    // Properties
-    unsigned long imageID;
-    int imageState;
-    int* renderState;
-
-    int sdf;
-    float size;
-    float height;
-    float ascent;
-    float descent;
-    float lineGap;
-
-} fvFont;
 
 typedef struct fvContext {
     // Render Context
@@ -215,9 +233,11 @@ fvFont* fvFontCreate(void* ctx);
 
 void fvFontDestroy(fvFont* font);
 
-void fvFontLoadGlyphs(void* ctx, const char* str, int strLen, int state);
+long fvFontGetCurrentAtlas(fvFont* font, int* w, int* h);
 
-void fvFontLoadAllGlyphs(void* ctx);
+void fvFontRenderAllGlyphs(fvFont* font);
+
+void fvFontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len);
 
 int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info);
 

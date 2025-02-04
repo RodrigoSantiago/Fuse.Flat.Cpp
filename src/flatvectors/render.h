@@ -28,6 +28,8 @@ void renderFlush(void *data,
 
 unsigned long renderCreateFontTexture(void* data, int width, int height);
 
+unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int width, int height);
+
 void renderUpdateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height);
 
 void renderDestroyFontTexture(unsigned long imageID);

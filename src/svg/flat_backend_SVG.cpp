@@ -184,17 +184,34 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate(JNIEnv * jEnv, jcl
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontPaintDestroy(JNIEnv * jEnv, jclass jClass, jlong fontPaint) {
     fvFontDestroy((fvFont*) fontPaint);
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadAllGlyphs(JNIEnv * jEnv, jclass jClass, jlong font) {
-    fvFontLoadAllGlyphs((void *) font);
+JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas(JNIEnv * jEnv, jclass jClass, jlong fontPaint, jintArray size) {
+    int w, h;
+    long imageID = fvFontGetCurrentAtlas((fvFont*) fontPaint, &w, &h);
+
+    jint imageInfo[2];
+    imageInfo[0] = w;
+    imageInfo[1] = h;
+    jEnv->SetIntArrayRegion(size, 0, 2, imageInfo);
+
+    return imageID;
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadGlyphs(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jint state) {
-    const char * chars = jEnv->GetStringUTFChars(characters, 0);
-    fvFontLoadGlyphs((void*) font, chars, jEnv->GetStringUTFLength(characters), state);
-    jEnv->ReleaseStringUTFChars(characters, chars);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontRenderAllGlyphs(JNIEnv * jEnv, jclass jClass, jlong fontPaint) {
+    fvFontRenderAllGlyphs((fvFont*) fontPaint);
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadGlyphsBuffer(JNIEnv * jEnv, jclass jClass, jlong font, jobject characters, jint offset, jint length, jint state) {
-    const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
-    fvFontLoadGlyphs((void*) font, chars, length, state);
+JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape(JNIEnv * jEnv, jclass jClass, jlong font, jint unicode) {
+    float* polygon;
+    int len;
+    fvFontGetGlyphShape((void *) font, unicode, &polygon, &len);
+
+    if (polygon == NULL) {
+        return NULL;
+    } else {
+        jfloatArray imageArray = jEnv->NewFloatArray(len);
+        jEnv->SetFloatArrayRegion(imageArray, 0, len, (jfloat *)polygon);
+        free(polygon);
+
+        return imageArray;
+    }
 }
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphs(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloatArray data) {
     const char *chars = jEnv->GetStringUTFChars(characters, 0);

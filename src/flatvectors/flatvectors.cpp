@@ -6,6 +6,7 @@
 #include "curves.h"
 #include "utf8.h"
 #include "font.h"
+#include "pack.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -173,7 +174,6 @@ void fv__commit(fvContext* ctx) {
         drawpaint.paintOp = ctx->op;
         drawpaint.winding = ctx->wr;
         drawpaint.convex = ctx->convex;
-        drawpaint.sdf = ctx->font->sdf;
         drawpaint.aa = 0;
         drawpaint.uniform.extra[3] = ctx->fontBlur;
 
@@ -182,15 +182,14 @@ void fv__commit(fvContext* ctx) {
         } else if (drawpaint.uniform.type == 1) {
             drawpaint.uniform.type = 3;
         }
-        drawpaint.image1 = ctx->font->imageID;
+        drawpaint.font = ctx->font;
     } else {
         drawpaint.paintOp = ctx->op;
         drawpaint.winding = ctx->wr;
         drawpaint.convex = ctx->convex;
-        drawpaint.sdf = 0;
         drawpaint.aa = ctx->aa;
         drawpaint.uniform.extra[3] = 1;
-        drawpaint.image1 = 0;
+        drawpaint.font = NULL;
     }
 
     for (int i = 0; i < 6; i++) {
@@ -1007,16 +1006,23 @@ void fvFontDestroy(fvFont* font) {
     if (font->imageID != 0) {
         renderDestroyFontTexture(font->imageID);
     }
+    packDestroy(font->pack);
     free(font->renderState);
     free(font);
 }
 
-void fvFontLoadGlyphs(void* ctx, const char* str, int strLen, int state) {
-    fontLoadGlyphs(ctx, str, strLen, state);
+long fvFontGetCurrentAtlas(fvFont* font, int* w, int* h) {
+    *w = font->pack->width;
+    *h = font->pack->height;
+    return font->imageID;
 }
 
-void fvFontLoadAllGlyphs(void* ctx) {
-    fontLoadAllGlyphs(ctx);
+void fvFontRenderAllGlyphs(fvFont* font) {
+    fontRenderAllGlyphs(font->fCtx, font);
+}
+
+void fvFontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len) {
+    fontGetGlyphShape(ctx, unicode, polygon, len);
 }
 
 int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info) {
@@ -1024,22 +1030,18 @@ int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info) {
     unsigned long chr = 0, prev = 0;
     while (utf8loop(str, strLen, i, chr)) {
         fvGlyph& glyph = fontGlyph(ctx, chr);
-        if (glyph.enabled) {
-            info[index++] = f ? fontKerning(ctx, prev, chr) : 0;
-            info[index++] = glyph.enabled;
-            info[index++] = glyph.advance;
 
-            info[index++] = glyph.x;
-            info[index++] = glyph.y;
-            info[index++] = glyph.w;
-            info[index++] = glyph.h;
+        info[index++] = f ? fontKerning(ctx, prev, chr) : 0;
+        info[index++] = glyph.enabled;
+        info[index++] = glyph.advance;
 
-            info[index++] = glyph.u;
-            info[index++] = glyph.v;
-            prev = chr;
-            f = 1;
-            count++;
-        }
+        info[index++] = glyph.x;
+        info[index++] = glyph.y;
+        info[index++] = glyph.w;
+        info[index++] = glyph.h;
+        prev = chr;
+        f = 1;
+        count++;
     }
     return count;
 }
@@ -1057,11 +1059,10 @@ float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float scale, fl
     while (utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
             fvGlyph &glyph = fontGlyph(ctx, chr);
-            if (glyph.enabled) {
-                w += ceil((glyph.advance + (f ? fontKerning(ctx, prev, chr) : 0)) * scl);
-                prev = chr;
-                f = 1;
-            }
+
+            w += ceil((glyph.advance + (f ? fontKerning(ctx, prev, chr) : 0)) * scl);
+            prev = chr;
+            f = 1;
         }
     }
     return w;
@@ -1076,20 +1077,19 @@ int fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float s
     while (utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
             fvGlyph &glyph = fontGlyph(ctx, chr);
-            if (glyph.enabled) {
-                float advance = ceil((glyph.advance + (f ? fontKerning(ctx, pchr, chr) : 0)) * scl);
-                if (!half && w + advance > x) {
-                    return pi;
-                } else if (w + advance / 2 > x) {
-                    return pi;
-                } else if (w + advance > x) {
-                    return i;
-                }
-                w += advance;
-                pchr = chr;
-                pi = i;
-                f = 1;
+
+            float advance = ceil((glyph.advance + (f ? fontKerning(ctx, pchr, chr) : 0)) * scl);
+            if (!half && w + advance > x) {
+                return pi;
+            } else if (w + advance / 2 > x) {
+                return pi;
+            } else if (w + advance > x) {
+                return i;
             }
+            w += advance;
+            pchr = chr;
+            pi = i;
+            f = 1;
         }
     }
     return i;
@@ -1139,35 +1139,36 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
     unsigned long chr = 0, prev = 0;
     while (utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
-            fvGlyph &glyph = fontGlyphRendered(font->fCtx, font, chr);
-            if (glyph.enabled) {
-                float kern = (f ? fontKerning(font->fCtx, prev, chr) : 0);
-                float advance = ceil((glyph.advance + kern) * (scl * spc));
-                if (maxWidth > 0 && floor(x + advance - start) > maxWidth) {
+            fvPoint uv;
+            fvGlyph &glyph = fontGlyphRendered(font->fCtx, font, chr, &uv);
+
+            float kern = (f ? fontKerning(font->fCtx, prev, chr) : 0);
+            float advance = ceil((glyph.advance + kern) * (scl * spc));
+            if (maxWidth > 0 && floor(x + advance - start) > maxWidth) {
+                break;
+            }
+
+            float px = x + kern * scl * spc;
+            if (uv.x > -1) {
+                float x1 = round(px + glyph.x * scl), y1 = y + glyph.y * scl;
+                float x2 = x1 + glyph.w * scl, y2 = y1 + glyph.h * scl;
+
+                if (ctx->vInd + 8 >= ctx->MVERTEX || ctx->eInd + 6 >= ctx->MELEMENT) {
                     break;
                 }
-                float px = x + kern * scl * spc;
-                if (glyph.u > -1) {
-                    float x1 = round(px + glyph.x * scl), y1 = y + glyph.y * scl;
-                    float x2 = x1 + glyph.w * scl, y2 = y1 + glyph.h * scl;
 
-                    if (ctx->vInd + 8 >= ctx->MVERTEX || ctx->eInd + 6 >= ctx->MELEMENT) {
-                        break;
-                    }
-
-                    int el = (ctx->vInd / 2);
-                    fv__text_vertex(ctx, x1, y1, glyph.u, glyph.v);
-                    fv__text_vertex(ctx, x2, y1, glyph.u2, glyph.v);
-                    fv__text_vertex(ctx, x2, y2, glyph.u2, glyph.v2);
-                    fv__text_vertex(ctx, x1, y2, glyph.u, glyph.v2);
-                    fv__triangle(ctx, el, el + 1, el + 2);
-                    fv__triangle(ctx, el, el + 2, el + 3);
-                }
-                x += advance;
-
-                prev = chr;
-                f = 1;
+                int el = (ctx->vInd / 2);
+                fv__text_vertex(ctx, x1, y1, uv.x, uv.y);
+                fv__text_vertex(ctx, x2, y1, uv.x + glyph.w, uv.y);
+                fv__text_vertex(ctx, x2, y2, uv.x + glyph.w, uv.y + glyph.h);
+                fv__text_vertex(ctx, x1, y2, uv.x, uv.y + glyph.h);
+                fv__triangle(ctx, el, el + 1, el + 2);
+                fv__triangle(ctx, el, el + 2, el + 3);
             }
+            x += advance;
+
+            prev = chr;
+            f = 1;
             p = i;
         }
     }
@@ -1205,7 +1206,7 @@ fvPaint fvColorPaint(long color) {
     fvPaint p{};
     p.uniform.type = 0;
     p.image0 = 0;
-    p.image1 = 0;
+    p.font = NULL;
     fv__identity(p.uniform.imageMat);
     fv__identity(p.uniform.colorMat);
 
@@ -1225,7 +1226,6 @@ fvPaint fvColorPaint(long color) {
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;
     p.convex = 0;
-    p.sdf = 0;
     p.aa = 0;
 
     return p;
@@ -1235,7 +1235,7 @@ fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
     fvPaint p{};
     p.uniform.type = 1;
     p.image0 = imageID;
-    p.image1 = 0;
+    p.font = NULL;
     if (affineImg != 0) {
         for (int i = 0; i < 6; i++) {
             p.uniform.imageMat[i] = affineImg[i];
@@ -1262,7 +1262,6 @@ fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;
     p.convex = 0;
-    p.sdf = 0;
     p.aa = 0;
 
     return p;
@@ -1272,7 +1271,7 @@ fvPaint fvLinearGradientPaint(float* affine, float x1, float y1, float x2, float
     fvPaint p{};
     p.uniform.type = 0;
     p.image0 = 0;
-    p.image1 = 0;
+    p.font = NULL;
     fv__identity(p.uniform.imageMat);
 
     float dx, dy, d;
@@ -1316,7 +1315,6 @@ fvPaint fvLinearGradientPaint(float* affine, float x1, float y1, float x2, float
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;
     p.convex = 0;
-    p.sdf = 0;
     p.aa = 0;
 
     return p;
@@ -1326,7 +1324,7 @@ fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float 
     fvPaint p{};
     p.uniform.type = 0;
     p.image0 = 0;
-    p.image1 = 0;
+    p.font = NULL;
     fv__identity(p.uniform.imageMat);
 
     float r = (rIn+rOut)*0.5f;
@@ -1359,7 +1357,6 @@ fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float 
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;
     p.convex = 0;
-    p.sdf = 0;
     p.aa = 0;
 
     p.uniform.extra[0] = fx;
@@ -1375,7 +1372,7 @@ fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, fl
     fvPaint p{};
     p.uniform.type = 0;
     p.image0 = 0;
-    p.image1 = 0;
+    p.font = NULL;
     fv__identity(p.uniform.imageMat);
 
     p.uniform.colorMat[0] = 1.0f;
@@ -1405,7 +1402,6 @@ fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, fl
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;
     p.convex = 0;
-    p.sdf = 0;
     p.aa = 0;
 
     return p;

@@ -246,31 +246,32 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontPaintDestroy
-        (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    FontLoadAllGlyphs
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadAllGlyphs
   (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_SVG
- * Method:    FontLoadGlyphs
- * Signature: (JLjava/lang/String;I)V
+ * Method:    FontPaintGetAtlas
+ * Signature: (J[I)V
  */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadGlyphs
-  (JNIEnv *, jclass, jlong, jstring, jint);
+JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas
+  (JNIEnv *, jclass, jlong, jintArray);
 
 /*
  * Class:     flat_backend_SVG
- * Method:    FontLoadGlyphsBuffer
- * Signature: (JLjava/nio/Buffer;III)V
+ * Method:    FontRenderAllGlyphs
+ * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontLoadGlyphsBuffer
-  (JNIEnv *, jclass, jlong, jobject, jint, jint, jint);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontRenderAllGlyphs
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetGlyphShape
+ * Signature: (J)[F
+ */
+JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape
+  (JNIEnv *, jclass, jlong, jint);
+
 
 /*
  * Class:     flat_backend_SVG

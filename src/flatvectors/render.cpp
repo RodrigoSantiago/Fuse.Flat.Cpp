@@ -41,6 +41,7 @@ const char *fragmentSource =
         "uniform int dbg;\n"
         "uniform sampler2D tex;\n"
         "uniform sampler2D fnt;\n"
+        "uniform vec2 fntSize;\n"
         "in vec2 oPos;\n"
         "in vec2 oTex;\n"
         "float roundrect(vec2 pt, vec2 ext, float rad) {\n"
@@ -108,15 +109,16 @@ const char *fragmentSource =
         "            if (dbg == 1) {\n"
         "                a = 1;\n"
         "            } else if (sdf == 1) {\n"
-        "                float r = texture(fnt, oTex).r;"
-        "                float d = (r - 0.5) * 2;\n"
         "                ivec2 sz = textureSize(fnt, 0);"
-        "                float dx = dFdx(oTex.x) * sz.x;\n"
-        "                float dy = dFdy(oTex.y) * sz.y;\n"
+        "                float r = texture(fnt, oTex / sz).r;"
+        "                float d = (r - 0.5) * 2;\n"
+        "                float dx = dFdx(oTex.x / sz.x) * sz.x;\n"
+        "                float dy = dFdy(oTex.y / sz.y) * sz.y;\n"
         "                float toPixels = 8.0 * inversesqrt(dx * dx + dy * dy);"
         "                a = a * clamp(mix(r, d * toPixels + 0.5, extra[3]), 0.0, 1.0);"
         "            } else {\n"
-        "                a = a * texture(fnt, oTex).r;\n"
+        "                ivec2 sz = textureSize(fnt, 0);"
+        "                a = a * texture(fnt, oTex / sz).r;\n"
         "            }\n"
         "        }\n"
         "        FragColor = vec4(color.rgb * color.a + texel.rgb * texel.a * (1 - color.a), a);\n"
@@ -354,7 +356,7 @@ void renderFlush(void *data,
 
         fvPaint &p = paints[i];
         int aa = p.aa;
-        int sd = p.sdf;
+        int sd = p.font == NULL ? 0 : p.font->sdf;
         int cv = p.convex;
         int wr = p.winding;
         int op = p.paintOp;
@@ -395,9 +397,11 @@ void renderFlush(void *data,
                 glBindTexture(GL_TEXTURE_2D, ctx->image0 = p.image0);
             }
 
-            if (ctx->image1 != p.image1) {
+            // Font
+            GLuint fntImg = p.font == NULL ? 0 : p.font->imageID;
+            if (ctx->image1 != fntImg) {
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, ctx->image1 = p.image1);
+                glBindTexture(GL_TEXTURE_2D, ctx->image1 = fntImg);
                 if (ctx->sdf != sd) {
                     ctx->sdf = sd;
                     if (ctx->sdf) {
@@ -487,6 +491,37 @@ unsigned long renderCreateFontTexture(void* data, int width, int height) {
 
     glBindTexture(GL_TEXTURE_2D, prev);
     return img;
+}
+
+unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int newWidth, int newHeight) {
+    GLint prev;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
+
+    GLuint newImg;
+    glGenTextures(1, &newImg);
+    glBindTexture(GL_TEXTURE_2D, newImg);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, newWidth, newHeight, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, oldImageID);
+
+    unsigned char* oldData = (unsigned char *) malloc(oldWidth * oldHeight * sizeof(unsigned char));
+
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, oldData);
+
+    glBindTexture(GL_TEXTURE_2D, newImg);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, oldWidth, oldHeight, GL_RED, GL_UNSIGNED_BYTE, oldData);
+
+    free(oldData);
+
+    GLuint oldImgID = oldImageID;
+    glDeleteTextures(1, &oldImgID);
+
+    return newImg;
 }
 
 void renderUpdateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height) {
