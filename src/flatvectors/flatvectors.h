@@ -51,6 +51,7 @@ typedef struct fvUniform {
 typedef struct fvGlyph {
     int enabled;
     float advance;
+    long int unicode;
 
     float x;
     float y;
@@ -59,7 +60,7 @@ typedef struct fvGlyph {
 } fvGlyph;
 
 typedef struct fvCell {
-    int id;
+    fvPoint* uvPtr;
     int w;
     int h;
 } fvCell;
@@ -73,6 +74,7 @@ typedef struct fvPack {
     int heightCount;
     int minX;
     int minY;
+    int clearQuad;
     fvCell* matrix;
 } fvPack;
 
@@ -83,9 +85,9 @@ typedef struct fvFont {
     // Properties
     fvPack* pack;
     unsigned long imageID;
-    int imageWidth, imageHeight;
     fvPoint* renderState;
 
+    int count;
     int sdf;
     float size;
     float height;
@@ -235,13 +237,13 @@ void fvFontDestroy(fvFont* font);
 
 long fvFontGetCurrentAtlas(fvFont* font, int* w, int* h);
 
-void fvFontRenderAllGlyphs(fvFont* font);
-
 void fvFontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len);
 
 int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info);
 
-void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap);
+void fvFontGetAllCodePoints(void* ctx, long int* codePoints);
+
+void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap, int* glyphCount);
 
 float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float size, float spacing);
 

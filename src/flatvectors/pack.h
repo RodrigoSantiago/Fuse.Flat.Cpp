@@ -11,8 +11,10 @@ fvPack* packCreate(int cellWidth, int cellHeight);
 
 void packDestroy(fvPack* pack);
 
-bool packAddRect(fvPack* pack, int w, int h, int* x, int* y);
+int packAddRect(fvPack* pack, int w, int h, fvPoint* point);
 
 bool packGrow(fvPack* pack);
+
+void packClear(fvPack* pack);
 
 #endif //FLAT_PACK_H

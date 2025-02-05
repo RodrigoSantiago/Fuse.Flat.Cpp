@@ -3,11 +3,10 @@
 //
 
 #include <cmath>
+#include <iostream>
 #include "pack.h"
 
-int __findOpenCell(fvPack* pack, int w, int h) {
-    int cellW = w <= pack->cellWidth ? 1 : (int)(ceil(w / (float)pack->cellWidth));
-    int cellH = h <= pack->cellHeight ? 1 : (int)(ceil(h / (float)pack->cellHeight));
+int __findOpenCell(fvPack* pack, int cellW, int cellH) {
     bool single = cellW == 1 && cellH == 1;
     bool updateEmpty = false;
 
@@ -21,7 +20,7 @@ int __findOpenCell(fvPack* pack, int w, int h) {
         for (; x + cellW <= wc;) {
             int index = yOff + x;
             fvCell rect = pack->matrix[index];
-            if (rect.id == 0) {
+            if (rect.uvPtr == NULL) {
                 if (!updateEmpty) {
                     updateEmpty = true;
                     pack->minX = x;
@@ -36,7 +35,7 @@ int __findOpenCell(fvPack* pack, int w, int h) {
                     int jOff = j * wc;
                     for (int i = 0; i < cellW; ++i) {
                         fvCell iRect = pack->matrix[index + jOff + i];
-                        if (iRect.id != 0) {
+                        if (iRect.uvPtr != NULL) {
                             jump = iRect.w;
                             break;
                         }
@@ -58,15 +57,16 @@ int __findOpenCell(fvPack* pack, int w, int h) {
     return open;
 }
 
-void __setCell(fvPack* pack, int w, int h, int openCell) {
+void __setCell(fvPack* pack, int cellW, int cellH, int openCell, fvPoint* point) {
+    (*point).x = openCell % pack->widthCount * pack->cellWidth;
+    (*point).y = openCell / pack->widthCount * pack->cellHeight;
+
     int wc = pack->widthCount;
-    int cellW = w <= pack->cellWidth ? 1 : (int)(ceil(w / (float)pack->cellWidth));
-    int cellH = h <= pack->cellHeight ? 1 : (int)(ceil(h / (float)pack->cellHeight));
     for (int y = 0; y < cellH; ++y) {
         int yOff = y * wc;
         for (int x = 0; x < cellW; ++x) {
             int index = yOff + x;
-            pack->matrix[openCell + index].id = 1;
+            pack->matrix[openCell + index].uvPtr = point;
             pack->matrix[openCell + index].w = cellW;
             pack->matrix[openCell + index].h = cellH;
         }
@@ -94,6 +94,7 @@ fvPack* packCreate(int cellWidth, int cellHeight) {
     pack->matrix = (fvCell *) calloc(pack->widthCount * pack->heightCount, sizeof(fvCell));
     pack->minX = 0;
     pack->minY = 0;
+    pack->clearQuad = 0;
 
     return pack;
 }
@@ -103,30 +104,30 @@ void packDestroy(fvPack* pack) {
     free(pack);
 }
 
-bool packAddRect(fvPack* pack, int w, int h, int* x, int* y) {
-    (*x) = -1;
-    (*y) = -1;
-    int openCell = __findOpenCell(pack, w, h);
+int packAddRect(fvPack* pack, int w, int h, fvPoint* point) {
+    int cellW = w <= pack->cellWidth ? 1 : (int)(ceil(w / (float)pack->cellWidth));
+    int cellH = h <= pack->cellHeight ? 1 : (int)(ceil(h / (float)pack->cellHeight));
+    (*point).x = -1;
+    (*point).y = -1;
+
+    int openCell = __findOpenCell(pack, cellW, cellH);
     if (openCell > -1) {
-        (*x) = openCell % pack->widthCount * pack->cellWidth;
-        (*y) = openCell / pack->widthCount * pack->cellHeight;
-        __setCell(pack, w, h, openCell);
-        return false;
+        __setCell(pack, cellW, cellH, openCell, point);
+        return 0;
 
     } else if (packGrow(pack)) {
-        openCell = __findOpenCell(pack, w, h);
+        openCell = __findOpenCell(pack, cellW, cellH);
         if (openCell > -1) {
-            (*x) = openCell % pack->widthCount * pack->cellWidth;
-            (*y) = openCell / pack->widthCount * pack->cellHeight;
-            __setCell(pack, w, h, openCell);
-            return true;
-
-        } else { // Unusually bigger
-            return true;
+            __setCell(pack, cellW, cellH, openCell, point);
+        } else {
+            return -1;
         }
+        return 1;
+
     } else {
-        // What to do now ?
-        return false;
+        packClear(pack);
+        return 2;
+
     }
 }
 
@@ -166,4 +167,20 @@ bool packGrow(fvPack* pack) {
     pack->minX = 0;
     pack->minY = 0;
     return true;
+}
+
+void packClear(fvPack* pack) {
+    // Todo - Implement quadrand clearing, circular, so avoid resetting everthig. Attention to mult width/height cells
+    int size = pack->widthCount * pack->heightCount;
+    for (int i = 0; i < size; ++i) {
+        if (pack->matrix[i].uvPtr != NULL) {
+            (*pack->matrix[i].uvPtr).x = -1;
+            (*pack->matrix[i].uvPtr).y = -1;
+            pack->matrix[i].uvPtr = NULL;
+        }
+        pack->matrix[i].w = 0;
+        pack->matrix[i].h = 0;
+    }
+    pack->minX = 0;
+    pack->minY = 0;
 }

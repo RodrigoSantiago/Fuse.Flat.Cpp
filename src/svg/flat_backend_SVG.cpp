@@ -195,9 +195,6 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas(JNIEnv * jEnv, j
 
     return imageID;
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontRenderAllGlyphs(JNIEnv * jEnv, jclass jClass, jlong fontPaint) {
-    fvFontRenderAllGlyphs((fvFont*) fontPaint);
-}
 JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape(JNIEnv * jEnv, jclass jClass, jlong font, jint unicode) {
     float* polygon;
     int len;
@@ -228,25 +225,40 @@ JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphsBuffer(JNIEnv * jEnv, 
     jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
     return count;
 }
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints(JNIEnv * jEnv, jclass jClass, jlong font, jintArray codePoints) {
+    jsize size = jEnv->GetArrayLength(codePoints);
+    jint* data = (jint*) malloc(size * sizeof(long int));
+
+    fvFontGetAllCodePoints((void *) font, data);
+
+    jEnv->SetIntArrayRegion(codePoints, 0, size, data);
+
+    free(data);
+}
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetHeight(JNIEnv * jEnv, jclass jClass, jlong font) {
     jfloat height;
-    fvFontGetMetrics((void *) font, 0, 0, &height, 0);
+    fvFontGetMetrics((void *) font, 0, 0, &height, 0, 0);
     return height;
 }
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetAscent(JNIEnv * jEnv, jclass jClass, jlong font) {
     jfloat ascent;
-    fvFontGetMetrics((void *) font, &ascent, 0, 0, 0);
+    fvFontGetMetrics((void *) font, &ascent, 0, 0, 0, 0);
     return ascent;
 }
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetDescent(JNIEnv * jEnv, jclass jClass, jlong font) {
     jfloat descent;
-    fvFontGetMetrics((void *) font, 0, &descent, 0, 0);
+    fvFontGetMetrics((void *) font, 0, &descent, 0, 0, 0);
     return descent;
 }
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetLineGap(JNIEnv * jEnv, jclass jClass, jlong font) {
     jfloat lineGap;
-    fvFontGetMetrics((void *) font, 0, 0, 0, &lineGap);
+    fvFontGetMetrics((void *) font, 0, 0, 0, &lineGap, 0);
     return lineGap;
+}
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphCount(JNIEnv * jEnv, jclass jClass, jlong font) {
+    int glyphCount;
+    fvFontGetMetrics((void *) font, 0, 0, 0, 0, &glyphCount);
+    return (jint) glyphCount;
 }
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetTextWidth(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloat scale, jfloat spacing) {
     const char *chars = jEnv->GetStringUTFChars(characters, 0);

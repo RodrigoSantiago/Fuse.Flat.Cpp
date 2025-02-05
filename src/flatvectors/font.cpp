@@ -7,6 +7,8 @@
 #include "render.h"
 
 #include <unordered_map>
+#include <iostream>
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 #include "pack.h"
@@ -18,14 +20,13 @@ typedef struct ftFontData {
     stbtt_fontinfo info;
     unsigned char* data;
     float scale;
-    int sdf;
     float size;
     float ascent;
     float descent;
     float lineGap;
     float height;
-    int glyphState;
     int glyphCount;
+    bool coded;
     fvGlyph* glyphs;
 } ftFontData;
 
@@ -42,12 +43,12 @@ void* fontCreate(const void* data, long int length, float size, int sdf) {
         return NULL;
 
     } else {
-        fdata->sdf = sdf;
         fdata->size = size;
 
         fdata->scale = stbtt_ScaleForMappingEmToPixels(&fdata->info, size);//stbtt_ScaleForPixelHeight(&fdata->info, height);
         fdata->glyphCount = fdata->info.numGlyphs;
         fdata->glyphs = (fvGlyph*) calloc(fdata->glyphCount, sizeof(fvGlyph));
+        fdata->coded = false;
 
         int ascent, descent, lineGap;
         stbtt_GetFontVMetrics(&fdata->info, &ascent, &descent, &lineGap);
@@ -76,7 +77,7 @@ void fontGetData(void* ctx, fvFont* ft) {
         ft->renderState[i] = fvPoint {-1, -1};
     }
 
-    ft->sdf = fdata->sdf;
+    ft->count = fdata->glyphCount;
     ft->size = fdata->size;
     ft->ascent = fdata->ascent;
     ft->descent = fdata->descent;
@@ -85,6 +86,49 @@ void fontGetData(void* ctx, fvFont* ft) {
 
     ft->fCtx = fdata;
     ft->pack = packCreate(ceil(ft->height * 1.01 + PADDING2), ceil(ft->height * 1.01 + PADDING2));
+}
+
+int __maxCodePoint(stbtt_fontinfo *info){
+    stbtt_uint8 *data = info->data;
+    stbtt_uint32 index_map = info->index_map;
+
+    stbtt_uint16 format = ttUSHORT(data + index_map + 0);
+    if (format == 0) { // apple byte encoding
+        stbtt_int32 bytes = ttUSHORT(data + index_map + 2);
+        return bytes-6;
+    } else if (format == 6) {
+        stbtt_uint32 first = ttUSHORT(data + index_map + 6);
+        stbtt_uint32 count = ttUSHORT(data + index_map + 8);
+        return first + count;
+    } else if (format == 2) {
+        return 0;
+    } else if (format == 4) {
+        return 0xffff;
+    } else if (format == 12 || format == 13) {
+        return 0;
+    }
+    return 0;
+}
+
+void fontGetAllCodePoints(void* ctx, long int* codePoints) {
+    ftFontData* fdata = (ftFontData*)(ctx);
+    if (!fdata->coded) {
+        int max = __maxCodePoint(&fdata->info);
+        if (max == 0) {
+            max = 0x10FFFF;
+        }
+
+        for (long int codePoint = 0; codePoint <= max; codePoint++) {
+            int glyphIndex = stbtt_FindGlyphIndex(&fdata->info, codePoint);
+            if (glyphIndex != 0) {
+                fdata->glyphs[glyphIndex].unicode = codePoint;
+            }
+        }
+        fdata->coded = true;
+    }
+    for (int i = 0; i < fdata->glyphCount; ++i) {
+        codePoints[i] = fdata->glyphs[i].unicode;
+    }
 }
 
 void __loadGlyph(ftFontData* fdata, int glyphIndex) {
@@ -111,7 +155,7 @@ void __loadGlyph(ftFontData* fdata, int glyphIndex) {
     }
 }
 
-void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex) {
+void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex, int* recreate) {
     fvGlyph& glyph = fdata->glyphs[glyphIndex];
 
     if (!glyph.enabled) {
@@ -124,15 +168,20 @@ void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex) {
     if (width > 0 && height > 0) {
         int oldW = font->pack->width;
         int oldH = font->pack->height;
-        int cellX, cellY;
-        bool grow = packAddRect(font->pack, width, height, &cellX, &cellY);
-        if (cellX > -1) {
+        fvPoint * point = &font->renderState[glyphIndex];
+        int state = packAddRect(font->pack, width, height, point);
+        (*recreate) = 0;
+        if (state == 2) {
+            (*recreate) = 1;
+        } else if (state == -1) {
+            font->renderState[glyphIndex] = fvPoint {-2, -2};
+
+        } else {
             if (font->imageID == 0) {
                 font->imageID = renderCreateFontTexture(0, font->pack->width, font->pack->height);
-            } else if (grow) {
+            } else if (state == 1) {
                 font->imageID = renderResizeFontTexture(font->imageID, oldW, oldH, font->pack->width, font->pack->height);
             }
-            font->renderState[glyphIndex] = fvPoint{cellX, cellY};
 
             unsigned char *img = (unsigned char *) calloc(width * height, sizeof(unsigned char));
 
@@ -157,24 +206,11 @@ void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex) {
                         , fdata->scale, fdata->scale, glyphIndex);
             }
 
-            renderUpdateFontTexture(font->imageID, img, cellX, cellY, width, height);
+            renderUpdateFontTexture(font->imageID, img, point->x, point->y, width, height);
             free(img);
-        } else {
-            font->renderState[glyphIndex] = fvPoint {-2, -2};
         }
     } else {
         font->renderState[glyphIndex] = fvPoint {-2, -2};
-    }
-}
-
-void fontRenderAllGlyphs(void* ctx, fvFont* font) {
-    ftFontData* fdata = (ftFontData*)(ctx);
-
-    for (int i = 0; i < fdata->glyphCount; i++) {
-        if (font->renderState[i].x == -1) {
-            __renderGlyph(fdata, font, i);
-            break;
-        }
     }
 }
 
@@ -229,12 +265,13 @@ void fontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len) {
     }
 }
 
-void fontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap) {
+void fontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap, int* glyphCount) {
     ftFontData* fdata = (ftFontData*)(ctx);
     if (ascender != 0) *ascender = fdata->ascent;
     if (descender != 0) *descender = fdata->descent;
     if (height != 0) *height = fdata->height;
     if (lineGap != 0) *lineGap = fdata->lineGap;
+    if (glyphCount != 0) *glyphCount = fdata->glyphCount;
 }
 
 fvGlyph& fontGlyph(void* ctx, long unicode) {
@@ -250,13 +287,13 @@ fvGlyph& fontGlyph(void* ctx, long unicode) {
     return glyph;
 }
 
-fvGlyph& fontGlyphRendered(void* ctx, fvFont* font, long unicode, fvPoint* uv) {
+fvGlyph& fontGlyphRendered(void* ctx, fvFont* font, long unicode, fvPoint* uv, int* recreate) {
     ftFontData* fdata = (ftFontData*)(ctx);
 
     int glyphIndex = stbtt_FindGlyphIndex(&fdata->info, unicode);
 
     if (font->renderState[glyphIndex].x == -1) {
-        __renderGlyph(fdata, font, glyphIndex);
+        __renderGlyph(fdata, font, glyphIndex, recreate);
     }
 
     (*uv) = font->renderState[glyphIndex];

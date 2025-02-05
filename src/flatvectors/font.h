@@ -13,15 +13,15 @@ void fontDestroy(void* ctx);
 
 void fontGetData(void* ctx, fvFont* ft);
 
-void fontRenderAllGlyphs(void* ctx, fvFont* font);
+void fontGetAllCodePoints(void* ctx, long int* codePoints);
 
 void fontGetGlyphShape(void* ctx, long unicode, float** data, int* len);
 
-void fontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap);
+void fontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap, int* glyphCount);
 
 fvGlyph& fontGlyph(void* ctx, long unicode);
 
-fvGlyph& fontGlyphRendered(void* ctx, fvFont* font, long unicode, fvPoint* uv);
+fvGlyph& fontGlyphRendered(void* ctx, fvFont* font, long unicode, fvPoint* uv, int* recreate);
 
 float fontKerning(void* ctx, long unicode1, long unicode2);
 

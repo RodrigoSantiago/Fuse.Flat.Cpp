@@ -258,14 +258,6 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas
 
 /*
  * Class:     flat_backend_SVG
- * Method:    FontRenderAllGlyphs
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontRenderAllGlyphs
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     flat_backend_SVG
  * Method:    FontGetGlyphShape
  * Signature: (J)[F
  */
@@ -288,6 +280,14 @@ JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphs
  */
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphsBuffer
   (JNIEnv *, jclass, jlong, jobject, jint, jint, jfloatArray);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetGlyphsBuffer
+ * Signature: (JL[I)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints
+  (JNIEnv *, jclass, jlong, jintArray);
 
 /*
  * Class:     flat_backend_SVG
@@ -319,6 +319,14 @@ JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetDescent
  * Signature: (J)F
  */
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetLineGap
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    _FontGetGlyphCount
+ * Signature: (J)F
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphCount
   (JNIEnv *, jclass, jlong);
 
 /*

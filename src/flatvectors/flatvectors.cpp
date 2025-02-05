@@ -16,6 +16,8 @@
 #define PI 3.14159265359f
 #define PI2 6.28318530718f
 
+bool fvIsDebugMode = false;
+
 float fv__angle(float x1, float y1, float x2, float y2) {
     return atan2(y2 - y1, x2 - x1);
 }
@@ -691,8 +693,6 @@ void fvDestroy(fvContext* ctx) {
     free(ctx);
 }
 
-bool fvIsDebugMode = false;
-
 void fvSetDebug(bool debug) {
     fvIsDebugMode = debug;
 }
@@ -1017,10 +1017,6 @@ long fvFontGetCurrentAtlas(fvFont* font, int* w, int* h) {
     return font->imageID;
 }
 
-void fvFontRenderAllGlyphs(fvFont* font) {
-    fontRenderAllGlyphs(font->fCtx, font);
-}
-
 void fvFontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len) {
     fontGetGlyphShape(ctx, unicode, polygon, len);
 }
@@ -1046,8 +1042,12 @@ int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info) {
     return count;
 }
 
-void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap) {
-    fontGetMetrics(ctx, ascender, descender, height, lineGap);
+void fvFontGetAllCodePoints(void* ctx, long int* codePoints) {
+    fontGetAllCodePoints(ctx, codePoints);
+}
+
+void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* height, float* lineGap, int* glyphCount) {
+    fontGetMetrics(ctx, ascender, descender, height, lineGap, glyphCount);
 }
 
 float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float scale, float spacing) {
@@ -1115,76 +1115,57 @@ void fvSetFontBlur(fvContext* ctx, float blur) {
 }
 
 int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float maxWidth, fvHAlign hAlign, fvVAlign vAlign) {
-    fvPathBegin(ctx, fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
-
-    fvFont *font = ctx->font;
     maxWidth = ceil(maxWidth);
 
-    fv__assert(ctx, strLen * 4, strLen * 2);
+    fvFont *font = ctx->font;
+    float scl = ctx->fontScale;
+    float spc = ctx->fontSpacing;
 
     float start = x;
-    int fEl = ctx->vInd / 2;
 
-    float scl = ctx->fontScale, spc = ctx->fontSpacing;
-
-    if (vAlign == fvVAlign::BOTTOM) {
-        y -= font->height * scl;
-    } else if (vAlign == fvVAlign::MIDDLE) {
-        y -= font->height / 2 * scl;
-    } else if (vAlign == fvVAlign::BASELINE) {
-        y -= font->ascent * scl;
-    }
+    fvPathBegin(ctx, fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
+    fv__assert(ctx, strLen * 4, strLen * 2);
 
     int p = 0, i = 0, f = 0;
     unsigned long chr = 0, prev = 0;
     while (utf8loop(str, strLen, i, chr)) {
-        if (chr != '\n') {
-            fvPoint uv;
-            fvGlyph &glyph = fontGlyphRendered(font->fCtx, font, chr, &uv);
+        if (chr == '\n') continue;
 
-            float kern = (f ? fontKerning(font->fCtx, prev, chr) : 0);
-            float advance = ceil((glyph.advance + kern) * (scl * spc));
-            if (maxWidth > 0 && floor(x + advance - start) > maxWidth) {
-                break;
-            }
+        fvPoint uv;
+        int recreate;
+        fvGlyph& glyph = fontGlyphRendered(font->fCtx, font, chr, &uv, &recreate);
+        if (recreate == 1) {
+            fvPathEnd(ctx);
+            fvFlush(ctx);
 
-            float px = x + kern * scl * spc;
-            if (uv.x > -1) {
-                float x1 = round(px + glyph.x * scl), y1 = y + glyph.y * scl;
-                float x2 = x1 + glyph.w * scl, y2 = y1 + glyph.h * scl;
-
-                if (ctx->vInd + 8 >= ctx->MVERTEX || ctx->eInd + 6 >= ctx->MELEMENT) {
-                    break;
-                }
-
-                int el = (ctx->vInd / 2);
-                fv__text_vertex(ctx, x1, y1, uv.x, uv.y);
-                fv__text_vertex(ctx, x2, y1, uv.x + glyph.w, uv.y);
-                fv__text_vertex(ctx, x2, y2, uv.x + glyph.w, uv.y + glyph.h);
-                fv__text_vertex(ctx, x1, y2, uv.x, uv.y + glyph.h);
-                fv__triangle(ctx, el, el + 1, el + 2);
-                fv__triangle(ctx, el, el + 2, el + 3);
-            }
-            x += advance;
-
-            prev = chr;
-            f = 1;
-            p = i;
+            fontGlyphRendered(font->fCtx, font, chr, &uv, &recreate);
+            fvPathBegin(ctx, fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
         }
-    }
 
-    if (hAlign == fvHAlign::RIGHT) {
-        float offset = x - start;
-        int el = (ctx->vInd / 2);
-        for (int j = fEl; j < el; j++) {
-            ctx->vtx[j * 2] -= offset;
+        float kern = (f ? fontKerning(font->fCtx, prev, chr) : 0);
+        float advance = ceil((glyph.advance + kern) * (scl * spc));
+        if (maxWidth > 0 && floor(x + advance - start) > maxWidth) {
+            break;
         }
-    } else if (hAlign == fvHAlign::CENTER) {
-        float offset = (x - start) / 2;
-        int el = (ctx->vInd / 2);
-        for (int j = fEl; j < el; j++) {
-            ctx->vtx[j * 2] -= offset;
+
+        float px = x + kern * scl * spc;
+        if (uv.x > -1) {
+            float x1 = round(px + glyph.x * scl), y1 = y + glyph.y * scl;
+            float x2 = x1 + glyph.w * scl, y2 = y1 + glyph.h * scl;
+
+            int el = (ctx->vInd / 2);
+            fv__text_vertex(ctx, x1, y1, uv.x, uv.y);
+            fv__text_vertex(ctx, x2, y1, uv.x + glyph.w, uv.y);
+            fv__text_vertex(ctx, x2, y2, uv.x + glyph.w, uv.y + glyph.h);
+            fv__text_vertex(ctx, x1, y2, uv.x, uv.y + glyph.h);
+            fv__triangle(ctx, el, el + 1, el + 2);
+            fv__triangle(ctx, el, el + 2, el + 3);
         }
+        x += advance;
+
+        prev = chr;
+        f = 1;
+        p = i;
     }
 
     fvPathEnd(ctx);
