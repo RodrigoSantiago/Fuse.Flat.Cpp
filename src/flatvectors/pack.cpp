@@ -104,6 +104,13 @@ void packDestroy(fvPack* pack) {
     free(pack);
 }
 
+void packToCellSize(fvPack* pack, int w, int h, int* cellW, int* cellH) {
+    *cellW = w <= pack->cellWidth ? 1 : (int)(ceil(w / (float)pack->cellWidth));
+    *cellH = h <= pack->cellHeight ? 1 : (int)(ceil(h / (float)pack->cellHeight));
+    *cellW *= pack->cellWidth;
+    *cellH *= pack->cellHeight;
+}
+
 int packAddRect(fvPack* pack, int w, int h, fvPoint* point) {
     int cellW = w <= pack->cellWidth ? 1 : (int)(ceil(w / (float)pack->cellWidth));
     int cellH = h <= pack->cellHeight ? 1 : (int)(ceil(h / (float)pack->cellHeight));

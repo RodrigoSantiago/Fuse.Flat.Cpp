@@ -52,6 +52,7 @@ typedef struct fvGlyph {
     int enabled;
     float advance;
     long int unicode;
+    void* cell;
 
     float x;
     float y;

@@ -11,6 +11,8 @@ fvPack* packCreate(int cellWidth, int cellHeight);
 
 void packDestroy(fvPack* pack);
 
+void packToCellSize(fvPack* pack, int w, int h, int* cellW, int* cellH);
+
 int packAddRect(fvPack* pack, int w, int h, fvPoint* point);
 
 bool packGrow(fvPack* pack);

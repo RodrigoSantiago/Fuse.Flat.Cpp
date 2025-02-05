@@ -19,6 +19,7 @@
 typedef struct ftFontData {
     stbtt_fontinfo info;
     unsigned char* data;
+    int sdf;
     float scale;
     float size;
     float ascent;
@@ -44,6 +45,7 @@ void* fontCreate(const void* data, long int length, float size, int sdf) {
 
     } else {
         fdata->size = size;
+        fdata->sdf = sdf;
 
         fdata->scale = stbtt_ScaleForMappingEmToPixels(&fdata->info, size);//stbtt_ScaleForPixelHeight(&fdata->info, height);
         fdata->glyphCount = fdata->info.numGlyphs;
@@ -63,6 +65,9 @@ void* fontCreate(const void* data, long int length, float size, int sdf) {
 
 void fontDestroy(void* ctx) {
     ftFontData* fdata = (ftFontData*)(ctx);
+    for (int i = 0; i < fdata->glyphCount; ++i) {
+        free(fdata->glyphs[i].cell);
+    }
     free(fdata->glyphs);
     free(fdata->data);
     free(fdata);
@@ -77,6 +82,7 @@ void fontGetData(void* ctx, fvFont* ft) {
         ft->renderState[i] = fvPoint {-1, -1};
     }
 
+    ft->sdf = fdata->sdf;
     ft->count = fdata->glyphCount;
     ft->size = fdata->size;
     ft->ascent = fdata->ascent;
@@ -166,8 +172,8 @@ int __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex) {
     int height = (int) ceil(glyph.h);
 
     if (width > 0 && height > 0) {
-        int oldW = font->pack->width;
-        int oldH = font->pack->height;
+        int oW = font->pack->width;
+        int oH = font->pack->height;
         fvPoint * point = &font->renderState[glyphIndex];
         int state = packAddRect(font->pack, width, height, point);
         if (state == 2) {
@@ -177,34 +183,38 @@ int __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex) {
             if (font->imageID == 0) {
                 font->imageID = renderCreateFontTexture(font->pack->width, font->pack->height);
             } else if (state == 1) {
-                font->imageID = renderResizeFontTexture(font->imageID, oldW, oldH, font->pack->width, font->pack->height);
+                font->imageID = renderResizeFontTexture(font->imageID, oW, oH, font->pack->width, font->pack->height);
             }
 
-            unsigned char *img = (unsigned char *) calloc(width * height, sizeof(unsigned char));
+            int cellW, cellH;
+            packToCellSize(font->pack, width, height, &cellW, &cellH);
 
-            if (font->sdf) {
-                int w, h, xof, yof;
-                unsigned char *bmap = stbtt_GetGlyphSDF(&fdata->info, fdata->scale, glyphIndex
-                        , PADDING, 128, 16
-                        , &w, &h, &xof, &yof);
-                if (bmap != 0) {
-                    for (int y = 0; y < height && y < h; y++) {
-                        for (int x = 0; x < width && x < w; x++) {
-                            img[x + y * width] = bmap[x + y * w];
+            if (glyph.cell == NULL) {
+                unsigned char *img = (unsigned char *) calloc(cellW * cellH, sizeof(unsigned char));
+
+                if (font->sdf) {
+                    int w, h, xof, yof;
+                    unsigned char *bmap = stbtt_GetGlyphSDF(&fdata->info, fdata->scale, glyphIndex, PADDING, 128, 16
+                                                            , &w, &h, &xof, &yof);
+                    if (bmap != 0) {
+                        for (int y = 0; y < height && y < h; y++) {
+                            for (int x = 0; x < width && x < w; x++) {
+                                img[x + y * cellW] = bmap[x + y * w];
+                            }
                         }
+                        stbtt_FreeSDF(bmap, &fdata->info.userdata);
                     }
-                    stbtt_FreeSDF(bmap, &fdata->info.userdata);
+                } else {
+                    stbtt_MakeGlyphBitmap(&fdata->info, img + (PADDING * cellW)/*y*/ + PADDING/*x*/
+                            , width - PADDING2
+                            , height - PADDING2
+                            , cellW
+                            , fdata->scale, fdata->scale, glyphIndex);
                 }
-            } else {
-                stbtt_MakeGlyphBitmap(&fdata->info, img + PADDING * width + PADDING
-                        , width - PADDING2
-                        , height - PADDING2
-                        , width
-                        , fdata->scale, fdata->scale, glyphIndex);
-            }
 
-            renderUpdateFontTexture(font->imageID, img, point->x, point->y, width, height);
-            free(img);
+                glyph.cell = img;
+            }
+            renderUpdateFontTexture(font->imageID, glyph.cell, point->x, point->y, cellW, cellH);
             return 1; // TEXT CREATED
         }
     }
