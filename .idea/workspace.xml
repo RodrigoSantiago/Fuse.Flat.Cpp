@@ -13,18 +13,10 @@
   <component name="ChangeListManager">
     <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Text rendering improved">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/stb_truetype.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/stb_truetype.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/font.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/font.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/font.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/pack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/pack.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/pack.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/pack.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/utf8.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/utf8.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/utf8.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/utf8.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +107,7 @@
       <workItem from="1738522582455" duration="8195000" />
       <workItem from="1738595558736" duration="30211000" />
       <workItem from="1738671493156" duration="38207000" />
-      <workItem from="1738756812026" duration="2269000" />
+      <workItem from="1738756812026" duration="7284000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -145,7 +137,14 @@
       <option name="project" value="LOCAL" />
       <updated>1738696291398</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Text rendering improved">
+      <created>1738759265022</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1738759265022</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

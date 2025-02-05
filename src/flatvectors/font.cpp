@@ -155,7 +155,7 @@ void __loadGlyph(ftFontData* fdata, int glyphIndex) {
     }
 }
 
-void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex, int* recreate) {
+int __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex) {
     fvGlyph& glyph = fdata->glyphs[glyphIndex];
 
     if (!glyph.enabled) {
@@ -170,15 +170,12 @@ void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex, int* recreat
         int oldH = font->pack->height;
         fvPoint * point = &font->renderState[glyphIndex];
         int state = packAddRect(font->pack, width, height, point);
-        (*recreate) = 0;
         if (state == 2) {
-            (*recreate) = 1;
-        } else if (state == -1) {
-            font->renderState[glyphIndex] = fvPoint {-2, -2};
+            return 2; // CLEARED - NO TEXT CREATED
 
-        } else {
+        } else if (state != -1) {
             if (font->imageID == 0) {
-                font->imageID = renderCreateFontTexture(0, font->pack->width, font->pack->height);
+                font->imageID = renderCreateFontTexture(font->pack->width, font->pack->height);
             } else if (state == 1) {
                 font->imageID = renderResizeFontTexture(font->imageID, oldW, oldH, font->pack->width, font->pack->height);
             }
@@ -208,10 +205,12 @@ void __renderGlyph(ftFontData* fdata, fvFont* font, int glyphIndex, int* recreat
 
             renderUpdateFontTexture(font->imageID, img, point->x, point->y, width, height);
             free(img);
+            return 1; // TEXT CREATED
         }
-    } else {
-        font->renderState[glyphIndex] = fvPoint {-2, -2};
     }
+
+    font->renderState[glyphIndex] = fvPoint {-2, -2};
+    return 0; // NOTHING HAPPENED, NO TEXT CREATED
 }
 
 void fontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len) {
@@ -293,7 +292,7 @@ fvGlyph& fontGlyphRendered(void* ctx, fvFont* font, long unicode, fvPoint* uv, i
     int glyphIndex = stbtt_FindGlyphIndex(&fdata->info, unicode);
 
     if (font->renderState[glyphIndex].x == -1) {
-        __renderGlyph(fdata, font, glyphIndex, recreate);
+        *recreate = __renderGlyph(fdata, font, glyphIndex);
     }
 
     (*uv) = font->renderState[glyphIndex];

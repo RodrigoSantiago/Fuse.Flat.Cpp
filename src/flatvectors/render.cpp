@@ -109,8 +109,8 @@ const char *fragmentSource =
         "            if (dbg == 1) {\n"
         "                a = 1;\n"
         "            } else if (sdf == 1) {\n"
-        "                ivec2 sz = textureSize(fnt, 0);"
-        "                float r = texture(fnt, oTex / sz).r;"
+        "                ivec2 sz = textureSize(fnt, 0);\n"
+        "                float r = texture(fnt, oTex / sz).r;\n"
         "                float d = (r - 0.5) * 2;\n"
         "                float dx = dFdx(oTex.x / sz.x) * sz.x;\n"
         "                float dy = dFdy(oTex.y / sz.y) * sz.y;\n"
@@ -332,6 +332,11 @@ void renderClearClip(void* data, int clip) {
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
+void renderUnbindImage(void *data) {
+    fvGLData *ctx = (fvGLData *) data;
+    ctx->image0 = 0;
+}
+
 void render__triangles(int pos, int length) {
     glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int)));
 }
@@ -476,31 +481,29 @@ void renderFlush(void *data,
     }
 }
 
-unsigned long renderCreateFontTexture(void* data, int width, int height) {
-    GLint prev;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
+unsigned long renderCreateFontTexture(int width, int height) {
+    glActiveTexture(GL_TEXTURE0);
 
     GLuint img;
     glGenTextures(1, &img);
     glBindTexture(GL_TEXTURE_2D, img);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBindTexture(GL_TEXTURE_2D, prev);
+    glBindTexture(GL_TEXTURE_2D, 0);
     return img;
 }
 
-unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int newWidth, int newHeight) {
-    GLint prev;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
+unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int width, int height) {
+    glActiveTexture(GL_TEXTURE0);
 
     GLuint newImg;
     glGenTextures(1, &newImg);
     glBindTexture(GL_TEXTURE_2D, newImg);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, newWidth, newHeight, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -521,18 +524,16 @@ unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, in
     GLuint oldImgID = oldImageID;
     glDeleteTextures(1, &oldImgID);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
     return newImg;
 }
 
 void renderUpdateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height) {
-    GLint  prev;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
+    glActiveTexture(GL_TEXTURE0);
 
     glBindTexture(GL_TEXTURE_2D, imageID);
-
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
-
-    glBindTexture(GL_TEXTURE_2D, prev);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void renderDestroyFontTexture(unsigned long imageID) {

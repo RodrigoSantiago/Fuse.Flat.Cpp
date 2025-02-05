@@ -1135,6 +1135,9 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
         int recreate;
         fvGlyph& glyph = fontGlyphRendered(font->fCtx, font, chr, &uv, &recreate);
         if (recreate == 1) {
+            renderUnbindImage(ctx->rCtx);
+        }
+        if (recreate == 2) {
             fvPathEnd(ctx);
             fvFlush(ctx);
 
