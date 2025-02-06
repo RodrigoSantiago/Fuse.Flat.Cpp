@@ -35,7 +35,8 @@ typedef struct fvUniform {
     float colorMat[12];
     float imageMat[12];
     float shape[4];             // Extent[0,1], Radius [2], Feather [3]
-    float extra[4];             // Focus[0,1], Blur [2], Active Focus [3]
+    float extra[4];             // Focus[0,1], Circle/Rect[2], Blur [3]
+    float font[4];             // Font Half Size[0]
     float stops[16];
     float colors[64];
 } fvUniform;

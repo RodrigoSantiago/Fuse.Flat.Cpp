@@ -177,6 +177,7 @@ void fv__commit(fvContext* ctx) {
         drawpaint.convex = ctx->convex;
         drawpaint.aa = 0;
         drawpaint.uniform.extra[3] = ctx->fontBlur;
+        drawpaint.uniform.font[0] = ctx->font->size / 2.0f;
 
         if (drawpaint.uniform.type == 0) {
             drawpaint.uniform.type = 2;
@@ -190,6 +191,7 @@ void fv__commit(fvContext* ctx) {
         drawpaint.convex = ctx->convex;
         drawpaint.aa = ctx->aa;
         drawpaint.uniform.extra[3] = 1;
+        drawpaint.uniform.font[0] = 0;
         drawpaint.font = NULL;
     }
 
@@ -1140,8 +1142,10 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
 
         float px = x + kern * scl * spc;
         if (uv.x > -1) {
-            float x1 = round(px + glyph.x * scl), y1 = y + glyph.y * scl;
-            float x2 = x1 + glyph.w * scl, y2 = y1 + glyph.h * scl;
+            float x1 = px + glyph.x * scl;
+            float y1 = y + glyph.y * scl;
+            float x2 = x1 + glyph.w * scl;
+            float y2 = y1 + glyph.h * scl;
 
             int el = (ctx->vInd / 2);
             fv__text_vertex(ctx, x1, y1, uv.x, uv.y);

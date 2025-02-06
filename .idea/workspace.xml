@@ -11,12 +11,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="SVG font api improvement">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Font alignment show be handle by interface">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/font.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +107,7 @@
       <workItem from="1738522582455" duration="8195000" />
       <workItem from="1738595558736" duration="30211000" />
       <workItem from="1738671493156" duration="38207000" />
-      <workItem from="1738756812026" duration="19294000" />
+      <workItem from="1738756812026" duration="28403000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -165,7 +165,14 @@
       <option name="project" value="LOCAL" />
       <updated>1738800383179</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Font alignment show be handle by interface">
+      <created>1738802161483</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1738802161483</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -190,6 +197,7 @@
     <MESSAGE value="Removed unnecessary GLGET" />
     <MESSAGE value="Save render on CPU memory" />
     <MESSAGE value="SVG font api improvement" />
-    <option name="LAST_COMMIT_MESSAGE" value="SVG font api improvement" />
+    <MESSAGE value="Font alignment show be handle by interface" />
+    <option name="LAST_COMMIT_MESSAGE" value="Font alignment show be handle by interface" />
   </component>
 </project>

@@ -6,14 +6,12 @@
 #include "utf8.h"
 #include "render.h"
 
-#include <unordered_map>
-
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 #include "pack.h"
 
-#define PADDING 4
-#define PADDING2 8
+#define PADDING 8
+#define PADDING2 16
 
 typedef struct ftFontData {
     stbtt_fontinfo info;
