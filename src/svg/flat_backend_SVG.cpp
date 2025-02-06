@@ -283,25 +283,15 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontSpacing(JNIEnv * jEnv, jclas
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontBlur(JNIEnv * jEnv, jclass jClass, jlong context, jfloat blur) {
     fvSetFontBlur((fvContext*) context, blur);
 }
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawText(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jstring characters, jfloat maxWidth, jint hAlign, jint vAlign) {
-    fvHAlign ha = hAlign == 0 ? fvHAlign::LEFT :
-                  hAlign == 1 ? fvHAlign::CENTER : fvHAlign::RIGHT;
-    fvVAlign va = vAlign == 0 ? fvVAlign::TOP :
-                  vAlign == 1 ? fvVAlign::MIDDLE :
-                  vAlign == 2 ? fvVAlign::BASELINE : fvVAlign::BOTTOM;
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawText(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jstring characters, jfloat maxWidth) {
     const char *chars = jEnv->GetStringUTFChars(characters, 0);
-    jfloat width = fvText((fvContext*) context, chars, jEnv->GetStringUTFLength(characters), x, y, maxWidth, ha, va);
+    jfloat width = fvText((fvContext*) context, chars, jEnv->GetStringUTFLength(characters), x, y, maxWidth);
     jEnv->ReleaseStringUTFChars(characters, chars);
     return width;
 }
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawTextBuffer(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jobject characters, jint offset, jint length, jfloat maxWidth, jint hAlign, jint vAlign) {
-    fvHAlign ha = hAlign == 0 ? fvHAlign::LEFT :
-                  hAlign == 1 ? fvHAlign::CENTER : fvHAlign::RIGHT;
-    fvVAlign va = vAlign == 0 ? fvVAlign::TOP :
-                  vAlign == 1 ? fvVAlign::MIDDLE :
-                  vAlign == 2 ? fvVAlign::BASELINE : fvVAlign::BOTTOM;
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawTextBuffer(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jobject characters, jint offset, jint length, jfloat maxWidth) {
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
-    return fvText((fvContext*) context, chars, length, x, y, maxWidth, ha, va);
+    return fvText((fvContext*) context, chars, length, x, y, maxWidth);
 }
 JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_ReadImage(JNIEnv * jEnv, jclass jClass, jbyteArray data, jintArray imageData) {
     jbyte *imageBytes = jEnv->GetByteArrayElements(data, NULL);

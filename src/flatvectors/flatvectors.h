@@ -17,14 +17,6 @@ enum fvPathOp {
     NOONE, CONVEX, FILL, STROKE, CLIP, TEXT
 };
 
-enum fvVAlign {
-    TOP, MIDDLE, BASELINE, BOTTOM
-};
-
-enum fvHAlign {
-    LEFT, CENTER, RIGHT
-};
-
 enum fvWindingRule {
     EVEN_ODD, NON_ZERO
 };
@@ -261,7 +253,7 @@ void fvSetFontSpacing(fvContext* context, float spacing);
 
 void fvSetFontBlur(fvContext* context, float blur);
 
-int fvText(fvContext* context, const char* str, int strLen, float x, float y, float maxWidth, fvHAlign hAlign, fvVAlign vAlign);
+int fvText(fvContext* context, const char* str, int strLen, float x, float y, float maxWidth);
 
 //-----------------------------------------
 //

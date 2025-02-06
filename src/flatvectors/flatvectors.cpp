@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <iostream>
 
 #define EPSILON 0.00001
 #define PI 3.14159265359f
@@ -1102,7 +1101,7 @@ void fvSetFontBlur(fvContext* ctx, float blur) {
     ctx->fontBlur = blur;
 }
 
-int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float maxWidth, fvHAlign hAlign, fvVAlign vAlign) {
+int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float maxWidth) {
     maxWidth = ceil(maxWidth);
 
     fvFont *font = ctx->font;

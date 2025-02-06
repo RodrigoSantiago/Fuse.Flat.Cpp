@@ -3,7 +3,6 @@
 //
 
 #include <cmath>
-#include <iostream>
 #include "pack.h"
 
 int __findOpenCell(fvPack* pack, int cellW, int cellH) {

@@ -7,7 +7,6 @@
 #include "render.h"
 
 #include <unordered_map>
-#include <iostream>
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
