@@ -388,18 +388,18 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontBlur
 /*
  * Class:     flat_backend_SVG
  * Method:    DrawText
- * Signature: (JFFLjava/lang/String;F)I
+ * Signature: (JFFLjava/lang/String;FF)V
  */
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawText
-  (JNIEnv *, jclass, jlong, jfloat, jfloat, jstring, jfloat);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawText
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jstring, jfloat, jfloat);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    DrawTextBuffer
- * Signature: (JFFLjava/nio/Buffer;IIFII)I
+ * Signature: (JFFLjava/nio/Buffer;IIFF)V
  */
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawTextBuffer
-  (JNIEnv *, jclass, jlong, jfloat, jfloat, jobject, jint, jint, jfloat);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jobject, jint, jint, jfloat, jfloat);
 
 
 /*

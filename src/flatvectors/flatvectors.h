@@ -254,7 +254,7 @@ void fvSetFontSpacing(fvContext* context, float spacing);
 
 void fvSetFontBlur(fvContext* context, float blur);
 
-int fvText(fvContext* context, const char* str, int strLen, float x, float y, float maxWidth);
+void fvText(fvContext* context, const char* str, int strLen, float x, float y, float maxWidth, float maxHeight);
 
 //-----------------------------------------
 //

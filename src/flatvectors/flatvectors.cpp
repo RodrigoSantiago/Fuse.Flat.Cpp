@@ -1103,8 +1103,11 @@ void fvSetFontBlur(fvContext* ctx, float blur) {
     ctx->fontBlur = blur;
 }
 
-int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float maxWidth) {
-    maxWidth = ceil(maxWidth);
+void fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float maxWidth, float maxHeight) {
+    if (maxWidth == 0) maxWidth = 99999;
+    else maxWidth = x + maxWidth;
+    if (maxHeight == 0) maxHeight = 99999;
+    else maxHeight = y + maxHeight;
 
     fvFont *font = ctx->font;
     float scl = ctx->fontScale;
@@ -1136,9 +1139,6 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
 
         float kern = (f ? fontKerning(font->fCtx, prev, chr) : 0);
         float advance = ceil((glyph.advance + kern) * (scl * spc));
-        if (maxWidth > 0 && floor(x + advance - start) > maxWidth) {
-            break;
-        }
 
         float px = x + kern * scl * spc;
         if (uv.x > -1) {
@@ -1147,15 +1147,35 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
             float x2 = x1 + glyph.w * scl;
             float y2 = y1 + glyph.h * scl;
 
-            int el = (ctx->vInd / 2);
-            fv__text_vertex(ctx, x1, y1, uv.x, uv.y);
-            fv__text_vertex(ctx, x2, y1, uv.x + glyph.w, uv.y);
-            fv__text_vertex(ctx, x2, y2, uv.x + glyph.w, uv.y + glyph.h);
-            fv__text_vertex(ctx, x1, y2, uv.x, uv.y + glyph.h);
-            fv__triangle(ctx, el, el + 1, el + 2);
-            fv__triangle(ctx, el, el + 2, el + 3);
+            if (x1 < maxWidth && y1 < maxHeight) {
+                float uvW = glyph.w;
+                float uvH = glyph.h;
+                if (x2 > maxWidth) {
+                    float wb = x2 - x1;
+                    x2 = maxWidth;
+                    float wa = x2 - x1;
+                    uvW *= wa / wb;
+                }
+                if (y2 > maxHeight) {
+                    float hb = y2 - y1;
+                    y2 = maxHeight;
+                    float ha = y2 - y1;
+                    uvH *= ha / hb;
+                }
+
+                int el = (ctx->vInd / 2);
+                fv__text_vertex(ctx, x1, y1, uv.x, uv.y);
+                fv__text_vertex(ctx, x2, y1, uv.x + uvW, uv.y);
+                fv__text_vertex(ctx, x2, y2, uv.x + uvW, uv.y + uvH);
+                fv__text_vertex(ctx, x1, y2, uv.x, uv.y + uvH);
+                fv__triangle(ctx, el, el + 1, el + 2);
+                fv__triangle(ctx, el, el + 2, el + 3);
+            }
         }
         x += advance;
+        if (x > maxWidth) {
+            break;
+        }
 
         prev = chr;
         f = 1;
@@ -1163,7 +1183,6 @@ int fvText(fvContext* ctx, const char* str, int strLen, float x, float y, float 
     }
 
     fvPathEnd(ctx);
-    return p;
 }
 
 //-----------------------------
