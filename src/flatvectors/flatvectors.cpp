@@ -1021,25 +1021,13 @@ void fvFontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len) {
     fontGetGlyphShape(ctx, unicode, polygon, len);
 }
 
-int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info) {
-    int i = 0, f = 0, index = 0, count;
-    unsigned long chr = 0, prev = 0;
-    while (utf8loop(str, strLen, i, chr)) {
-        fvGlyph& glyph = fontGlyph(ctx, chr);
-
-        info[index++] = f ? fontKerning(ctx, prev, chr) : 0;
-        info[index++] = glyph.enabled;
-        info[index++] = glyph.advance;
-
-        info[index++] = glyph.x;
-        info[index++] = glyph.y;
-        info[index++] = glyph.w;
-        info[index++] = glyph.h;
-        prev = chr;
-        f = 1;
-        count++;
-    }
-    return count;
+void fvFontGetGlyph(void* ctx, int codePoint, float* info) {
+    fvGlyph& glyph = fontGlyph(ctx, codePoint);
+    info[0] = glyph.advance;
+    info[1] = glyph.x;
+    info[2] = glyph.y;
+    info[3] = glyph.w;
+    info[4] = glyph.h;
 }
 
 void fvFontGetAllCodePoints(void* ctx, long int* codePoints) {
@@ -1068,31 +1056,31 @@ float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float scale, fl
     return w;
 }
 
-int fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float spacing, float x, int half) {
+int fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float spacing, float cursorX, int half) {
     float scl = scale * spacing;
 
     float w = 0;
     int i = 0, f = 0, pi = 0;
     unsigned long chr = 0, pchr = 0;
     while (utf8loop(str, strLen, i, chr)) {
-        if (chr != '\n') {
-            fvGlyph &glyph = fontGlyph(ctx, chr);
+        if (chr == '\n') continue;
 
-            float advance = ceil((glyph.advance + (f ? fontKerning(ctx, pchr, chr) : 0)) * scl);
-            if (!half && w + advance > x) {
+        fvGlyph &glyph = fontGlyph(ctx, chr);
+
+        float advance = ceil((glyph.advance + (f ? fontKerning(ctx, pchr, chr) : 0)) * scl);
+        if (w + advance > cursorX) {
+            if (cursorX <= w + advance * 0.5) {
                 return pi;
-            } else if (w + advance / 2 > x) {
-                return pi;
-            } else if (w + advance > x) {
-                return i;
+            } else {
+                return pi + half;
             }
-            w += advance;
-            pchr = chr;
-            pi = i;
-            f = 1;
         }
+        w += advance;
+        pchr = chr;
+        pi++;
+        f = 1;
     }
-    return i;
+    return pi;
 }
 //-----------------------------------------
 //

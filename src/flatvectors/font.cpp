@@ -91,7 +91,17 @@ void fontGetData(void* ctx, fvFont* ft) {
     ft->height = fdata->height;
 
     ft->fCtx = fdata;
-    ft->pack = packCreate(ceil(ft->height * 1.01 + PADDING2), ceil(ft->height * 1.01 + PADDING2));
+    int x, y, w, h;
+    stbtt_GetFontBoundingBox(&fdata->info, &x, &y, &w, &h);
+    int cellW = ceil((w - x) * fdata->scale) + PADDING2;
+    int cellH = ceil((h - y) * fdata->scale) + PADDING2;
+    if (cellW > ceil(ft->height * 1.01 + PADDING2) * 2) {
+        cellW = ceil(ft->height * 1.01 + PADDING2);
+    }
+    if (cellH > ceil(ft->height * 1.01 + PADDING2) * 2) {
+        cellH = ceil(ft->height * 1.01 + PADDING2);
+    }
+    ft->pack = packCreate(cellW, cellH);
 }
 
 int __maxCodePoint(stbtt_fontinfo *info){

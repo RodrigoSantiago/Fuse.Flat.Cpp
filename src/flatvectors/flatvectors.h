@@ -240,7 +240,7 @@ long fvFontGetCurrentAtlas(fvFont* font, int* w, int* h);
 
 void fvFontGetGlyphShape(void* ctx, long unicode, float** polygon, int* len);
 
-int fvFontGetGlyphs(void* ctx, const char* str, int strLen, float* info);
+void fvFontGetGlyph(void* ctx, int codePoint, float* info);
 
 void fvFontGetAllCodePoints(void* ctx, long int* codePoints);
 

@@ -210,20 +210,11 @@ JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape(JNIEnv * j
         return imageArray;
     }
 }
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphs(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloatArray data) {
-    const char *chars = jEnv->GetStringUTFChars(characters, 0);
-    float *_data = (float *) jEnv->GetPrimitiveArrayCritical(data, 0);
-    jint count = fvFontGetGlyphs((void *) font, chars, jEnv->GetStringUTFLength(characters), _data);
-    jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
-    jEnv->ReleaseStringUTFChars(characters, chars);
-    return count;
-}
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphsBuffer(JNIEnv * jEnv, jclass jClass, jlong font, jobject characters, jint offset, jint length, jfloatArray data) {
-    const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
-    float *_data = (float *) jEnv->GetPrimitiveArrayCritical(data, 0);
-    jint count = fvFontGetGlyphs((void *) font, chars, length, _data);
-    jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
-    return count;
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetGlyph(JNIEnv * jEnv, jclass jClass, jlong font, jint codePoint, jfloatArray glyph) {
+    float* data = (float *) malloc(8 * sizeof(float));
+    fvFontGetGlyph((void *) font, codePoint, data);
+    jEnv->SetFloatArrayRegion(glyph, 0, 8, (jfloat *)data);
+    free(data);
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints(JNIEnv * jEnv, jclass jClass, jlong font, jintArray codePoints) {
     jsize size = jEnv->GetArrayLength(codePoints);

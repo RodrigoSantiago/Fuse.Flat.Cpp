@@ -267,19 +267,11 @@ JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape
 
 /*
  * Class:     flat_backend_SVG
- * Method:    FontGetGlyphs
- * Signature: (JLjava/lang/String;[F)I
+ * Method:    FontGetGlyph
+ * Signature: (JLI[F)void
  */
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphs
-  (JNIEnv *, jclass, jlong, jstring, jfloatArray);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    FontGetGlyphsBuffer
- * Signature: (JLjava/nio/Buffer;II[F)I
- */
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphsBuffer
-  (JNIEnv *, jclass, jlong, jobject, jint, jint, jfloatArray);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetGlyph
+  (JNIEnv *, jclass, jlong, jint, jfloatArray);
 
 /*
  * Class:     flat_backend_SVG
