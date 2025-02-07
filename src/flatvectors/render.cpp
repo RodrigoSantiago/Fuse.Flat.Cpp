@@ -103,9 +103,9 @@ const char *fragmentSource =
         "        }\n"
         "        if (data[0] == 1 || data[0] == 3) {\n"
         "            vec2 tPt = (imageMat * vec3(oPos, 1.0)).xy;\n"
-        "            texel = texture(tex, tPt);\n"
+        "            color *= texture(tex, tPt);\n"
         "        }\n"
-        "        float a = color.a + texel.a * (1 - color.a);\n"
+        "        float a = color.a;\n"
         "        if (data[0] > 1) {\n"
         "            ivec2 sz = textureSize(fnt, 0);\n"
         "            float dist = texture(fnt, oTex / sz).r;\n"
@@ -119,7 +119,7 @@ const char *fragmentSource =
         "                a = a * dist;\n"
         "            }\n"
         "        }\n"
-        "        FragColor = vec4(color.rgb * color.a + texel.rgb * texel.a * (1 - color.a), a);\n"
+        "        FragColor = vec4(color.rgb * a, a);\n"
         "    }\n"
         "}\0";
 
@@ -295,7 +295,7 @@ void renderBegin(void *data, unsigned int width, unsigned int height) {
     glStencilMask(0xFF);
 
     glEnable(GL_BLEND);
-    glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
