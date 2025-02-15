@@ -11,12 +11,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Better SDF Font shadow">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Fix alpha blending">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +100,12 @@
       <workItem from="1738595558736" duration="30211000" />
       <workItem from="1738671493156" duration="38207000" />
       <workItem from="1738756812026" duration="30512000" />
-      <workItem from="1738840128066" duration="8347000" />
+      <workItem from="1738840128066" duration="8961000" />
+      <workItem from="1738931215659" duration="7461000" />
+      <workItem from="1739075638192" duration="1374000" />
+      <workItem from="1739106592501" duration="725000" />
+      <workItem from="1739479942777" duration="648000" />
+      <workItem from="1739634638198" duration="1352000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -175,7 +177,21 @@
       <option name="project" value="LOCAL" />
       <updated>1738813778641</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Text width\height improvement">
+      <created>1738872299910</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1738872299910</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Fix alpha blending">
+      <created>1738955666842</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1738955666842</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,6 +218,8 @@
     <MESSAGE value="SVG font api improvement" />
     <MESSAGE value="Font alignment show be handle by interface" />
     <MESSAGE value="Better SDF Font shadow" />
-    <option name="LAST_COMMIT_MESSAGE" value="Better SDF Font shadow" />
+    <MESSAGE value="Text width\height improvement" />
+    <MESSAGE value="Fix alpha blending" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix alpha blending" />
   </component>
 </project>
