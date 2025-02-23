@@ -1033,6 +1033,22 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_TextureDataBuffer
 
 /*
  * Class:     flat_backend_GL
+ * Method:    TexGetImageI
+ * Signature: (III[BI)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageB
+        (JNIEnv *, jclass, jint, jint, jint, jbyteArray, jint);
+
+/*
+ * Class:     flat_backend_GL
+ * Method:    TexGetImageI
+ * Signature: (III[II)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageI
+        (JNIEnv *, jclass, jint, jint, jint, jintArray, jint);
+
+/*
+ * Class:     flat_backend_GL
  * Method:    TextureSubData
  * Signature: (IIIIIIIJ)V
  */

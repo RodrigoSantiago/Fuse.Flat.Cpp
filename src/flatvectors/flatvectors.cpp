@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <iostream>
 
 #define EPSILON 0.00001
 #define PI 3.14159265359f
@@ -177,7 +178,6 @@ void fv__commit(fvContext* ctx) {
         drawpaint.convex = ctx->convex;
         drawpaint.aa = 0;
         drawpaint.uniform.extra[3] = ctx->fontBlur;
-        drawpaint.uniform.font[0] = ctx->font->size / 2.0f;
 
         if (drawpaint.uniform.type == 0) {
             drawpaint.uniform.type = 2;
@@ -191,7 +191,6 @@ void fv__commit(fvContext* ctx) {
         drawpaint.convex = ctx->convex;
         drawpaint.aa = ctx->aa;
         drawpaint.uniform.extra[3] = 1;
-        drawpaint.uniform.font[0] = 0;
         drawpaint.font = NULL;
     }
 
