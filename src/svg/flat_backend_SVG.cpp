@@ -261,15 +261,19 @@ JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetTextWidthBuffer(JNIEnv * j
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
     return fvFontGetTextWidth((void *) font, chars, length, scale, spacing);
 }
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetOffset(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloat scale, jfloat spacing, jfloat x, jboolean half) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffset(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloat scale, jfloat spacing, jfloat x, jboolean half, jfloatArray cursor) {
     const char *chars = jEnv->GetStringUTFChars(characters, 0);
-    jint offset = fvFontGetOffset((void *) font, chars, jEnv->GetStringUTFLength(characters), scale, spacing, x, half);
+    float data[2] = {0, 1};
+    fvFontGetOffset((void *) font, chars, jEnv->GetStringUTFLength(characters), scale, spacing, x, half, data, data + 1);
     jEnv->ReleaseStringUTFChars(characters, chars);
-    return offset;
+    jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
+
 }
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetOffsetBuffer(JNIEnv * jEnv, jclass jClass, jlong font, jobject characters, jint offset, jint length, jfloat scale, jfloat spacing, jfloat x, jboolean half) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetBuffer(JNIEnv * jEnv, jclass jClass, jlong font, jobject characters, jint offset, jint length, jfloat scale, jfloat spacing, jfloat x, jboolean half, jfloatArray cursor) {
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
-    return fvFontGetOffset((void *) font, chars, length, scale, spacing, x, half);
+    float data[2] = {0, 1};
+    fvFontGetOffset((void *) font, chars, length, scale, spacing, x, half, data, data + 1);
+    jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFont(JNIEnv * jEnv, jclass jClass, jlong context, jlong fontPaint) {
     fvSetFont((fvContext*) context, (fvFont *) fontPaint);
@@ -288,7 +292,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawText(JNIEnv * jEnv, jclass jCla
     fvText((fvContext*) context, chars, jEnv->GetStringUTFLength(characters), x, y, maxWidth, maxHeight);
     jEnv->ReleaseStringUTFChars(characters, chars);
 }
-JNIEXPORT jint JNICALL Java_flat_backend_SVG_DrawTextBuffer(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jobject characters, jint offset, jint length, jfloat maxWidth, jfloat maxHeight) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawTextBuffer(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jobject characters, jint offset, jint length, jfloat maxWidth, jfloat maxHeight) {
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
     fvText((fvContext*) context, chars, length, x, y, maxWidth, maxHeight);
 }

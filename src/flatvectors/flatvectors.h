@@ -241,7 +241,7 @@ void fvFontGetMetrics(void* ctx, float* ascender, float* descender, float* heigh
 
 float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float size, float spacing);
 
-int fvFontGetOffset(void* ctx, const char* str, int strLen, float size, float spacing, float x, int half);
+void fvFontGetOffset(void* ctx, const char* str, int strLen, float size, float spacing, float x, int half, float* index, float* width);
 //-----------------------------------------
 //
 //-----------------------------------------

@@ -1057,7 +1057,7 @@ float fvFontGetTextWidth(void* ctx, const char* str, int strLen, float scale, fl
     return w;
 }
 
-int fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float spacing, float cursorX, int half) {
+void fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float spacing, float cursorX, int half, float* index, float* width) {
     float scl = scale * spacing;
 
     float w = 0;
@@ -1071,17 +1071,21 @@ int fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float s
         float advance = ceil((glyph.advance + (f ? fontKerning(ctx, pchr, chr) : 0)) * scl);
         if (w + advance > cursorX) {
             if (cursorX <= w + advance * 0.5) {
-                return pi;
+                *width = w;
+                *index = pi;
             } else {
-                return pi + half;
+                *width = w + advance * half;
+                *index = pi + half;
             }
+            return;
         }
         w += advance;
         pchr = chr;
         pi++;
         f = 1;
     }
-    return pi;
+    *width = w;
+    *index = pi;
 }
 //-----------------------------------------
 //
