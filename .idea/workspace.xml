@@ -11,10 +11,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Text cursor improved">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Text aliasing fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.h" afterDir="false" />
     </list>
@@ -114,7 +113,7 @@
       <workItem from="1739925009997" duration="595000" />
       <workItem from="1739968083490" duration="1459000" />
       <workItem from="1740274332608" duration="705000" />
-      <workItem from="1740315418116" duration="8390000" />
+      <workItem from="1740315418116" duration="10245000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -214,7 +213,14 @@
       <option name="project" value="LOCAL" />
       <updated>1740343300360</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Text aliasing fix">
+      <created>1740354901995</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1740354901995</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -245,6 +251,7 @@
     <MESSAGE value="Fix alpha blending" />
     <MESSAGE value="Improved shadow" />
     <MESSAGE value="Text cursor improved" />
-    <option name="LAST_COMMIT_MESSAGE" value="Text cursor improved" />
+    <MESSAGE value="Text aliasing fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Text aliasing fix" />
   </component>
 </project>

@@ -1072,15 +1072,18 @@ void fvFontGetOffset(void* ctx, const char* str, int strLen, float scale, float 
             if (cursorX <= w + advance * 0.5) {
                 *width = w;
                 *index = pi;
+            } else if (half) {
+                *width = w + advance;
+                *index = i;
             } else {
-                *width = w + advance * half;
-                *index = pi + half;
+                *width = w;
+                *index = pi;
             }
             return;
         }
         w += advance;
         pchr = chr;
-        pi++;
+        pi = i;
         f = 1;
     }
     *width = w;

@@ -354,6 +354,22 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetInputMode
 
 /*
  * Class:     flat_backend_WL
+ * Method:    SetClipboardString
+ * Signature: (JLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    GetClipboardString
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString
+        (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_WL
  * Method:    GetKeyName
  * Signature: (II)Ljava/lang/String;
  */

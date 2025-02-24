@@ -494,8 +494,27 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetInputMode(JNIEnv * jEnv, jclass j
     glfwSetInputMode((GLFWwindow*) win, mode, value);
 }
 
+JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString(JNIEnv * jEnv, jclass jClass, jlong win, jstring clipboard) {
+    jboolean isCopy;
+    const char *sClipboard = jEnv->GetStringUTFChars(clipboard, &isCopy);
+    glfwSetClipboardString((GLFWwindow*) win, sClipboard);
+    jEnv->ReleaseStringUTFChars(clipboard, sClipboard);
+}
+
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString(JNIEnv * jEnv, jclass jClass, jlong win) {
+    const char* clipboard = glfwGetClipboardString((GLFWwindow*) win);
+    if (clipboard == NULL) {
+        return NULL;
+    }
+    return jEnv->NewStringUTF(clipboard);
+}
+
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetKeyName(JNIEnv * jEnv, jclass jClass, jint key, jint scancode) {
-    return jEnv->NewStringUTF(glfwGetKeyName(key, scancode));
+    const char* name = glfwGetKeyName(key, scancode);
+    if (name == NULL) {
+        return NULL;
+    }
+    return jEnv->NewStringUTF(name);
 }
 
 JNIEXPORT jint JNICALL Java_flat_backend_WL_GetKey(JNIEnv * jEnv, jclass jClass, jlong win, jint key) {

@@ -1041,11 +1041,35 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageB
 
 /*
  * Class:     flat_backend_GL
+ * Method:    TexGetImageS
+ * Signature: (III[SI)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageS
+        (JNIEnv *, jclass, jint, jint, jint, jshortArray, jint);
+
+/*
+ * Class:     flat_backend_GL
  * Method:    TexGetImageI
  * Signature: (III[II)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageI
         (JNIEnv *, jclass, jint, jint, jint, jintArray, jint);
+
+/*
+ * Class:     flat_backend_GL
+ * Method:    TexGetImageF
+ * Signature: (III[FI)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageF
+        (JNIEnv *, jclass, jint, jint, jint, jfloatArray, jint);
+
+/*
+ * Class:     flat_backend_GL
+ * Method:    TexGetImageBuffer
+ * Signature: (IIILjava/nio/Buffer;I)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageBuffer
+        (JNIEnv *, jclass, jint, jint, jint, jobject, jint);
 
 /*
  * Class:     flat_backend_GL

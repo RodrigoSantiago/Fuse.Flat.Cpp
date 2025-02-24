@@ -719,6 +719,14 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageB(JNIEnv * jEnv, jclass j
     glGetTexImage(trgTT, level, formatTF, dataType, pointer + offset);
     jEnv->ReleasePrimitiveArrayCritical(data, pointer, 0);
 }
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageS(JNIEnv * jEnv, jclass jClass, jint trgTT, jint level, jint formatTF, jshortArray data, jint offset) {
+    GLenum dafaFormat, dataType;
+    convertImageType(formatTF, dafaFormat, dataType);
+
+    jshort * pointer = (jshort *) jEnv->GetPrimitiveArrayCritical(data, 0);
+    glGetTexImage(trgTT, level, formatTF, dataType, pointer + offset);
+    jEnv->ReleasePrimitiveArrayCritical(data, pointer, 0);
+}
 JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageI(JNIEnv * jEnv, jclass jClass, jint trgTT, jint level, jint formatTF, jintArray data, jint offset) {
     GLenum dafaFormat, dataType;
     convertImageType(formatTF, dafaFormat, dataType);
@@ -727,7 +735,21 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageI(JNIEnv * jEnv, jclass j
     glGetTexImage(trgTT, level, formatTF, dataType, pointer + offset);
     jEnv->ReleasePrimitiveArrayCritical(data, pointer, 0);
 }
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageF(JNIEnv * jEnv, jclass jClass, jint trgTT, jint level, jint formatTF, jfloatArray data, jint offset) {
+    GLenum dafaFormat, dataType;
+    convertImageType(formatTF, dafaFormat, dataType);
 
+    jfloat * pointer = (jfloat *) jEnv->GetPrimitiveArrayCritical(data, 0);
+    glGetTexImage(trgTT, level, formatTF, dataType, pointer + offset);
+    jEnv->ReleasePrimitiveArrayCritical(data, pointer, 0);
+}
+JNIEXPORT void JNICALL Java_flat_backend_GL_TexGetImageBuffer(JNIEnv * jEnv, jclass jClass, jint trgTT, jint level, jint formatTF, jobject buffer, jint offset) {
+    GLenum dafaFormat, dataType;
+    convertImageType(formatTF, dafaFormat, dataType);
+
+    char *pointer = (char *) jEnv->GetDirectBufferAddress(buffer);
+    glGetTexImage(trgTT, level, formatTF, dataType, pointer + offset);
+}
 JNIEXPORT void JNICALL Java_flat_backend_GL_TextureSubData(JNIEnv * jEnv, jclass jClass, jint trgTT, jint level, jint x, jint y, jint width, jint height, jint dataFormatTF, jlong offset) {
     GLenum dafaFormat, dataType;
     convertImageType(dataFormatTF, dafaFormat, dataType);
