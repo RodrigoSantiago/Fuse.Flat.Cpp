@@ -576,7 +576,7 @@ void fv__dashline(fvContext* ctx, float x, float y) {
             if (!ctx->open) fvPathMoveTo(ctx, prevX, prevY);
             fvPathLineTo(ctx, nx, ny);
 
-            if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+            if (ctx->lt != -1 && ctx->mInd + 2 < ctx->vInd) {
                 fv__linecap(ctx);
             }
             ctx->ft = 0;
@@ -614,7 +614,7 @@ void fv__dashclose(fvContext* ctx) {
     if (ctx->phaseFill && ctx->startFill) {
         // fv__linejoincap(ctx, ctx->dSx, ctx->dSy);
 
-        if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+        if (ctx->lt != -1 && ctx->mInd + 2 < ctx->vInd) {
             fv__linecap(ctx);
         }
         float _px1, _sx1, _py1, _sy1, _px2, _sx2, _py2, _sy2;
@@ -779,7 +779,7 @@ void fvPathMoveTo(fvContext* ctx, float x, float y) {
     if (ctx->op == STROKE && ctx->dashCommand) {
         fv__dashmove(ctx, x, y);
     } else if (ctx->op == STROKE) {
-        if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+        if (ctx->lt != -1 && ctx->mInd + 2 < ctx->vInd) {
             fv__linecap(ctx);
         }
         ctx->ft = 0;
@@ -854,7 +854,7 @@ void fvPathClose(fvContext* ctx) {
         fv__dashclose(ctx);
     } else if (ctx->op == STROKE) {
         fvPathLineTo(ctx, ctx->mx, ctx->my);
-        if (ctx->mInd != ctx->vInd) {
+        if (ctx->mInd + 2 < ctx->vInd) {
             fv__linejoincap(ctx, ctx->mx, ctx->my);
         }
     } else {
@@ -873,11 +873,11 @@ void fvPathEnd(fvContext* ctx) {
     } else if (ctx->op == STROKE && ctx->dashCommand) {
         fv__dashend(ctx);
     } else if (ctx->op == STROKE) {
-        if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+        if (ctx->lt != -1 && ctx->mInd + 2 < ctx->vInd) {
             fv__linecap(ctx);
         }
     } else {
-        if (ctx->lt != -1 && ctx->mInd != ctx->vInd) {
+        if (ctx->lt != -1 && ctx->mInd + 2 < ctx->vInd) {
             fvPathClose(ctx);
         }
 
