@@ -261,12 +261,12 @@ void fvText(fvContext* context, const char* str, int strLen, float x, float y, f
 
 fvPaint fvColorPaint(long color);
 
-fvPaint fvImagePaint(unsigned long imageID, float* affine, long color);
+fvPaint fvImagePaint(unsigned long imageID, float* affine, long color, int cycleMethod);
 
 fvPaint fvLinearGradientPaint(float* affine, float x1, float y1, float x2, float y2, int count, float* stops, long* colors, int cycleMethod);
 
 fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float rOut, float fx, float fy, int count, float* stops, long* colors, int cycleMethod);
 
-fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod);
+fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, float a, long c);
 
 #endif //FLATVECTORS_FLATVECTORS_H

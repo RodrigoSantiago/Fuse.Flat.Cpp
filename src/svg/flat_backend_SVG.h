@@ -83,34 +83,34 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintColor
 /*
  * Class:     flat_backend_SVG
  * Method:    SetPaintLinearGradient
- * Signature: (J[FFFFFI[F[II)V
+ * Signature: (JFFFFI[FI)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintLinearGradient
-  (JNIEnv *, jclass, jlong, jfloatArray, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jint);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    SetPaintRadialGradient
- * Signature: (J[FFFFFFFI[F[II)V
+ * Signature: (JFFFFFFI[FI)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintRadialGradient
-  (JNIEnv *, jclass, jlong, jfloatArray, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jint);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    SetPaintBoxGradient
- * Signature: (J[FFFFFFFI[F[II)V
+ * Signature: (JFFFFFFFI[F)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintBoxGradient
-  (JNIEnv *, jclass, jlong, jfloatArray, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray, jintArray, jint);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jint, jfloatArray);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    SetPaintImage
- * Signature: (JI[FI)V
+ * Signature: (JII[FI)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage
-  (JNIEnv *, jclass, jlong, jint, jfloatArray, jint);
+  (JNIEnv *, jclass, jlong, jint, jint, jfloatArray, jint);
 
 /*
  * Class:     flat_backend_SVG

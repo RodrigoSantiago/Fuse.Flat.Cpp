@@ -1231,7 +1231,7 @@ fvPaint fvColorPaint(long color) {
     return p;
 }
 
-fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
+fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color, int cycleMethod) {
     fvPaint p{};
     p.uniform.type = 1;
     p.image0 = imageID;
@@ -1257,7 +1257,7 @@ fvPaint fvImagePaint(unsigned long imageID, float* affineImg, long color) {
     p.uniform.colors[1] = ((color >> 16) & 0xFF) / 255.f;
     p.uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
     p.uniform.colors[3] = ((color >> 0) & 0xFF) / 255.f;
-    p.uniform.cycleType = 0;
+    p.uniform.cycleType = cycleMethod;
 
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;
@@ -1359,8 +1359,8 @@ fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float 
     p.convex = 0;
     p.aa = 0;
 
-    p.uniform.extra[0] = fx;
-    p.uniform.extra[1] = fy;
+    p.uniform.extra[0] = rOut < 0.0001f ? 0 : (fx - x) / rOut;
+    p.uniform.extra[1] = rOut < 0.0001f ? 0 : (fy - y) / rOut;
     if (fx < -0.0001 || fx > 0.0001 || fy < -0.0001 || fy > 0.0001) {
         p.uniform.extra[2] = 1;
     }
@@ -1368,7 +1368,7 @@ fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float 
     return p;
 }
 
-fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, int count, float* stops, long* colors, int cycleMethod) {
+fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, float r, float f, float a, long c) {
     fvPaint p{};
     p.uniform.type = 0;
     p.image0 = 0;
@@ -1388,16 +1388,22 @@ fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, fl
     p.uniform.shape[2] = r;
     p.uniform.shape[3] = f < 1.0f ? 1.0f : f;
 
-    p.uniform.stopCount = count - 1;
+    p.uniform.stopCount = 2;
     p.uniform.joinType = 0;
-    for (int i = 0; i < count; i++) {
-        p.uniform.stops[i] = stops[i];
-        p.uniform.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
-        p.uniform.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
-        p.uniform.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
-        p.uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
-    }
-    p.uniform.cycleType = cycleMethod;
+
+    p.uniform.stops[0] = 0;
+    p.uniform.colors[0] = ((c >> 24) & 0xFF) / 255.f;
+    p.uniform.colors[1] = ((c >> 16) & 0xFF) / 255.f;
+    p.uniform.colors[2] = ((c >> 8) & 0xFF) / 255.f;
+    p.uniform.colors[3] = ((c >> 0) & 0xFF) / 255.f;
+
+    p.uniform.stops[1] = 1;
+    p.uniform.colors[4] = ((c >> 24) & 0xFF) / 255.f;
+    p.uniform.colors[5] = ((c >> 16) & 0xFF) / 255.f;
+    p.uniform.colors[6] = ((c >> 8) & 0xFF) / 255.f;
+    p.uniform.colors[7] = 0;
+
+    p.uniform.cycleType = 3;
 
     p.paintOp = fvPathOp::NOONE;
     p.winding = fvWindingRule::EVEN_ODD;

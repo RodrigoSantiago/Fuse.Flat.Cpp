@@ -11,11 +11,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Text aliasing fix">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Empty Shapes fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,7 +114,12 @@
       <workItem from="1739925009997" duration="595000" />
       <workItem from="1739968083490" duration="1459000" />
       <workItem from="1740274332608" duration="705000" />
-      <workItem from="1740315418116" duration="10245000" />
+      <workItem from="1740315418116" duration="11275000" />
+      <workItem from="1740406859467" duration="2002000" />
+      <workItem from="1740514777163" duration="3513000" />
+      <workItem from="1740570296894" duration="724000" />
+      <workItem from="1740700680186" duration="594000" />
+      <workItem from="1741038924833" duration="3782000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -220,7 +226,21 @@
       <option name="project" value="LOCAL" />
       <updated>1740354901995</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Implemented some missing GL and GLFW methods">
+      <created>1740371549398</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1740371549398</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Empty Shapes fix">
+      <created>1740600176835</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1740600176835</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,6 +272,8 @@
     <MESSAGE value="Improved shadow" />
     <MESSAGE value="Text cursor improved" />
     <MESSAGE value="Text aliasing fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Text aliasing fix" />
+    <MESSAGE value="Implemented some missing GL and GLFW methods" />
+    <MESSAGE value="Empty Shapes fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Empty Shapes fix" />
   </component>
 </project>
