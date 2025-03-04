@@ -1381,7 +1381,9 @@ fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, fl
     p.uniform.colorMat[3] = 1.0f;
     p.uniform.colorMat[4] = x + w * 0.5f;
     p.uniform.colorMat[5] = y + h * 0.5f;
-    fv__multiply(p.uniform.colorMat, affine);
+    if (affine != NULL) {
+        fv__multiply(p.uniform.colorMat, affine);
+    }
 
     p.uniform.shape[0] = w * 0.5f;
     p.uniform.shape[1] = h * 0.5f;

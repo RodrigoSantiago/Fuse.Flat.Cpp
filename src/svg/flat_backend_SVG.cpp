@@ -88,9 +88,11 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintRadialGradient(JNIEnv * jEn
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintBoxGradient(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat w, jfloat h, jfloat corners, jfloat blur, jfloat alpha, jint color, jfloatArray data) {
-    float* _data = (float*) jEnv->GetPrimitiveArrayCritical(data, 0);
+    float* _data = data == NULL ? 0 : (float*) jEnv->GetPrimitiveArrayCritical(data, 0);
     fvSetPaint((fvContext *) context, fvBoxGradientPaint(_data, x, y, w, h, corners, blur, alpha, color));
-    jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
+    if (data != NULL) {
+        jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
+    }
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage(JNIEnv * jEnv, jclass jClass, jlong context, jint imageID, jint color, jfloatArray data, jint cycleMethod) {
