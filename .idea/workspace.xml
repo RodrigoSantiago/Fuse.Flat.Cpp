@@ -11,9 +11,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Better paint JNI methods">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Painters improvement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/font.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +119,8 @@
       <workItem from="1740570296894" duration="724000" />
       <workItem from="1740700680186" duration="594000" />
       <workItem from="1741038924833" duration="4592000" />
-      <workItem from="1741094671240" duration="1062000" />
+      <workItem from="1741094671240" duration="4701000" />
+      <workItem from="1741119288185" duration="4925000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -245,7 +248,21 @@
       <option name="project" value="LOCAL" />
       <updated>1741046135110</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Image Pattern CycleMethod">
+      <created>1741095755847</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1741095755847</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Painters improvement">
+      <created>1741099398147</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1741099398147</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -280,6 +297,8 @@
     <MESSAGE value="Implemented some missing GL and GLFW methods" />
     <MESSAGE value="Empty Shapes fix" />
     <MESSAGE value="Better paint JNI methods" />
-    <option name="LAST_COMMIT_MESSAGE" value="Better paint JNI methods" />
+    <MESSAGE value="Image Pattern CycleMethod" />
+    <MESSAGE value="Painters improvement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Painters improvement" />
   </component>
 </project>

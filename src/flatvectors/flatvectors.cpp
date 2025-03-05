@@ -1359,8 +1359,8 @@ fvPaint fvRadialGradientPaint(float* affine, float x, float y, float rIn, float 
     p.convex = 0;
     p.aa = 0;
 
-    p.uniform.extra[0] = rOut < 0.0001f ? 0 : (fx - x) / rOut;
-    p.uniform.extra[1] = rOut < 0.0001f ? 0 : (fy - y) / rOut;
+    p.uniform.extra[0] = (fx = rOut < 0.0001f ? 0 : (fx - x) / rOut);
+    p.uniform.extra[1] = (fy = rOut < 0.0001f ? 0 : (fy - y) / rOut);
     if (fx < -0.0001 || fx > 0.0001 || fy < -0.0001 || fy > 0.0001) {
         p.uniform.extra[2] = 1;
     }
@@ -1390,14 +1390,14 @@ fvPaint fvBoxGradientPaint(float* affine, float x, float y, float w, float h, fl
     p.uniform.shape[2] = r;
     p.uniform.shape[3] = f < 1.0f ? 1.0f : f;
 
-    p.uniform.stopCount = 2;
+    p.uniform.stopCount = 1;
     p.uniform.joinType = 0;
 
     p.uniform.stops[0] = 0;
     p.uniform.colors[0] = ((c >> 24) & 0xFF) / 255.f;
     p.uniform.colors[1] = ((c >> 16) & 0xFF) / 255.f;
     p.uniform.colors[2] = ((c >> 8) & 0xFF) / 255.f;
-    p.uniform.colors[3] = ((c >> 0) & 0xFF) / 255.f;
+    p.uniform.colors[3] = ((c >> 0) & 0xFF) / 255.f * a;
 
     p.uniform.stops[1] = 1;
     p.uniform.colors[4] = ((c >> 24) & 0xFF) / 255.f;

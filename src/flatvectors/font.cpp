@@ -44,7 +44,7 @@ void* fontCreate(const void* data, long int length, float size, int sdf) {
         fdata->size = size;
         fdata->sdf = sdf;
 
-        fdata->scale = stbtt_ScaleForMappingEmToPixels(&fdata->info, size);//stbtt_ScaleForPixelHeight(&fdata->info, height);
+        fdata->scale = stbtt_ScaleForPixelHeight(&fdata->info, size);
         fdata->glyphCount = fdata->info.numGlyphs;
         fdata->glyphs = (fvGlyph*) calloc(fdata->glyphCount, sizeof(fvGlyph));
         fdata->coded = false;
