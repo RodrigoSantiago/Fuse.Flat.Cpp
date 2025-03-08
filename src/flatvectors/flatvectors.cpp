@@ -818,6 +818,8 @@ void fvPathLineTo(fvContext* ctx, float x, float y) {
 }
 
 void fvPathQuadTo(fvContext* ctx, float cx, float cy, float x, float y) {
+    if (fv__equals(cx, cy, x, y)) return fvPathLineTo(ctx, x, y);
+
     if (ctx->op == STROKE) {
         ctx->cp = ctx->lt == 0 ? 0 : 1;
         ctx->cx = ctx->lx;
@@ -834,6 +836,8 @@ void fvPathQuadTo(fvContext* ctx, float cx, float cy, float x, float y) {
 }
 
 void fvPathCubicTo(fvContext* ctx, float cx1, float cy1, float cx2, float cy2, float x, float y) {
+    if (fv__equals(cx1, cy1, x, y) && fv__equals(cx2, cy2, x, y)) return fvPathLineTo(ctx, x, y);
+
     if (ctx->op == STROKE) {
         ctx->cp = ctx->lt == 0 ? 0 : 1;
         ctx->cx = ctx->lx;
