@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 #include "flatvectors.h"
+#include "image.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -314,4 +315,38 @@ JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_ReadImage(JNIEnv * jEnv, jcla
     jEnv->ReleaseByteArrayElements(data, imageBytes, JNI_ABORT);
 
     return imageArray;
+}
+JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_WriteImage(JNIEnv * jEnv, jclass jClass, jbyteArray imageData, jint width, jint height, jint channels, jint format, jint quality) {
+    jbyte *imageBytes = jEnv->GetByteArrayElements(imageData, NULL);
+
+    int size;
+    unsigned char* data = NULL;
+    if (format == 0) {
+        data = writePng((unsigned char *) imageBytes, width, height, channels, &size);
+    } else if (format == 1) {
+        data = writeJpg((unsigned char *) imageBytes, width, height, channels, quality, &size);
+    } else if (format == 2) {
+        data = writeBmp((unsigned char *) imageBytes, width, height, channels, &size);
+    } else if (format == 3) {
+        data = writeTga((unsigned char *) imageBytes, width, height, channels, &size);
+    }
+
+    if (data == NULL) {
+        return NULL;
+    }
+
+    jbyteArray dataArrey = jEnv->NewByteArray(size);
+    jEnv->SetByteArrayRegion(dataArrey, 0, size, (jbyte *)data);
+
+    if (format == 0) {
+        freePng(data);
+    } else if (format == 1) {
+        freeJpg(data);
+    } else if (format == 2) {
+        freeBmp(data);
+    } else if (format == 3) {
+        freeTga(data);
+    }
+
+    return dataArrey;
 }

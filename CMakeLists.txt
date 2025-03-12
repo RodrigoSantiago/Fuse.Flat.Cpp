@@ -27,7 +27,8 @@ set(SOURCE_FILES
         src/flatvectors/font.cpp
         src/flatvectors/render.cpp
         src/flatvectors/utf8.cpp
-        src/flatvectors/pack.cpp)
+        src/flatvectors/pack.cpp
+        src/flatvectors/image.cpp)
 
 add_library(Flat SHARED ${SOURCE_FILES})
 #add_executable(Flat ${SOURCE_FILES} main.cpp)

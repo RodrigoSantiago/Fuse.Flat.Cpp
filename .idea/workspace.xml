@@ -11,11 +11,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Painters improvement">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Degenerate quad and cubic curves fixes">
+      <change afterPath="$PROJECT_DIR$/src/flatvectors/image.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/flatvectors/image.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/font.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/stb_rect_pack.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +72,11 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -120,7 +128,11 @@
       <workItem from="1740700680186" duration="594000" />
       <workItem from="1741038924833" duration="4592000" />
       <workItem from="1741094671240" duration="4701000" />
-      <workItem from="1741119288185" duration="4925000" />
+      <workItem from="1741119288185" duration="5009000" />
+      <workItem from="1741269248490" duration="2516000" />
+      <workItem from="1741448503137" duration="1562000" />
+      <workItem from="1741756907743" duration="609000" />
+      <workItem from="1741805078728" duration="3284000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -262,7 +274,21 @@
       <option name="project" value="LOCAL" />
       <updated>1741099398147</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Shadow Render Fix">
+      <created>1741148140281</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1741148140281</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Degenerate quad and cubic curves fixes">
+      <created>1741449886992</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1741449886992</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -299,6 +325,8 @@
     <MESSAGE value="Better paint JNI methods" />
     <MESSAGE value="Image Pattern CycleMethod" />
     <MESSAGE value="Painters improvement" />
-    <option name="LAST_COMMIT_MESSAGE" value="Painters improvement" />
+    <MESSAGE value="Shadow Render Fix" />
+    <MESSAGE value="Degenerate quad and cubic curves fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Degenerate quad and cubic curves fixes" />
   </component>
 </project>
