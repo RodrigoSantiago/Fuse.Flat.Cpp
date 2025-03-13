@@ -11,12 +11,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Degenerate quad and cubic curves fixes">
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/image.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/image.h" afterDir="false" />
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="SVG Image Write">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/stb_rect_pack.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/font.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/image.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/image.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/image.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/image.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/pack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/pack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/render.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nanovg.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
     </list>
@@ -48,19 +52,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;cmake.loaded.for.project&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Github/Fuse.Flat.Cpp/include&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "cmake.loaded.for.project": "true",
+    "last_opened_file_path": "D:/Github/Fuse.Flat.Cpp/include",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "dynamic.analysis.tools.valgrind"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Github\Fuse.Flat.Cpp\include" />
@@ -72,12 +77,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -132,7 +137,8 @@
       <workItem from="1741269248490" duration="2516000" />
       <workItem from="1741448503137" duration="1562000" />
       <workItem from="1741756907743" duration="609000" />
-      <workItem from="1741805078728" duration="3284000" />
+      <workItem from="1741805078728" duration="4182000" />
+      <workItem from="1741872329538" duration="22187000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -288,7 +294,14 @@
       <option name="project" value="LOCAL" />
       <updated>1741449886992</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="SVG Image Write">
+      <created>1741808702244</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1741808702244</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -327,6 +340,7 @@
     <MESSAGE value="Painters improvement" />
     <MESSAGE value="Shadow Render Fix" />
     <MESSAGE value="Degenerate quad and cubic curves fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Degenerate quad and cubic curves fixes" />
+    <MESSAGE value="SVG Image Write" />
+    <option name="LAST_COMMIT_MESSAGE" value="SVG Image Write" />
   </component>
 </project>

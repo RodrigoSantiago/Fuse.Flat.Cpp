@@ -120,17 +120,6 @@ int fv__realloc(fvContext* ctx, int paint, int shape, int element, int vertex) {
 
     if (ctx->paints == 0 || ctx->uniforms == 0 || ctx->shapes == 0 ||
             ctx->elements == 0 || ctx->vtx == 0 || ctx->uvs == 0) {
-        free(ctx->paints);
-        free(ctx->uniforms);
-        free(ctx->shapes);
-        free(ctx->elements);
-        free(ctx->vtx);
-        free(ctx->uvs);
-        ctx->paints = 0;
-        ctx->shapes = 0;
-        ctx->elements = 0;
-        ctx->vtx = 0;
-        ctx->uvs = 0;
         return 0;
     } else {
         renderAlloc(ctx->rCtx, paint, element, vertex);
@@ -677,6 +666,7 @@ fvContext* fvCreate() {
     ctx->vtx = 0;
     ctx->uvs = 0;
     ctx->shapes = 0;
+    ctx->uniforms = 0;
 
     ctx->MPAINT = 0;
     ctx->MSHAPE = 0;
@@ -689,6 +679,12 @@ fvContext* fvCreate() {
 }
 
 void fvDestroy(fvContext* ctx) {
+    free(ctx->paints);
+    free(ctx->uniforms);
+    free(ctx->shapes);
+    free(ctx->elements);
+    free(ctx->vtx);
+    free(ctx->uvs);
     renderDestroy(ctx->rCtx);
     free(ctx);
 }
