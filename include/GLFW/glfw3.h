@@ -1061,7 +1061,7 @@ extern "C" {
 /*! @brief Client API function pointer type.
  *
  *  Generic function pointer used for returning client API function pointers
- *  without forcing a cast from a regular pointer.
+ *  without forcing a ctx from a regular pointer.
  *
  *  @sa @ref context_glext
  *  @sa @ref glfwGetProcAddress
@@ -1075,7 +1075,7 @@ typedef void (*GLFWglproc)(void);
 /*! @brief Vulkan API function pointer type.
  *
  *  Generic function pointer used for returning Vulkan API function pointers
- *  without forcing a cast from a regular pointer.
+ *  without forcing a ctx from a regular pointer.
  *
  *  @sa @ref vulkan_proc
  *  @sa @ref glfwGetInstanceProcAddress

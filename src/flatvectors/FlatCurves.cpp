@@ -1,23 +1,19 @@
-/*
-    Anti-Grain Geometry - Version 2.4
-    Copyright (C) 2002-2004 Maxim Shemanarev (McSeem)
+//
+// Created by Rodrigo on 15/03/2025.
+//
 
-    Permission to copy, use, modify, sell and distribute this software
-    is granted provided this copyright notice appears in all copies.
-    This software is provided "as is" without express or implied
-    warranty, and with no claim as to its suitability for any purpose.
-*/
+#include "FlatCurves.h"
 
-#include <curves.h>
 #include <cmath>
+#include <iostream>
 
 #define pi 3.14159265359
 
 #define collinearity_epsilon 1e-30
 #define angle_epsilon 0.01
 
-#define m_angle 0
-#define m_cusp 0
+#define m_angle 0.25
+#define m_cusp 1
 #define m_level 32
 
 inline double distance2(double x1, double y1, double x2, double y2) {
@@ -30,7 +26,7 @@ void quad(double m_distance,
           double x1, double y1,
           double x2, double y2,
           double x3, double y3,
-          unsigned level, void* data, void (*vertex)(void*, double x, double y)) {
+          unsigned level, FlatVectors* data, void (*vertex)(FlatVectors*, double, double)) {
     if(level > m_level) {
         return;
     }
@@ -88,15 +84,15 @@ void quad(double m_distance,
     quad(m_distance, x123, y123, x23, y23, x3, y3, level + 1, data, vertex);
 }
 
-void tessQuad(double scale,
-              double x1, double y1,
-              double x2, double y2,
-              double x3, double y3,
-              void* data, void (*vertex)(void*, double, double)) {
+void FlatCurves::tessQuad(double scale,
+                          double x1, double y1,
+                          double x2, double y2,
+                          double x3, double y3,
+                          FlatVectors* context, void (*vertex)(FlatVectors*, double, double)) {
     //vertex(data, x1, y1);
     scale = 1 / ((scale) * (scale));
-    quad(scale, x1, y1, x2, y2, x3, y3, 0, data, vertex);
-    vertex(data, x3, y3);
+    quad(scale, x1, y1, x2, y2, x3, y3, 0, context, vertex);
+    vertex(context, x3, y3);
 }
 
 void cubic(double m_distance,
@@ -104,7 +100,7 @@ void cubic(double m_distance,
            double x2, double y2,
            double x3, double y3,
            double x4, double y4,
-           unsigned level, void* data, void (*vertex)(void*, double x, double y)) {
+           unsigned level, FlatVectors* data, void (*vertex)(FlatVectors*, double, double)) {
     if (level > m_level) {
         return;
     }
@@ -259,14 +255,14 @@ void cubic(double m_distance,
     cubic(m_distance, x1234, y1234, x234, y234, x34, y34, x4, y4, level + 1, data, vertex);
 }
 
-void tessCubic(double scale,
-               double x1, double y1,
-               double x2, double y2,
-               double x3, double y3,
-               double x4, double y4,
-               void* data, void (*vertex)(void*, double x, double y)) {
+void FlatCurves::tessCubic(double scale,
+                           double x1, double y1,
+                           double x2, double y2,
+                           double x3, double y3,
+                           double x4, double y4,
+                           FlatVectors* context, void (*vertex)(FlatVectors*, double, double)) {
     //vertex(data, x1, y1);
     scale = 1 / ((scale) * (scale));
-    cubic(scale, x1, y1, x2, y2, x3, y3, x4, y4, 0, data, vertex);
-    vertex(data, x4, y4);
+    cubic(scale, x1, y1, x2, y2, x3, y3, x4, y4, 0, context, vertex);
+    vertex(context, x4, y4);
 }

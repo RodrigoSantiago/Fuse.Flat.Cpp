@@ -1,8 +1,8 @@
 //
-// Created by Rodrigo on 12/03/2025.
+// Created by Rodrigo on 16/03/2025.
 //
 
-#include "image.h"
+#include "FlatImage.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -33,15 +33,15 @@ static void custom_stbi_write_mem(void *context, void *data, int size) {
     c->last_pos = cur_pos;
 }
 
-unsigned char* writePng(unsigned char* data, int width, int height, int channels, int* dataSize) {
+unsigned char* FlatImage::writePng(unsigned char* data, int width, int height, int channels, int* dataSize) {
     return stbi_write_png_to_mem(data, 0, width, height, channels, dataSize);
 }
 
-void freePng(unsigned char* data) {
+void FlatImage::freePng(unsigned char* data) {
     STBIW_FREE(data);
 }
 
-unsigned char* writeJpg(unsigned char* data, int width, int height, int channels, int quality, int* dataSize) {
+unsigned char* FlatImage::writeJpg(unsigned char* data, int width, int height, int channels, int quality, int* dataSize) {
     custom_stbi_mem_context context;
     context.last_pos = 0;
     context.size = 256;
@@ -54,11 +54,11 @@ unsigned char* writeJpg(unsigned char* data, int width, int height, int channels
     return (unsigned char *) context.context;
 }
 
-void freeJpg(unsigned char* data) {
+void FlatImage::freeJpg(unsigned char* data) {
     free(data);
 }
 
-unsigned char* writeBmp(unsigned char* data, int width, int height, int channels, int* dataSize) {
+unsigned char* FlatImage::writeBmp(unsigned char* data, int width, int height, int channels, int* dataSize) {
     custom_stbi_mem_context context;
     context.last_pos = 0;
     context.size = 256;
@@ -71,11 +71,11 @@ unsigned char* writeBmp(unsigned char* data, int width, int height, int channels
     return (unsigned char *) context.context;
 }
 
-void freeBmp(unsigned char* data) {
+void FlatImage::freeBmp(unsigned char* data) {
     free(data);
 }
 
-unsigned char* writeTga(unsigned char* data, int width, int height, int channels, int* dataSize) {
+unsigned char* FlatImage::writeTga(unsigned char* data, int width, int height, int channels, int* dataSize) {
     custom_stbi_mem_context context;
     context.last_pos = 0;
     context.size = 256;
@@ -88,6 +88,6 @@ unsigned char* writeTga(unsigned char* data, int width, int height, int channels
     return (unsigned char *) context.context;
 }
 
-void freeTga(unsigned char* data) {
+void FlatImage::freeTga(unsigned char* data) {
     free(data);
 }

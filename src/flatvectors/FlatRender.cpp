@@ -1,9 +1,9 @@
 //
-// Created by Rodrigo on 25/10/2018.
+// Created by Rodrigo on 14/03/2025.
 //
-#include "render.h"
-#include <glad/glad.h>
 
+#include "FlatRender.h"
+#include "FlatFontRender.h"
 #include <iostream>
 #include <cmath>
 
@@ -37,7 +37,6 @@ const char *fragmentSource =
         "    vec4 colors[16];\n"
         "};\n"
         "uniform int stc;\n"
-        "uniform int sdf;\n"
         "uniform int dbg;\n"
         "uniform sampler2D tex;\n"
         "uniform sampler2D fnt;\n"
@@ -123,7 +122,7 @@ const char *fragmentSource =
         "            float dist = texture(fnt, oTex / sz).r;\n"
         "            if (dbg == 1) {\n"
         "                a = 1;\n"
-        "            } else if (sdf == 1) {\n"
+        "            } else if (extra[3] >= 0) {\n"
         "                float screenSpaceScale = fwidth(oTex).x * 0.05 + extra[3] * 0.5;\n"
         "                float aliasing = smoothstep(0.5 - screenSpaceScale, 0.5 + screenSpaceScale, dist);\n"
         "                a = a * aliasing;\n"
@@ -135,32 +134,25 @@ const char *fragmentSource =
         "    }\n"
         "}\0";
 
-typedef struct fvGLData {
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
-    GLuint ubo;
-    int paint, vertex, element;
+// Local Private
 
-    GLuint image0, image1;
+int _get_align() {
+    GLint align;
+    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &align);
+    return (GLint) ceil(sizeof(fvUniform) / (float)align) * align;
+}
 
-    GLuint shader;
-    GLint viewID, matID, texID, fntID, sdfID, stcID, dbgID;
+void _render_triangles(int pos, int length) {
+    glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int)));
+}
 
-    int aa, sdf;
-    unsigned int width, height;
-} fvGLData;
+// Class
 
-void* renderCreate() {
-// todo - single buffer for vertex, uv, elements
-
-    fvGLData* ctx = (fvGLData*) malloc(sizeof(fvGLData));
-    memset(ctx, 0, sizeof(fvGLData));
-
-    glGenVertexArrays(1, &ctx->vao);
-    glGenBuffers(1, &ctx->vbo);
-    glGenBuffers(1, &ctx->ebo);
-    glGenBuffers(1, &ctx->ubo);
+FlatRender::FlatRender() : paint(0), vertex(0), element(0), curAA(0), curImage0(0), curImage1(0) {
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glGenBuffers(1, &ubo);
 
     // Vertex Shader
     int success;
@@ -185,118 +177,90 @@ void* renderCreate() {
     }
 
     // Shader Program
-    ctx->shader = glCreateProgram();
-    glAttachShader(ctx->shader, vS);
-    glAttachShader(ctx->shader, fS);
-    glLinkProgram(ctx->shader);
-    glGetProgramiv(ctx->shader, GL_LINK_STATUS, &success);
+    shader = glCreateProgram();
+    glAttachShader(shader, vS);
+    glAttachShader(shader, fS);
+    glLinkProgram(shader);
+    glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(ctx->shader, 512, NULL, infoLog);
+        glGetProgramInfoLog(shader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     glDeleteShader(vS);
     glDeleteShader(fS);
 
-    GLuint paintIndex = glGetUniformBlockIndex(ctx->shader, "Paint");
-    glUniformBlockBinding(ctx->shader, paintIndex, 0);
-    ctx->viewID = glGetUniformLocation(ctx->shader, "view");
-    ctx->matID = glGetUniformLocation(ctx->shader, "mat");
-    ctx->texID = glGetUniformLocation(ctx->shader, "tex");
-    ctx->fntID = glGetUniformLocation(ctx->shader, "fnt");
-    ctx->sdfID = glGetUniformLocation(ctx->shader, "sdf");
-    ctx->stcID = glGetUniformLocation(ctx->shader, "stc");
-    ctx->dbgID = glGetUniformLocation(ctx->shader, "dbg");
-    ctx->width = 0;
-    ctx->height = 0;
-
-    return ctx;
+    GLuint paintIndex = glGetUniformBlockIndex(shader, "Paint");
+    glUniformBlockBinding(shader, paintIndex, 0);
+    viewID = glGetUniformLocation(shader, "view");
+    matID = glGetUniformLocation(shader, "mat");
+    texID = glGetUniformLocation(shader, "tex");
+    fntID = glGetUniformLocation(shader, "fnt");
+    stcID = glGetUniformLocation(shader, "stc");
+    dbgID = glGetUniformLocation(shader, "dbg");
+    std::cout << "Renderer: " << glGetError() << std::endl;
 }
 
-int _get_align() {
-    GLint align;
-    glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &align);
-    return (GLint) ceil(sizeof(fvUniform) / (float)align) * align;
+FlatRender::~FlatRender() {
+    glDeleteBuffers(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
+    glDeleteBuffers(1, &ubo);
+    glDeleteShader(shader);
 }
 
-int renderAlign() {
+int FlatRender::renderAlign() {
     static int align = _get_align();
     return align;
 }
 
-void renderAlloc(void * data, int paint, int element, int vertex) {
-    fvGLData* ctx = (fvGLData*) data;
+void FlatRender::ensureCapacity(int paint, int element, int vertex) {
 
-    if (ctx->paint != paint) {
-        ctx->paint = paint;
-
-        // Uniform Buffer
-        glBindBuffer(GL_UNIFORM_BUFFER, ctx->ubo);
+    // Uniform Buffer
+    if (this->paint < paint) {
+        this->paint = paint;
         glBufferData(GL_UNIFORM_BUFFER, paint * renderAlign(), NULL, GL_STATIC_DRAW);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    glBindVertexArray(ctx->vao);
-
     // Vertices + UVs
-    if (ctx->vertex != vertex) {
-        ctx->vertex = vertex;
-
-        glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo);
+    if (this->vertex < vertex) {
+        this->vertex = vertex;
         glBufferData(GL_ARRAY_BUFFER, vertex * sizeof(float) * 2, NULL, GL_STATIC_DRAW);
+
+        // pos
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) 0);
+        glEnableVertexAttribArray(0);
+
+        // uv
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) (vertex * sizeof(float)));
+        glEnableVertexAttribArray(1);
     }
 
     // Elements
-    if (ctx->element != element) {
-        ctx->element = element;
+    if (this->element < element) {
+        this->element = element;
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, element * sizeof(int), NULL, GL_STATIC_DRAW);
-
     }
-
-    // pos
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
-
-    // uv
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *) (vertex * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);
 }
 
-void renderDestroy(void *data) {
-    fvGLData* ctx = (fvGLData*) data;
+void FlatRender::begin(unsigned int width, unsigned int height, bool dbg) {
+    curAA = 0;
+    curImage0 = 0;
+    curImage1 = 0;
+    debug = dbg;
 
-    glDeleteBuffers(1, &ctx->vao);
-    glDeleteBuffers(1, &ctx->vbo);
-    glDeleteBuffers(1, &ctx->ebo);
-    glDeleteBuffers(1, &ctx->ubo);
-    glDeleteShader(ctx->shader);
-    free(ctx);
-}
+    glUseProgram(shader);
+    glUniform2f(viewID, width, height);
+    glUniform1i(texID, 0);
+    glUniform1i(fntID, 1);
+    glUniform1i(stcID, 0);
+    glUniform1i(dbgID, debug ? 1 : 0);
 
-void renderBegin(void *data, unsigned int width, unsigned int height) {
-    fvGLData* ctx = (fvGLData*) data;
-    ctx->width = width;
-    ctx->height = height;
-    ctx->image0 = 0;
-    ctx->image1 = 0;
-    ctx->aa = 0;
-    ctx->sdf = 0;
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    glUseProgram(ctx->shader);
-    glUniform2f(ctx->viewID, width, height);
-    // glUniformMatrix3fv(ctx->matID, 1, 0, *);
-    glUniform1i(ctx->texID, 0);
-    glUniform1i(ctx->fntID, 1);
-    glUniform1i(ctx->sdfID, 0);
-    glUniform1i(ctx->stcID, 0);
-    glUniform1i(ctx->dbgID, fvIsDebug());
-
-    glBindVertexArray(ctx->vao);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, ctx->ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 
     glDisable(GL_MULTISAMPLE);
     glDisable(GL_DEPTH_TEST);
@@ -315,15 +279,13 @@ void renderBegin(void *data, unsigned int width, unsigned int height) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
-void renderEnd(void *data) {
-    fvGLData *ctx = (fvGLData *) data;
-
+void FlatRender::end() {
     glUseProgram(0);
     glBindVertexArray(0);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    if (ctx->image1 != 0) {
+    if (curImage1 != 0) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -332,7 +294,7 @@ void renderEnd(void *data) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void renderClearClip(void* data, int clip) {
+void FlatRender::clearClip(bool clip) {
     glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
     glClearStencil(clip ? 0x00 : 0x80);
@@ -342,156 +304,165 @@ void renderClearClip(void* data, int clip) {
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
-void renderUnbindImage(void *data) {
-    fvGLData *ctx = (fvGLData *) data;
-    ctx->image0 = 0;
-}
+void FlatRender::flush(
+        fvPaint *paints, void* uniforms, int pSize,
+        int* elements, int eSize,
+        float *vtx, float *uvs, int vSize) {
 
-void render__triangles(int pos, int length) {
-    glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int)));
-}
-
-void renderFlush(void *data,
-                 fvPaint *paints, void* uniforms, int pSize,
-                 int* elements, int eSize,
-                 float *vtx, float *uvs, int vSize) {
-    fvGLData* ctx = (fvGLData*) data;
+    ensureCapacity(pSize, eSize, vSize);
 
     glBufferSubData(GL_UNIFORM_BUFFER, 0, pSize * renderAlign(), uniforms);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, eSize * sizeof(int), elements);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vSize * sizeof(float), vtx);
-    glBufferSubData(GL_ARRAY_BUFFER, ctx->vertex * sizeof(float), vSize * sizeof(float), uvs);
+    glBufferSubData(GL_ARRAY_BUFFER, vertex * sizeof(float), vSize * sizeof(float), uvs);
 
     GLsizei pos = 0;
     for (int i = 0; i < pSize; i++) {
-        // Exclude size, antealiasing and images info
-        glBindBufferRange(GL_UNIFORM_BUFFER, 0, ctx->ubo, i * renderAlign(), renderAlign());
+        fvPaint &curPaint = paints[i];
+        int totalElements = curPaint.elements * 3;
+        int renderElements = totalElements - pos;
 
-        glUniformMatrix3fv(ctx->matID, 1, 0, paints[i].mat);
-
-        fvPaint &p = paints[i];
-        int aa = p.aa;
-        int sd = p.font == NULL ? 0 : p.font->sdf;
-        int cv = p.convex;
-        int wr = p.winding;
-        int op = p.paintOp;
+        glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, i * renderAlign(), renderAlign());
+        glUniformMatrix3fv(matID, 1, 0, curPaint.transform);
 
         // Antialiasing
-        if (ctx->aa != aa) {
-            ctx->aa = aa;
-            if (ctx->aa) {
+        if (curAA != curPaint.antiAlias) {
+            curAA = curPaint.antiAlias;
+            if (curAA) {
                 glEnable(GL_MULTISAMPLE);
             } else {
                 glDisable(GL_MULTISAMPLE);
             }
         }
 
-        if (op == CLIP) {
+        if (curPaint.pathOp == CLIP || curPaint.pathOp == UNCLIP) {
             glColorMask(0, 0, 0, 0);
-            glUniform1i(ctx->stcID, 1);
-            glStencilFunc(GL_ALWAYS, 0x80, 0x80);
-            glStencilMask(0x80);
+            glUniform1i(stcID, 1);
 
-            if (cv) {
+            if (curPaint.convex) {
+                unsigned char val = curPaint.pathOp == CLIP ? 0x00 : 0x80;
+
+                glStencilFunc(GL_ALWAYS, val, 0xFF);
+                glStencilMask(0xFF);
                 glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-                render__triangles(pos, p.size - pos);
+                _render_triangles(pos, renderElements);
             } else {
-                glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
-                render__triangles(pos, p.size - pos);
+                glStencilFunc(GL_ALWAYS, 0x01, 0xFF);
+                glStencilMask(0x01);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
+                _render_triangles(pos, renderElements);
+
+                if (curPaint.pathOp == CLIP) {
+                    glStencilFunc(GL_EQUAL, 0x01, 0x01);
+                    glStencilMask(0xFF);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+                    _render_triangles(pos, renderElements);
+                } else {
+                    glStencilFunc(GL_EQUAL, 0x81, 0x01);
+                    glStencilMask(0xFF);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+                    _render_triangles(pos, renderElements);
+
+                    glStencilFunc(GL_EQUAL, 0x01, 0x01);
+                    glStencilMask(0x01);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+                    _render_triangles(pos, renderElements);
+                }
             }
 
             glStencilFunc(GL_EQUAL, 0x80, 0xFF);
             glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             glStencilMask(0xFF);
             glColorMask(1, 1, 1, 1);
-            glUniform1i(ctx->stcID, 0);
+            glUniform1i(stcID, 0);
         } else {
-            // Images
-            if (ctx->image0 != p.image0) {
+            if (curImage0 != curPaint.image0) {
+                curImage0 = curPaint.image0;
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, ctx->image0 = p.image0);
+                glBindTexture(GL_TEXTURE_2D, curImage0);
             }
 
-            // Font
-            GLuint fntImg = p.font == NULL ? 0 : p.font->imageID;
-            if (ctx->image1 != fntImg) {
+            GLuint fntImg = curPaint.pathOp == TEXT && curPaint.font != nullptr ? curPaint.font->getImage() : 0;
+            if (curImage1 != fntImg) {
+                curImage1 = fntImg;
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, ctx->image1 = fntImg);
-                if (ctx->sdf != sd) {
-                    ctx->sdf = sd;
-                    if (ctx->sdf) {
-                        glUniform1i(ctx->sdfID, 1);
-                    } else {
-                        glUniform1i(ctx->sdfID, 0);
-                    }
-                }
+                glBindTexture(GL_TEXTURE_2D, curImage1);
             }
 
-            if (op == TEXT || (op == FILL && cv)) {
+            if (debug) {
+                glStencilFunc(GL_ALWAYS, 0x80, 0xFF);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+                _render_triangles(pos, renderElements);
+
+            } else if (curPaint.pathOp == TEXT || curPaint.pathOp == CONVEX || curPaint.convex) {
                 glStencilFunc(GL_EQUAL, 0x80, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-                render__triangles(pos, p.size - pos);
-            } else if (op == FILL) {
+                _render_triangles(pos, renderElements);
 
-                if (wr == EVEN_ODD) {
+            } else if (curPaint.pathOp == FILL) {
+
+                if (curPaint.pathRule == EVEN_ODD) {
                     // Even-Odd
 
-                    glUniform1i(ctx->stcID, 1);
+                    glUniform1i(stcID, 1);
                     glColorMask(0, 0, 0, 0);
                     glStencilFunc(GL_NOTEQUAL, 0x00, 0xFF);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-                    render__triangles(pos, p.size - pos);
+                    _render_triangles(pos, renderElements);
 
-                    glUniform1i(ctx->stcID, 0);
+                    glUniform1i(stcID, 0);
                     glColorMask(1, 1, 1, 1);
                     glStencilFunc(GL_EQUAL, 0x7F, 0xFF);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-                    render__triangles(pos, p.size - pos);
+                    _render_triangles(pos, renderElements);
                 } else {
                     // Non-Zero
 
-                    glUniform1i(ctx->stcID, 1);
+                    glUniform1i(stcID, 1);
                     glColorMask(0, 0, 0, 0);
                     glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, 0x00, 0xFF);
                     glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
                     glStencilFuncSeparate(GL_BACK, GL_NOTEQUAL, 0x00, 0xFF);
                     glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR_WRAP);
                     glStencilMask(0x7F);
-                    render__triangles(pos, p.size - pos);
+                    _render_triangles(pos, renderElements);
 
-                    glUniform1i(ctx->stcID, 0);
+                    glUniform1i(stcID, 0);
                     glColorMask(1, 1, 1, 1);
                     glStencilFunc(GL_LESS, 0x80, 0xFF);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
                     glStencilMask(0xFF);
-                    render__triangles(pos, p.size - pos);
+                    _render_triangles(pos, renderElements);
                 }
 
                 glStencilFunc(GL_EQUAL, 0x80, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            } else if (op == STROKE) {
-                glUniform1i(ctx->stcID, 1);
+
+            } else if (curPaint.pathOp == STROKE) {
+                glUniform1i(stcID, 1);
                 glColorMask(0, 0, 0, 0);
                 glStencilFunc(GL_EQUAL, 0x80, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-                render__triangles(pos, p.size - pos);
+                _render_triangles(pos, renderElements);
 
-                glUniform1i(ctx->stcID, 0);
+                glUniform1i(stcID, 0);
                 glColorMask(1, 1, 1, 1);
                 glStencilFunc(GL_EQUAL, 0x7F, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-                render__triangles(pos, p.size - pos);
+                _render_triangles(pos, renderElements);
 
                 glStencilFunc(GL_EQUAL, 0x80, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             }
         }
 
-        pos = p.size;
+        pos = totalElements;
     }
 }
 
-unsigned long renderCreateFontTexture(int width, int height) {
+// -- Font -- //
+
+unsigned long FlatRender::createFontTexture(int width, int height) {
     glActiveTexture(GL_TEXTURE0);
 
     GLuint img;
@@ -504,10 +475,12 @@ unsigned long renderCreateFontTexture(int width, int height) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glBindTexture(GL_TEXTURE_2D, 0);
+    curImage0 = 0;
+
     return img;
 }
 
-unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int width, int height) {
+unsigned long FlatRender::resizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int width, int height) {
     glActiveTexture(GL_TEXTURE0);
 
     GLuint newImg;
@@ -531,22 +504,34 @@ unsigned long renderResizeFontTexture(unsigned long oldImageID, int oldWidth, in
 
     free(oldData);
 
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    curImage1 = 0;
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    curImage0 = 0;
+
     GLuint oldImgID = oldImageID;
     glDeleteTextures(1, &oldImgID);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
     return newImg;
 }
 
-void renderUpdateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height) {
+void FlatRender::updateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height) {
     glActiveTexture(GL_TEXTURE0);
 
     glBindTexture(GL_TEXTURE_2D, imageID);
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
+
     glBindTexture(GL_TEXTURE_2D, 0);
+    curImage0 = 0;
+
 }
 
-void renderDestroyFontTexture(unsigned long imageID) {
-    GLuint imgID = imageID;
-    glDeleteTextures(1, &imgID);
+void FlatRender::destroyFontTexture(unsigned long imageID) {
+    if (imageID != 0) {
+        GLuint imgID = imageID;
+        glDeleteTextures(1, &imgID);
+    }
 }

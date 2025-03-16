@@ -2,38 +2,53 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream>
+#include "src/objective/FlatVectors.h"
+#include "src/objective/FlatFont.h"
+#include "src/objective/FlatFontRender.h"
+#include "src/objective/FlatPaints.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 1200;
+unsigned int SCR_HEIGHT = 800;
 
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "}\n\0";
+unsigned char* readFile(const std::string& filename, std::size_t& fileSize) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+
+    if (!file.is_open()) {
+        std::cerr << "Font file error!" << std::endl;
+        return nullptr;
+    }
+
+    fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    unsigned char* buffer = new unsigned char[fileSize];
+
+    if (!file.read(reinterpret_cast<char*>(buffer), fileSize)) {
+        std::cerr << "Font file error!" << std::endl;
+        delete[] buffer;
+        return nullptr;
+    }
+
+    file.close();
+    return buffer;
+}
 
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 8);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FlatVectors Test", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -47,161 +62,208 @@ int main() {
         return -1;
     }
 
+    fvUniform color = {};
+    FlatPaints::setColorPaint(color, 0xFF0000FF);
 
-    // build and compile our shader program
-    // ------------------------------------
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // link shaders
-    int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    size_t size = 0;
+    unsigned char * fontFile = readFile("C:/Nova/Roboto-Regular.ttf", size);
+    FlatVectors * fv = new FlatVectors();
+    FlatFont* font = new FlatFont(fontFile, size, 48, true);
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float vertices[] = {
-            -0.5f,  0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-             0.0f,  0.0f, 0.0f,
+    FlatStroke stroke = FlatStroke();
 
-            0.25f,  0.25f, 0.0f,
-            0.75f,  0.25f, 0.0f,
-            0.75f,  0.75f, 0.0f,
-            0.25f,  0.75f, 0.0f,
+    std::cout << "Font : " << font->isValid() << std::endl;
+    FlatFontRender* fontRender = new FlatFontRender(font, fv->getRender());
 
-            0.0f,  -0.95f, 0.0f,
-            -0.95f,  0.70f, 0.0f,
-             0.95f,  0.70f, 0.0f
-    };
-    unsigned int indices[] = {
-            0, 1, 2,
-            0, 2, 3,
-            0, 3, 4,
-
-            0, 5, 6,
-            0, 6, 7,
-            0, 7, 8,
-            0, 8, 5,
-
-            9, 10, 11,
-    };
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
-
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glStencilFunc(GL_ALWAYS, 0, 0xFF);
-    glStencilMask(0xFF);
+    FlatVectors::setDebug(true);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
     // -----------
+    double x, y;
+    int t = 0;
+    glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
         // input
         // -----
         processInput(window);
+        glfwGetCursorPos((GLFWwindow*) window, &x, &y);
+        float ix = static_cast<int>(x) / 2.0f;
+        float iy = static_cast<int>(y) / 2.0f;
 
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0, 0.0, 0.0, 1.0f);
         glClearStencil(0x00);
         glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        // draw our first triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        fv->setAntiAliasing(0);
+        fv->setTransform(1, 0, 0, 1, 0, 0);
+        FlatPaints::setColorPaint(color, 0xFF0000FF);
+        fv->setColor(color, 0);
+        fv->beginFrame(SCR_WIDTH / 2, SCR_HEIGHT / 2);
 
-        /*
-         * Clip
-         */
-        glColorMask(0, 0, 0, 0);
-        glStencilFunc(GL_ALWAYS, 0x01, 0xFF);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void *)(21 * sizeof(unsigned int)));
+        fv->begin(CLIP, EVEN_ODD);
+        fv->moveTo(25, 25);
+        fv->lineTo(50, 25);
+        fv->lineTo(50, 50);
+        fv->lineTo(25, 50);
+        fv->close();
+        fv->moveTo(30, 30);
+        fv->lineTo(45, 30);
+        fv->lineTo(45, 45);
+        fv->lineTo(30, 45);
+        fv->close();
+        fv->end();
 
-        glStencilFunc(GL_EQUAL, 0x01, 0xFF);
-        glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
-        glDrawElements(GL_TRIANGLES, 21, GL_UNSIGNED_INT, 0);
-        glColorMask(1, 1, 1, 1);
+        fv->begin(UNCLIP, EVEN_ODD);
+        fv->moveTo(35, 35);
+        fv->lineTo(60, 35);
+        fv->lineTo(60, 60);
+        fv->lineTo(35, 60);
+        fv->close();
+        fv->moveTo(40, 40);
+        fv->lineTo(55, 40);
+        fv->lineTo(55, 55);
+        fv->lineTo(40, 55);
+        fv->close();
+        fv->end();
 
-        glStencilFunc(GL_EQUAL, 0xFE, 0xFF);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-        glDrawElements(GL_TRIANGLES, 21, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time
+        fv->begin(FILL, EVEN_ODD);
+        fv->moveTo(0, 0);
+        fv->lineTo(0, 100);
+        fv->lineTo(100, 100);
+        fv->lineTo(100, 0);
+        fv->close();
+        fv->end();
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+        //fv->ellipse(300, 0, 100, 100);
+        fv->roundRect(300, 0, 100, 100, 30, 10, 40, 20);
+
+        FlatPaints::setColorPaint(color, 0xFFFF00FF);
+        fv->setColor(color, 0);
+        fv->setFont(fontRender);
+        fv->text("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 23, 10, 20, 0, 0);
+        fv->text("abcdefghijklmnopqrstuvwxyz", 23, 10, 50, 0, 0);
+
+        stroke = FlatStroke(
+                10, 1.5, fvCap::CAP_BUTT, fvJoin::JOIN_BEVEL
+        );
+        fv->setStroke(stroke);
+        fv->begin(FILL, EVEN_ODD);
+        fv->moveTo(100, 100);
+        fv->quadTo(50, 150, 100, 200);
+        fv->lineTo(105, 150);
+        fv->lineTo(150, 200);
+        fv->flush();
+        fv->lineTo(195, 150);
+        fv->lineTo(200, 200);
+        fv->cubicTo(150, 150, 300, 150, 200, 100);
+        fv->close();
+        fv->end();
+
+        /*stroke = {
+                10, 1.5, fvCap::CAP_BUTT, fvJoin::JOIN_MITER
+        };
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        fv->moveTo(100 + 150, 100);
+        fv->lineTo(100 + 150, 200);
+        fv->lineTo(105 + 150, 150);
+        fv->lineTo(150 + 150, 200);
+        fv->lineTo(195 + 150, 150);
+        fv->lineTo(200 + 150, 200);
+        fv->lineTo(200 + 150, 100);
+        fv->close();
+        fv->end();*/
+
+        stroke = FlatStroke(
+                10, 1.5, fvCap::CAP_ROUND, fvJoin::JOIN_BEVEL
+        );
+        stroke.dash.push_back(30);
+        stroke.dash.push_back(30);
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        // fv->moveTo(100 + 300, 100);
+        fv->moveTo(100 + 150, 200);
+        fv->cubicTo(200 + 150, 100, 100 + 150, 100, ix, iy);
+        //fv->lineTo(200 + 300, 100);
+        fv->end();
+
+        stroke = FlatStroke(
+                10, 1.5, fvCap::CAP_ROUND, fvJoin::JOIN_BEVEL
+        );
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        fv->moveTo(300 + 150, 200);
+        fv->lineTo(300 + 300, 200);
+        fv->close();
+        fv->end();
+
+        stroke = FlatStroke(
+                20, 1.5, fvCap::CAP_ROUND, fvJoin::JOIN_MITER
+        );
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        fv->moveTo(200 + 300, 150);
+        fv->end();
+
+        stroke = FlatStroke(
+                10, 1.5, fvCap::CAP_BUTT, fvJoin::JOIN_ROUND
+        );
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        fv->moveTo(100, 100 + 150);
+        fv->lineTo(100, 200 + 150);
+        fv->lineTo(105, 150 + 150);
+        fv->lineTo(150, 200 + 150);
+        fv->lineTo(195, 150 + 150);
+        fv->lineTo(200, 200 + 150);
+        fv->lineTo(200, 100 + 150);
+        fv->close();
+        fv->end();
+
+        FlatPaints::setColorPaint(color, 0xFF0000FF);
+        fv->setColor(color, 0);
+
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        fv->moveTo(200 + 150, 100 + 150);
+        fv->lineTo(200 + 150, 200 + 150);
+        fv->lineTo(195 + 150, 150 + 150);
+        fv->lineTo(150 + 150, 200 + 150);
+        fv->lineTo(105 + 150, 150 + 150);
+        fv->lineTo(100 + 150, 200 + 150);
+        fv->lineTo(100 + 150, 100 + 150);
+        fv->close();
+        fv->end();
+
+        stroke = FlatStroke(
+                10, 10, fvCap::CAP_ROUND, fvJoin::JOIN_MITER
+        );
+        fv->setStroke(stroke);
+        fv->begin(STROKE, EVEN_ODD);
+        fv->moveTo(ix, iy);
+        fv->lineTo(200 + 300, 200 + 150);
+        fv->lineTo(195 + 300, 150 + 150);
+        fv->lineTo(150 + 300, 200 + 150);
+        fv->lineTo(105 + 300, 150 + 150);
+        fv->lineTo(100 + 300, 200 + 150);
+        fv->lineTo(100 + 300, 100 + 150);
+        fv->end();
+
+        fv->endFrame();
+        int error = glGetError();
+        if (error != 0) {
+            std::cout << "GL Error: " << error << std::endl;
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shaderProgram);
-
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
+    delete fontRender;
+    delete font;
+    delete fv;
     glfwTerminate();
     return 0;
 }
@@ -212,5 +274,5 @@ void processInput(GLFWwindow *window) {
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, SCR_WIDTH = width, SCR_HEIGHT = height);
 }

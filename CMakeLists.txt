@@ -22,13 +22,17 @@ set(SOURCE_FILES
         src/gl/flat_backend_GL.cpp
         src/ml/flat_backend_ML.cpp
         src/svg/flat_backend_SVG.cpp
-        src/flatvectors/curves.cpp
-        src/flatvectors/flatvectors.cpp
-        src/flatvectors/font.cpp
-        src/flatvectors/render.cpp
-        src/flatvectors/utf8.cpp
-        src/flatvectors/pack.cpp
-        src/flatvectors/image.cpp)
+
+        src/flatvectors/FlatVectors.cpp
+        src/flatvectors/FlatRender.cpp
+        src/flatvectors/FlatFont.cpp
+        src/flatvectors/FlatPack.cpp
+        src/flatvectors/FlatFontRender.cpp
+        src/flatvectors/FlatPaints.cpp
+        src/flatvectors/FlatText.cpp
+        src/flatvectors/FlatCurves.cpp
+        src/flatvectors/FlatImage.cpp
+        src/flatvectors/FlatStroke.cpp)
 
 add_library(Flat SHARED ${SOURCE_FILES})
 #add_executable(Flat ${SOURCE_FILES} main.cpp)

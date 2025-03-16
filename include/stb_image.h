@@ -7875,7 +7875,7 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
       1.28  (2010-08-01)
               fix bug in GIF palette transparency (SpartanJ)
       1.27  (2010-08-01)
-              cast-to-stbi_uc to fix warnings
+              ctx-to-stbi_uc to fix warnings
       1.26  (2010-07-24)
               fix bug in file buffering for PNG reported by SpartanJ
       1.25  (2010-07-17)

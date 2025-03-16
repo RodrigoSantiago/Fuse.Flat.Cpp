@@ -235,10 +235,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload
 /*
  * Class:     flat_backend_SVG
  * Method:    FontPaintCreate
- * Signature: (J)V
+ * Signature: (JJ)V
  */
 JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate
-  (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass, jlong, jlong);
 
 /*
  * Class:     flat_backend_SVG
