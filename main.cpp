@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include <fstream>
-#include "src/objective/FlatVectors.h"
-#include "src/objective/FlatFont.h"
-#include "src/objective/FlatFontRender.h"
-#include "src/objective/FlatPaints.h"
+#include "src/flatvectors/FlatVectors.h"
+#include "src/flatvectors/FlatFont.h"
+#include "src/flatvectors/FlatFontRender.h"
+#include "src/flatvectors/FlatPaints.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -61,6 +61,68 @@ int main() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    float vertices[] = {
+            0.5f,  0.5f, 0.0f,  // top right
+            0.5f, -0.5f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f   // top left
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+            0, 1, 3,  // first Triangle
+            1, 2, 3   // second Triangle
+    };
+
+    unsigned int VBO, VAO, EBO, EBO2;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    glGenBuffers(1, &EBO2);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    glBindVertexArray(0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+    GLint id = 0;
+    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &id);
+    std::cout << "bbe " << id << std::endl;
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &id);
+    std::cout << "bba " << id << std::endl;
+    glBindVertexArray(VAO);
+    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &id);
+    std::cout << "bbe " << id << std::endl;
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &id);
+    std::cout << "bba " << id << std::endl;
+    glBindVertexArray(0);
+    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &id);
+    std::cout << "bbe " << id << std::endl;
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &id);
+    std::cout << "bba " << id << std::endl;
+
+    /*if (trgBB == GL_ARRAY_BUFFER) {
+        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &id);
+    } else if (trgBB == GL_ELEMENT_ARRAY_BUFFER) {
+        glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &id);
+    }*/
+
 
     fvUniform color = {};
     FlatPaints::setColorPaint(color, 0xFF0000FF);

@@ -137,7 +137,7 @@ float* FlatVectors::isin = nullptr;
 
 // Class
 
-FlatVectors::FlatVectors() {
+FlatVectors::FlatVectors() : paint(), uniform(), stroke() {
     lastStep = CLOSE;
     curVtxIndex = 0;
     curElmIndex = 0;
@@ -160,9 +160,6 @@ FlatVectors::FlatVectors() {
     fontSpacing = 1;
     fontBlur = 0;
     curveJoin = 0;
-    paint = {};
-    uniform = {};
-    stroke = {};
     dashAmount = 0;
     dashPhase = 0;
     dashFill = 0;

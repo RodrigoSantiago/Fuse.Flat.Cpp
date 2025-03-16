@@ -11,46 +11,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="SVG Fix">
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatCurves.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatImage.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatStroke.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatStroke.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatText.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="FlatVectors is now cpp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GLFW/glfw3.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GLFW/glfw3.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/stb_image.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/stb_image.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/curves.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatCurves.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/curves.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/flatvectors.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/font.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/image.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatImage.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/image.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/pack.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/pack.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/render.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/utf8.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatText.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/utf8.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,7 +137,7 @@
       <workItem from="1741872329538" duration="34825000" />
       <workItem from="1741955334694" duration="29168000" />
       <workItem from="1742043102677" duration="41653000" />
-      <workItem from="1742126091769" duration="10106000" />
+      <workItem from="1742126091769" duration="23895000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -340,7 +307,14 @@
       <option name="project" value="LOCAL" />
       <updated>1741907239511</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="FlatVectors is now cpp">
+      <created>1742136967469</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1742136967469</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -381,9 +355,54 @@
     <MESSAGE value="Degenerate quad and cubic curves fixes" />
     <MESSAGE value="SVG Image Write" />
     <MESSAGE value="SVG Fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="SVG Fix" />
+    <MESSAGE value="FlatVectors is now cpp" />
+    <option name="LAST_COMMIT_MESSAGE" value="FlatVectors is now cpp" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>939</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>981</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>986</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>1393</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>1402</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>1422</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>990</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
+          <line>1009</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
         <watch expression="*uniforms @ 32" />

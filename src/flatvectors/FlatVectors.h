@@ -16,8 +16,8 @@ class FlatVectors {
 
     FlatRender* render;
 
-    fvPaint paint{};
-    fvUniform uniform{};
+    fvPaint paint;
+    fvUniform uniform;
 
     std::vector<fvPaint> draws;
     std::vector<char> uniforms;

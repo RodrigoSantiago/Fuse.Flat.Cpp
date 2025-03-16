@@ -283,6 +283,8 @@ void FlatRender::end() {
     glUseProgram(0);
     glBindVertexArray(0);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     if (curImage1 != 0) {
