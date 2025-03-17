@@ -544,10 +544,7 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_FrameBufferGetPixelDataSize(JNIEnv *
     jEnv->SetIntArrayRegion(data6, 5, 1, &val);
 }
 JNIEXPORT void JNICALL Java_flat_backend_GL_FrameBufferSetTargets(JNIEnv *jEnv, jclass jClass, jint c0FA, jint c1FA, jint c2FA, jint c3FA, jint c4FA, jint c5FA, jint c6FA, jint c7FA) {
-    GLint id;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &id);
-    GLuint arr[8] = {(GLuint)(id == 0 && c0FA != 0 ? GL_BACK_LEFT : c0FA),
-                     (GLuint)c1FA, (GLuint)c2FA, (GLuint)c3FA,
+    GLuint arr[8] = {(GLuint)c0FA, (GLuint)c1FA, (GLuint)c2FA, (GLuint)c3FA,
                      (GLuint)c4FA, (GLuint)c5FA, (GLuint)c6FA, (GLuint)c7FA };
     glDrawBuffers(8, arr);
 }

@@ -610,7 +610,6 @@ FlatRender* FlatVectors::getRender() {
 
 void FlatVectors::beginFrame(int width, int height) {
     render->begin(width, height, debug);
-    render->clearClip(false);
 }
 
 void FlatVectors::endFrame() {

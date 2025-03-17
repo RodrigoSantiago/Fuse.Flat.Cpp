@@ -262,6 +262,7 @@ void FlatRender::begin(unsigned int width, unsigned int height, bool dbg) {
 
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 
+    glDisable(GL_CULL_FACE);
     glDisable(GL_MULTISAMPLE);
     glDisable(GL_DEPTH_TEST);
 
