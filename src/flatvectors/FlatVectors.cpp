@@ -183,7 +183,6 @@ FlatVectors::~FlatVectors() {
 
 void FlatVectors::ensureSpace(int vertex, int elements) {
     if (curDrwIndex > 0 && ((curVtxIndex + vertex) * 2 >= 32768 || (curElmIndex + elements) * 3 >= 32768)) {
-        std::cout << "Early draw" << std::endl;
         flush();
     }
 }
