@@ -183,6 +183,7 @@ FlatVectors::~FlatVectors() {
 
 void FlatVectors::ensureSpace(int vertex, int elements) {
     if (curDrwIndex > 0 && ((curVtxIndex + vertex) * 2 >= 32768 || (curElmIndex + elements) * 3 >= 32768)) {
+        std::cout << "Early draw" << std::endl;
         flush();
     }
 }
@@ -557,6 +558,7 @@ void FlatVectors::strokeDashTo(float x, float y, bool curve) {
 
 void FlatVectors::shapeDiscard() {
     vtx.resize(curShapeBeginVtxIndex);
+    uvs.resize(curShapeBeginVtxIndex);
     elm.resize(curShapeBeginElmIndex);
     curVtxIndex = curShapeBeginVtxIndex;
     curElmIndex = curShapeBeginElmIndex;
@@ -564,6 +566,7 @@ void FlatVectors::shapeDiscard() {
 
 void FlatVectors::shapeDrawDiscard() {
     vtx.resize(curDrawBeginVtxIndex);
+    uvs.resize(curDrawBeginVtxIndex);
     elm.resize(curDrawBeginElmIndex);
     curVtxIndex = curDrawBeginVtxIndex;
     curElmIndex = curDrawBeginElmIndex;
@@ -860,8 +863,8 @@ void FlatVectors::text(const char* str, int strLen, float x, float y, float maxW
     end();
 }
 
-void FlatVectors::rect(float x, float y, float width, float height) {
-    begin(fvPathOp::CONVEX, fvWindingRule::EVEN_ODD);
+void FlatVectors::rect(float x, float y, float width, float height, bool fill) {
+    begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
     moveTo(x, y);
     lineTo(x + width, y);
     lineTo(x + width, y + height);
@@ -870,8 +873,8 @@ void FlatVectors::rect(float x, float y, float width, float height) {
     end();
 }
 
-void FlatVectors::ellipse(float x, float y, float width, float height) {
-    begin(fvPathOp::CONVEX, fvWindingRule::EVEN_ODD);
+void FlatVectors::ellipse(float x, float y, float width, float height, bool fill) {
+    begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
     float points = scale * std::sqrt(width * width + height * height);
     points = std::ceil((points < 64 ? 64 : points > 256 ? 256 : points) / 4.0f);
     int n = (int) points;
@@ -892,8 +895,14 @@ void FlatVectors::ellipse(float x, float y, float width, float height) {
     end();
 }
 
-void FlatVectors::roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4) {
-    begin(fvPathOp::CONVEX, fvWindingRule::EVEN_ODD);
+void FlatVectors::roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4, bool fill) {
+    begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
+
+    float max = std::min(width, height) / 2;
+    c1 = std::min(max, c1);
+    c2 = std::min(max, c2);
+    c3 = std::min(max, c3);
+    c4 = std::min(max, c4);
 
     float xc = x + c1, yc = y + c1;
     if (c1 > 0.5 / scale) {

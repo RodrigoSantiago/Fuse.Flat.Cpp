@@ -195,26 +195,26 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_PathEnd
 /*
  * Class:     flat_backend_SVG
  * Method:    Rect
- * Signature: (JFFFF)V
+ * Signature: (JFFFFZ)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_Rect
-  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jboolean);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    Ellipse
- * Signature: (JFFFF)V
+ * Signature: (JFFFFZ)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_Ellipse
-  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jboolean);
 
 /*
  * Class:     flat_backend_SVG
  * Method:    RoundRect
- * Signature: (JFFFFFFFF)V
+ * Signature: (JFFFFFFFFZ)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_RoundRect
-  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat);
+  (JNIEnv *, jclass, jlong, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jfloat, jboolean);
 
 /*
  * Class:     flat_backend_SVG

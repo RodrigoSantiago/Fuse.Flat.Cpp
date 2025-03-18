@@ -3,6 +3,7 @@
 //
 
 #include <cmath>
+#include <iostream>
 #include "FlatFontRender.h"
 #include "FlatFont.h"
 #include "FlatRender.h"

@@ -167,12 +167,14 @@ bool FlatPack::grow() {
     int newWidthCount = idealWidth / cellWidth;
     int newHeightCount = idealHeight / cellHeight;
 
-    matrix.resize(newWidthCount * newHeightCount);
-    for (int y = hc - 1; y >= 0; --y) {
-        for (int x = wc - 1; x >= 0; --x) {
-            matrix[y * newWidthCount + x] = matrix[y * wc + x];
+    std::vector<fvCell> newVec = matrix;
+    newVec.resize(newWidthCount * newHeightCount);
+    for (int y = 0; y < hc; y++) {
+        for (int x = 0; x < wc; x++) {
+            newVec[y * newWidthCount + x] = matrix[y * wc + x];
         }
     }
+    matrix = newVec;
 
     width = idealWidth;
     height = idealHeight;

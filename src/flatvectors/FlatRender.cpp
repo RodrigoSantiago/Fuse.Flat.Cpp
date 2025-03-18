@@ -300,10 +300,10 @@ void FlatRender::end() {
 void FlatRender::clearClip(bool clip) {
     glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
-    glClearStencil(clip ? 0x00 : 0x80);
+    glClearStencil(clip ? 0x80 : 0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
-    glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+    glStencilFunc(GL_EQUAL, 0x00, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
@@ -343,7 +343,7 @@ void FlatRender::flush(
             glUniform1i(stcID, 1);
 
             if (curPaint.convex) {
-                unsigned char val = curPaint.pathOp == CLIP ? 0x00 : 0x80;
+                unsigned char val = curPaint.pathOp == CLIP ? 0x80 : 0x00;
 
                 glStencilFunc(GL_ALWAYS, val, 0xFF);
                 glStencilMask(0xFF);
@@ -355,7 +355,7 @@ void FlatRender::flush(
                 glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                 _render_triangles(pos, renderElements);
 
-                if (curPaint.pathOp == CLIP) {
+                if (curPaint.pathOp == UNCLIP) {
                     glStencilFunc(GL_EQUAL, 0x01, 0x01);
                     glStencilMask(0xFF);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
@@ -373,7 +373,7 @@ void FlatRender::flush(
                 }
             }
 
-            glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+            glStencilFunc(GL_EQUAL, 0x00, 0xFF);
             glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             glStencilMask(0xFF);
             glColorMask(1, 1, 1, 1);
@@ -393,29 +393,29 @@ void FlatRender::flush(
             }
 
             if (debug) {
-                glStencilFunc(GL_ALWAYS, 0x80, 0xFF);
+                glStencilFunc(GL_ALWAYS, 0x00, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
                 _render_triangles(pos, renderElements);
 
             } else if (curPaint.pathOp == TEXT || curPaint.pathOp == CONVEX || curPaint.convex) {
-                glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+                glStencilFunc(GL_EQUAL, 0x00, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
                 _render_triangles(pos, renderElements);
 
             } else if (curPaint.pathOp == FILL) {
 
-                if (curPaint.pathRule == EVEN_ODD) {
+                if (curPaint.pathRule == EVEN_ODD || curPaint.pathRule == NON_ZERO) {
                     // Even-Odd
 
                     glUniform1i(stcID, 1);
                     glColorMask(0, 0, 0, 0);
-                    glStencilFunc(GL_NOTEQUAL, 0x00, 0xFF);
+                    glStencilFunc(GL_NOTEQUAL, 0x80, 0xFF);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                     _render_triangles(pos, renderElements);
 
                     glUniform1i(stcID, 0);
                     glColorMask(1, 1, 1, 1);
-                    glStencilFunc(GL_EQUAL, 0x7F, 0xFF);
+                    glStencilFunc(GL_EQUAL, 0xFF, 0xFF);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                     _render_triangles(pos, renderElements);
                 } else {
@@ -423,38 +423,38 @@ void FlatRender::flush(
 
                     glUniform1i(stcID, 1);
                     glColorMask(0, 0, 0, 0);
-                    glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, 0x00, 0xFF);
+                    glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, 0x80, 0xFF);
                     glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
-                    glStencilFuncSeparate(GL_BACK, GL_NOTEQUAL, 0x00, 0xFF);
+                    glStencilFuncSeparate(GL_BACK, GL_NOTEQUAL, 0x80, 0xFF);
                     glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR_WRAP);
                     glStencilMask(0x7F);
                     _render_triangles(pos, renderElements);
 
                     glUniform1i(stcID, 0);
                     glColorMask(1, 1, 1, 1);
-                    glStencilFunc(GL_LESS, 0x80, 0xFF);
+                    glStencilFunc(GL_GREATER, 0x00, 0x7F);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-                    glStencilMask(0xFF);
+                    glStencilMask(0x7F);
                     _render_triangles(pos, renderElements);
                 }
 
-                glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+                glStencilFunc(GL_EQUAL, 0x00, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
             } else if (curPaint.pathOp == STROKE) {
                 glUniform1i(stcID, 1);
                 glColorMask(0, 0, 0, 0);
-                glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+                glStencilFunc(GL_EQUAL, 0x00, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                 _render_triangles(pos, renderElements);
 
                 glUniform1i(stcID, 0);
                 glColorMask(1, 1, 1, 1);
-                glStencilFunc(GL_EQUAL, 0x7F, 0xFF);
+                glStencilFunc(GL_EQUAL, 0xFF, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
                 _render_triangles(pos, renderElements);
 
-                glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+                glStencilFunc(GL_EQUAL, 0x00, 0xFF);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
             }
         }

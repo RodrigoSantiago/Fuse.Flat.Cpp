@@ -161,14 +161,14 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_Close(JNIEnv * jEnv, jclass jClass,
 JNIEXPORT void JNICALL Java_flat_backend_SVG_PathEnd(JNIEnv * jEnv, jclass jClass, jlong context) {
     ctx(context)->end();
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_Rect(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat width, jfloat height) {
-    ctx(context)->rect(x, y, width, height);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_Rect(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat width, jfloat height, jboolean fill) {
+    ctx(context)->rect(x, y, width, height, fill);
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_Ellipse(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat width, jfloat height) {
-    ctx(context)->ellipse(x, y, width, height);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_Ellipse(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat width, jfloat height, jboolean fill) {
+    ctx(context)->ellipse(x, y, width, height, fill);
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_RoundRect(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat width, jfloat height, jfloat c1, jfloat c2, jfloat c3, jfloat c4) {
-    ctx(context)->roundRect(x, y, width, height, c1, c2, c3, c4);
+JNIEXPORT void JNICALL Java_flat_backend_SVG_RoundRect(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jfloat width, jfloat height, jfloat c1, jfloat c2, jfloat c3, jfloat c4, jboolean fill) {
+    ctx(context)->roundRect(x, y, width, height, c1, c2, c3, c4, fill);
 }
 //---------------------------
 //           Text

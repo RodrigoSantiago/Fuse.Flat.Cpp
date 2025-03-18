@@ -115,9 +115,9 @@ public:
     void cubicTo(float cx1, float cy1, float cx2, float cy2, float x, float y);
     void close();
 
-    void rect(float x, float y, float width, float height);
-    void ellipse(float x, float y, float width, float height);
-    void roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4);
+    void rect(float x, float y, float width, float height, bool fill);
+    void ellipse(float x, float y, float width, float height, bool fill);
+    void roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4, bool fill);
 
     void clearClip(bool clip);
 
