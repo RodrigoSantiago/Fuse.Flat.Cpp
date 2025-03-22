@@ -6,6 +6,7 @@
 #define FLAT_FLATVECTORSBASE_H
 
 #include <vector>
+#include "../flat_base_types.h"
 
 class FlatVectors;
 class FlatRender;
@@ -43,9 +44,9 @@ typedef struct fvPoint {
 } fvPoint;
 
 typedef struct fvTriangle {
-    int a;
-    int b;
-    int c;
+    int32 a;
+    int32 b;
+    int32 c;
 } fvTriangle;
 
 typedef struct fvUniform {
@@ -65,19 +66,19 @@ typedef struct fvUniform {
 typedef struct fvPaint {
     fvPathOp pathOp;
     fvWindingRule pathRule;
-    int elements;
-    int vertices;
+    int32 elements;
+    int32 vertices;
     FlatFontRender* font;
-    unsigned long int image0;
-    int antiAlias;
-    int convex;
+    uint32 image0;
+    int32 antiAlias;
+    int32 convex;
     float transform[12];
 } fvPaint;
 
 typedef struct fvGlyph {
-    int enabled;
+    int32 enabled;
     float advance;
-    long int unicode;
+    int32 unicode;
     unsigned char* cell;
 
     float x;

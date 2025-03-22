@@ -26,24 +26,24 @@ class FlatVectors {
     std::vector<fvPoint> uvs;
 
     fvPathStep lastStep;
-    int curVtxIndex;            // INDEX
-    int curElmIndex;            // INDEX
-    int curDrwIndex;            // INDEX
-    int curDrawBeginVtxIndex;   // INDEX
-    int curDrawBeginElmIndex;   // INDEX
-    int curShapeBeginVtxIndex;  // INDEX
-    int curShapeBeginElmIndex;  // INDEX
+    int32 curVtxIndex;            // INDEX
+    int32 curElmIndex;            // INDEX
+    int32 curDrwIndex;            // INDEX
+    int32 curDrawBeginVtxIndex;   // INDEX
+    int32 curDrawBeginElmIndex;   // INDEX
+    int32 curShapeBeginVtxIndex;  // INDEX
+    int32 curShapeBeginElmIndex;  // INDEX
     float curPosX;
     float curPosY;
     float strokeStartPosX;
     float strokeStartPosY;
-    int strokeFirstLineVtxIndex;
+    int32 strokeFirstLineVtxIndex;
     float strokeFirstLinePosX;
     float strokeFirstLinePosY;
-    int prevVtxIndex;
+    int32 prevVtxIndex;
     float prevLineStartPosX;
     float prevLineStartPosY;
-    int curveJoin;
+    int32 curveJoin;
 
     float fontScale;
     float fontSpacing;
@@ -51,16 +51,16 @@ class FlatVectors {
 
     FlatStroke stroke;
     float dashAmount;
-    int dashPhase;
-    int dashFill;
+    int32 dashPhase;
+    int32 dashFill;
     float scale;
 public:
     FlatVectors();
     ~FlatVectors();
 private:
-    void ensureSpace(int vertex, int elements);
-    int addVertex(float x, float y, float u, float v);
-    int addTriangle(int elA, int elB, int elC);
+    void ensureSpace(int32 vertex, int32 elements);
+    int32 addVertex(float x, float y, float u, float v);
+    int32 addTriangle(int32 elA, int32 elB, int32 elC);
     bool equals(float x, float y);
     inline static float fastCos(float a);
     inline static float fastSin(float a);
@@ -78,10 +78,10 @@ private:
     void strokeLineTo(float x, float y, bool curve);
     static void strokeCurveTo(FlatVectors* context, double x, double y);
     void strokeCap();
-    void strokeJoin(int vx0, int vx1, float x1, float y1, float x2, float y2, float x3, float y3, bool cruve);
+    void strokeJoin(int32 vx0, int32 vx1, float x1, float y1, float x2, float y2, float x3, float y3, bool cruve);
     void strokeClose();
 
-    void strokeBevel(float det, int v0, int v1);
+    void strokeBevel(float det, int32 v0, int32 v1);
     void strokeRound(fvPoint from, fvPoint to, fvPoint center);
     void strokeDashTo(float x, float y, bool curve);
 
@@ -94,14 +94,14 @@ public:
 
     FlatRender* getRender();
 
-    void beginFrame(int width, int height);
+    void beginFrame(int32 width, int32 height);
     void endFrame();
     void flush();
 
-    void setColor(fvUniform& color, int img);
+    void setColor(fvUniform& color, int32 img);
     void setStroke(FlatStroke& stroke);
     void setTransform(float m00, float m10, float m01, float m11, float m02, float m12);
-    void setAntiAliasing(int enabled);
+    void setAntiAliasing(int32 enabled);
     void setFont(FlatFontRender* fontRender);
     void setFontScale(float fscale);
     void setFontSpacing(float fspacing);
@@ -121,7 +121,7 @@ public:
 
     void clearClip(bool clip);
 
-    void text(const char* str, int strLen, float x, float y, float maxWidth, float maxHeight);
+    void text(const char* str, int32 strLen, float x, float y, float maxWidth, float maxHeight);
 };
 
 

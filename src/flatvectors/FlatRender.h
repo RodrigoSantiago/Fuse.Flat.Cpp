@@ -13,10 +13,10 @@ class FlatRender {
     GLuint vbo;
     GLuint ebo;
     GLuint ubo;
-    int paint, vertex, element;
+    int32 paint, vertex, element;
 
     bool debug;
-    int curAA;
+    int32 curAA;
     GLuint curImage0;
     GLuint curImage1;
 
@@ -28,24 +28,24 @@ public:
     ~FlatRender();
 
 private:
-    void ensureCapacity(int paint, int element, int vertex);
+    void ensureCapacity(int32 paint, int32 element, int32 vertex);
 
 public:
-    int renderAlign();
+    int32 renderAlign();
 
     // Render
-    void begin(unsigned int width, unsigned int height, bool debug);
+    void begin(unsigned int32 width, unsigned int32 height, bool debug);
     void end();
     void clearClip(bool clip);
-    void flush(fvPaint *paints, void* uniforms, int pSize,
-               int* elements, int eSize,
-               float *vtx, float *uvs, int vSize);
+    void flush(fvPaint *paints, void* uniforms, int32 pSize,
+               int32* elements, int32 eSize,
+               float *vtx, float *uvs, int32 vSize);
 
     // Font
-    unsigned long createFontTexture(int width, int height);
-    unsigned long resizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int width, int height);
-    void updateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height);
-    void destroyFontTexture(unsigned long imageID);
+    uint32 createFontTexture(int32 width, int32 height);
+    uint32 resizeFontTexture(uint32 oldImageID, int32 oldWidth, int32 oldHeight, int32 width, int32 height);
+    void updateFontTexture(uint32 imageID, void* data, int32 x, int32 y, int32 width, int32 height);
+    void destroyFontTexture(uint32 imageID);
 };
 
 

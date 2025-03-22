@@ -13,7 +13,7 @@ class FlatFontRender {
 
     FlatPack* pack;
     fvPoint* renderState;
-    unsigned long imageID;
+    uint32 imageID;
 
 public:
     FlatFontRender(FlatFont* font, FlatRender* render);
@@ -22,15 +22,15 @@ public:
 
     FlatFont* getFont();
 
-    int renderGlyph(fvGlyph& glyph, int glyphIndex);
+    int32 renderGlyph(fvGlyph& glyph, int32 glyphIndex);
 
-    bool isGlyphRendered(int glyphIndex);
+    bool isGlyphRendered(int32 glyphIndex);
 
-    fvPoint getUv(int glyphIndex);
+    fvPoint getUv(int32 glyphIndex);
 
-    unsigned long getImage();
+    uint32 getImage();
 
-    unsigned long getCurrentAtlas(int* w, int* h);
+    uint32 getCurrentAtlas(int32* w, int32* h);
 };
 
 

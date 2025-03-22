@@ -10,39 +10,39 @@
 
 typedef struct fvCell {
     fvPoint* uvPtr;
-    int w;
-    int h;
+    int32 w;
+    int32 h;
 } fvCell;
 
 class FlatPack {
-    int cellWidth;
-    int cellHeight;
-    int width;
-    int height;
-    int widthCount;
-    int heightCount;
-    int minX;
-    int minY;
-    int clearQuad;
+    int32 cellWidth;
+    int32 cellHeight;
+    int32 width;
+    int32 height;
+    int32 widthCount;
+    int32 heightCount;
+    int32 minX;
+    int32 minY;
+    int32 clearQuad;
     std::vector<fvCell> matrix;
 
 public:
-    FlatPack(int cellWidth, int cellHeight);
+    FlatPack(int32 cellWidth, int32 cellHeight);
 
     ~FlatPack();
 private:
-    int findOpenCell(int cellW, int cellH);
+    int32 findOpenCell(int32 cellW, int32 cellH);
 
-    void setCell(int cellW, int cellH, int openCell, fvPoint* point);
+    void setCell(int32 cellW, int32 cellH, int32 openCell, fvPoint* point);
 
 public:
-    int getWidth();
+    int32 getWidth();
 
-    int getHeight();
+    int32 getHeight();
 
-    void toCellSize(int w, int h, int* cellW, int* cellH);
+    void toCellSize(int32 w, int32 h, int32* cellW, int32* cellH);
 
-    int addRect(int w, int h, fvPoint* point);
+    int32 addRect(int32 w, int32 h, fvPoint* point);
 
     bool grow();
 

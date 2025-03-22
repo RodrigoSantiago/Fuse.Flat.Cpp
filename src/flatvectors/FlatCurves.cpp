@@ -125,7 +125,7 @@ void cubic(double m_distance,
     double d3 = fabs(((x3 - x4) * dy - (y3 - y4) * dx));
     double da1, da2, k;
 
-    switch ((int(d2 > collinearity_epsilon) << 1) + int(d3 > collinearity_epsilon)) {
+    switch ((int32(d2 > collinearity_epsilon) << 1) + int32(d3 > collinearity_epsilon)) {
         case 0:
             k = dx * dx + dy * dy;
             if (k == 0) {

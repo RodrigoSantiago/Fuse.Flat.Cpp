@@ -4,12 +4,10 @@
 
 #include "flat_backend_WL.h"
 #include <glad/glad.h>
-#include <glfw/glfw3.h>
-#include <vector>
+#include <GLFW/glfw3.h>
 #include <cstring>
-#include <functional>
-#include <unordered_map>
-#include <iostream>
+#include <string>
+#include "../system_base.h"
 
 static JavaVM *jvm;
 static bool loadGlad = false;
@@ -206,7 +204,7 @@ GLFWmonitor * findMonitor(GLFWwindow* window) {
     return glfwGetPrimaryMonitor();
 }
 
-JNIEXPORT jlong JNICALL Java_flat_backend_WL_Init(JNIEnv * jEnv, jclass) {
+JNIEXPORT jboolean JNICALL Java_flat_backend_WL_Init(JNIEnv * jEnv, jclass) {
     jEnv->GetJavaVM(&jvm);
     loadGlad = false;
     return glfwInit();
@@ -641,7 +639,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetWindowFocusCallback(JNIEnv * jEnv
         sWindowFocusCallback = nullptr;
     } else {
         jclass cls = jEnv->GetObjectClass(callback);
-        jmethodID mid = jEnv->GetMethodID(cls, "handle", "(JI)V");
+        jmethodID mid = jEnv->GetMethodID(cls, "handle", "(JZ)V");
         sWindowFocusCallback = jLambda<void(jlong,jint)>(callback, mid);
     }
 }
@@ -764,4 +762,54 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetErrorCallback(JNIEnv * jEnv, jcla
         jmethodID mid = jEnv->GetMethodID(cls, "handle", "(Ljava/lang/String;)V");
         sErrorCallback = jLambda<void(jstring)>(callback, mid);
     }
+}
+
+JNIEXPORT void JNICALL Java_flat_backend_WL_TargetLastModal(JNIEnv *jEnv, jclass jClass) {
+
+}
+
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFile(JNIEnv * jEnv, jclass jClass, jlong window,  jstring fileFilters, jstring initialFolder) {
+    const char *sFileFilters = jEnv->GetStringUTFChars(fileFilters, NULL);
+    const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
+
+    std::string file = showOpenFile((GLFWwindow*)window, sFileFilters, sInitialFolder);
+
+    jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
+    jEnv->ReleaseStringUTFChars(fileFilters, sFileFilters);
+
+    return file.empty() ? NULL : jEnv->NewStringUTF(file.c_str());
+}
+
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenMultipleFiles(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder) {
+    const char *sFileFilters = jEnv->GetStringUTFChars(fileFilters, NULL);
+    const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
+
+    std::string files = showOpenMultipleFiles((GLFWwindow*)window, sFileFilters, sInitialFolder);
+
+    jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
+    jEnv->ReleaseStringUTFChars(fileFilters, sFileFilters);
+
+    return files.empty() ? NULL : jEnv->NewStringUTF(files.c_str());
+}
+
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowSaveFile(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder) {
+    const char *sFileFilters = jEnv->GetStringUTFChars(fileFilters, NULL);
+    const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
+
+    std::string file = showSaveFile((GLFWwindow*)window, sFileFilters, sInitialFolder);
+
+    jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
+    jEnv->ReleaseStringUTFChars(fileFilters, sFileFilters);
+
+    return file.empty() ? NULL : jEnv->NewStringUTF(file.c_str());
+}
+
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFolder(JNIEnv * jEnv, jclass jClass, jlong window, jstring initialFolder) {
+    const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
+
+    std::string file = showOpenFolder((GLFWwindow*)window, sInitialFolder);
+
+    jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
+
+    return file.empty() ? NULL : jEnv->NewStringUTF(file.c_str());
 }

@@ -9,10 +9,10 @@
 
 class FlatText {
 private:
-    static int readChar(const char* str, int strLen, int& i, unsigned long& unicode);
+    static int32 readChar(const char* str, int32 strLen, int32& i, uint32& unicode);
 
 public:
-    static int utf8loop(const char* str, int strLen, int& i, unsigned long& out);
+    static int32 utf8loop(const char* str, int32 strLen, int32& i, uint32& out);
 };
 
 

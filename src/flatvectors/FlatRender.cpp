@@ -136,14 +136,14 @@ const char *fragmentSource =
 
 // Local Private
 
-int _get_align() {
+int32 _get_align() {
     GLint align;
     glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &align);
     return (GLint) ceil(sizeof(fvUniform) / (float)align) * align;
 }
 
-void _render_triangles(int pos, int length) {
-    glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int)));
+void _render_triangles(int32 pos, int32 length) {
+    glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int32)));
 }
 
 // Class
@@ -208,12 +208,12 @@ FlatRender::~FlatRender() {
     glDeleteShader(shader);
 }
 
-int FlatRender::renderAlign() {
-    static int align = _get_align();
+int32 FlatRender::renderAlign() {
+    static int32 align = _get_align();
     return align;
 }
 
-void FlatRender::ensureCapacity(int paint, int element, int vertex) {
+void FlatRender::ensureCapacity(int32 paint, int32 element, int32 vertex) {
 
     // Uniform Buffer
     if (this->paint < paint) {
@@ -239,11 +239,11 @@ void FlatRender::ensureCapacity(int paint, int element, int vertex) {
     if (this->element < element) {
         this->element = element;
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, element * sizeof(int), NULL, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, element * sizeof(int32), NULL, GL_STATIC_DRAW);
     }
 }
 
-void FlatRender::begin(unsigned int width, unsigned int height, bool dbg) {
+void FlatRender::begin(unsigned int32 width, unsigned int32 height, bool dbg) {
     curAA = 0;
     curImage0 = 0;
     curImage1 = 0;
@@ -308,22 +308,22 @@ void FlatRender::clearClip(bool clip) {
 }
 
 void FlatRender::flush(
-        fvPaint *paints, void* uniforms, int pSize,
-        int* elements, int eSize,
-        float *vtx, float *uvs, int vSize) {
+        fvPaint *paints, void* uniforms, int32 pSize,
+        int32* elements, int32 eSize,
+        float *vtx, float *uvs, int32 vSize) {
 
     ensureCapacity(pSize, eSize, vSize);
 
     glBufferSubData(GL_UNIFORM_BUFFER, 0, pSize * renderAlign(), uniforms);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, eSize * sizeof(int), elements);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, eSize * sizeof(int32), elements);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vSize * sizeof(float), vtx);
     glBufferSubData(GL_ARRAY_BUFFER, vertex * sizeof(float), vSize * sizeof(float), uvs);
 
     GLsizei pos = 0;
-    for (int i = 0; i < pSize; i++) {
+    for (int32 i = 0; i < pSize; i++) {
         fvPaint &curPaint = paints[i];
-        int totalElements = curPaint.elements * 3;
-        int renderElements = totalElements - pos;
+        int32 totalElements = curPaint.elements * 3;
+        int32 renderElements = totalElements - pos;
 
         glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, i * renderAlign(), renderAlign());
         glUniformMatrix3fv(matID, 1, 0, curPaint.transform);
@@ -465,7 +465,7 @@ void FlatRender::flush(
 
 // -- Font -- //
 
-unsigned long FlatRender::createFontTexture(int width, int height) {
+uint32 FlatRender::createFontTexture(int32 width, int32 height) {
     glActiveTexture(GL_TEXTURE0);
 
     GLuint img;
@@ -483,7 +483,7 @@ unsigned long FlatRender::createFontTexture(int width, int height) {
     return img;
 }
 
-unsigned long FlatRender::resizeFontTexture(unsigned long oldImageID, int oldWidth, int oldHeight, int width, int height) {
+uint32 FlatRender::resizeFontTexture(uint32 oldImageID, int32 oldWidth, int32 oldHeight, int32 width, int32 height) {
     glActiveTexture(GL_TEXTURE0);
 
     GLuint newImg;
@@ -521,7 +521,7 @@ unsigned long FlatRender::resizeFontTexture(unsigned long oldImageID, int oldWid
     return newImg;
 }
 
-void FlatRender::updateFontTexture(unsigned long imageID, void* data, int x, int y, int width, int height) {
+void FlatRender::updateFontTexture(uint32 imageID, void* data, int32 x, int32 y, int32 width, int32 height) {
     glActiveTexture(GL_TEXTURE0);
 
     glBindTexture(GL_TEXTURE_2D, imageID);
@@ -532,7 +532,7 @@ void FlatRender::updateFontTexture(unsigned long imageID, void* data, int x, int
 
 }
 
-void FlatRender::destroyFontTexture(unsigned long imageID) {
+void FlatRender::destroyFontTexture(uint32 imageID) {
     if (imageID != 0) {
         GLuint imgID = imageID;
         glDeleteTextures(1, &imgID);

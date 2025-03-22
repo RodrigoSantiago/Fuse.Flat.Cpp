@@ -14,9 +14,24 @@ include_directories(include
         src/flatvectors
         ${JNI_INCLUDE_DIRS})
 
-link_directories(lib)
+if(WIN32)
+    link_directories(lib/win)
+    add_definitions(-DWINDOWS_PLATFORM)
+    set(SOURCE_FILES
+            src/nfd/nfd_common.c
+            src/nfd/nfd_win.cpp
+            src/system_win.cpp
+            )
+elseif(UNIX)
+    link_directories(lib/unix)
+    add_definitions(-DUNIX_PLATFORM)
+    set(SOURCE_FILES
+            src/nfd/nfd_common.c
+            src/nfd/nfd_gtk.cpp
+            src/system_unix.cpp)
+endif()
 
-set(SOURCE_FILES
+list(APPEND SOURCE_FILES
         src/glad.c
         src/wl/flat_backend_WL.cpp
         src/gl/flat_backend_GL.cpp
@@ -37,6 +52,11 @@ set(SOURCE_FILES
 add_library(Flat SHARED ${SOURCE_FILES})
 #add_executable(Flat ${SOURCE_FILES} main.cpp)
 
-target_link_libraries(Flat opengl32 gdi32 glfw3.a -static-libstdc++)
-
-#g++ -shared -o flat.dll -std=c++11 -Iinclude -Iinclude/nanovg -Isrc/gl -Isrc/ml -Isrc/wl -Isrc/svg -Isrc/flatvectors -I"C:/Program Files/Java/jdk-17/include" -I"C:/Program Files/Java/jdk-17/include/win32" -Llib src/glad.c src/wl/flat_backend_WL.cpp src/gl/flat_backend_GL.cpp src/ml/flat_backend_ML.cpp src/svg/flat_backend_SVG.cpp src/flatvectors/curves.cpp src/flatvectors/flatvectors.cpp src/flatvectors/font.cpp src/flatvectors/render.cpp src/flatvectors/utf8.cpp lib/libglfw3.a -lopengl32 -lgdi32 -static-libstdc++
+if(WIN32)
+    target_link_libraries(Flat opengl32 gdi32 glfw3.a -static-libstdc++)
+elseif(UNIX)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+    include_directories(${GTK3_INCLUDE_DIRS})
+    target_link_libraries(Flat glfw3 GL X11 pthread dl ${GTK3_LIBRARIES})
+endif()

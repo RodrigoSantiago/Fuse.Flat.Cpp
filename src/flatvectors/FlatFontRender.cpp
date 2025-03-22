@@ -13,9 +13,9 @@ FlatFontRender::FlatFontRender(FlatFont *font, FlatRender *render) : imageID(0) 
     this->font = font;
     this->render = render;
 
-    int len = font->getGlyphCount();
+    int32 len = font->getGlyphCount();
     renderState = new fvPoint [len];
-    for (int i = 0; i < len; i++) {
+    for (int32 i = 0; i < len; i++) {
         renderState[i] = {-1, -1};
     }
 
@@ -32,16 +32,16 @@ FlatFont* FlatFontRender::getFont() {
     return font;
 }
 
-int FlatFontRender::renderGlyph(fvGlyph& glyph, int glyphIndex) {
-    int width = (int) ceil(glyph.w);
-    int height = (int) ceil(glyph.h);
+int32 FlatFontRender::renderGlyph(fvGlyph& glyph, int32 glyphIndex) {
+    int32 width = (int32) ceil(glyph.w);
+    int32 height = (int32) ceil(glyph.h);
 
     if (width > 0 && height > 0) {
-        int oW = pack->getWidth();
-        int oH = pack->getHeight();
+        int32 oW = pack->getWidth();
+        int32 oH = pack->getHeight();
 
         fvPoint * point = &renderState[glyphIndex];
-        int state = pack->addRect(width, height, point);
+        int32 state = pack->addRect(width, height, point);
 
         if (state == 2) {
             return 2; // PACK CLEARED - NO TEXTURE CREATED/MODIFIED
@@ -53,7 +53,7 @@ int FlatFontRender::renderGlyph(fvGlyph& glyph, int glyphIndex) {
                 imageID = render->resizeFontTexture(imageID, oW, oH, pack->getWidth(), pack->getHeight());
             }
 
-            int cellW, cellH;
+            int32 cellW, cellH;
             pack->toCellSize(width, height, &cellW, &cellH);
 
             render->updateFontTexture(imageID, glyph.cell, point->x, point->y, cellW, cellH);
@@ -65,23 +65,23 @@ int FlatFontRender::renderGlyph(fvGlyph& glyph, int glyphIndex) {
     return 0; // NOTHING HAPPENED, NO TEXTURE CREATED/MODIFIED
 }
 
-bool FlatFontRender::isGlyphRendered(int glyphIndex) {
+bool FlatFontRender::isGlyphRendered(int32 glyphIndex) {
 
     return renderState[glyphIndex].x != -1;
 }
 
 
-fvPoint FlatFontRender::getUv(int glyphIndex) {
+fvPoint FlatFontRender::getUv(int32 glyphIndex) {
 
     return renderState[glyphIndex];
 }
 
-unsigned long FlatFontRender::getImage() {
+uint32 FlatFontRender::getImage() {
 
     return imageID;
 }
 
-unsigned long FlatFontRender::getCurrentAtlas(int* w, int* h) {
+uint32 FlatFontRender::getCurrentAtlas(int32* w, int32* h) {
     *w = pack->getWidth();
     *h = pack->getHeight();
     return imageID;

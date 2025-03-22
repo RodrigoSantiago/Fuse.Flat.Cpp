@@ -5,6 +5,7 @@
 #include "flat_backend_SVG.h"
 #include <memory>
 
+#include "../flat_base_types.h"
 #include "../flatvectors/FlatVectorsBase.h"
 #include "../flatvectors/FlatVectors.h"
 #include "../flatvectors/FlatPaints.h"
@@ -65,9 +66,9 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetStroke(JNIEnv * jEnv, jclass jCl
 
     FlatStroke stroke = FlatStroke(width, miter, _cap, _join);
     if (dash != 0) {
-        int length = jEnv->GetArrayLength(dash);
+        int32 length = jEnv->GetArrayLength(dash);
         float* data = (float *) jEnv->GetPrimitiveArrayCritical(dash, 0);
-        for (int i = 0; i < length; ++i) {
+        for (int32 i = 0; i < length; ++i) {
             stroke.dash.push_back(data[i]);
         }
         jEnv->ReleasePrimitiveArrayCritical(dash, data, 0);
@@ -84,7 +85,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintColor(JNIEnv * jEnv, jclass
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintLinearGradient(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x1, jfloat y1, jfloat x2, jfloat y2, jint count, jfloatArray data, jint cycleMethod) {
     float* _data = (float*) jEnv->GetPrimitiveArrayCritical(data, 0);
     fvUniform uniform;
-    FlatPaints::setLinearGradientPaint(uniform, _data, x1, y1, x2, y2, count, _data + 6, (long*)(_data + 6 + 16), cycleMethod);
+    FlatPaints::setLinearGradientPaint(uniform, _data, x1, y1, x2, y2, count, _data + 6, (int32*)(_data + 6 + 16), cycleMethod);
     ctx(context)->setColor(uniform, 0);
     jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
 }
@@ -92,7 +93,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintLinearGradient(JNIEnv * jEn
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintRadialGradient(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x1, jfloat y1, jfloat fx, jfloat fy, jfloat rIn, jfloat rOut, jint count, jfloatArray data, jint cycleMethod) {
     float* _data = (float*) jEnv->GetPrimitiveArrayCritical(data, 0);
     fvUniform uniform;
-    FlatPaints::setRadialGradientPaint(uniform, _data, x1, y1, rIn, rOut, fx, fy, count, _data + 6, (long*)(_data + 6 + 16), cycleMethod);
+    FlatPaints::setRadialGradientPaint(uniform, _data, x1, y1, rIn, rOut, fx, fy, count, _data + 6, (int32*)(_data + 6 + 16), cycleMethod);
     ctx(context)->setColor(uniform, 0);
     jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
 }
@@ -174,7 +175,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_RoundRect(JNIEnv * jEnv, jclass jCl
 //           Text
 //---------------------------
 JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontLoad(JNIEnv * jEnv, jclass jClass, jbyteArray data, jfloat size, jint sdf) {
-    int length = jEnv->GetArrayLength(data);
+    int32 length = jEnv->GetArrayLength(data);
     void* _data = jEnv->GetPrimitiveArrayCritical(data, 0);
     FlatFont* font = new FlatFont(_data, length, size, sdf == 1);
     jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
@@ -196,8 +197,8 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontPaintDestroy(JNIEnv * jEnv, jcl
     delete(fntCtx(fontPaint));
 }
 JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas(JNIEnv * jEnv, jclass jClass, jlong fontPaint, jintArray size) {
-    int w, h;
-    long imageID = fntCtx(fontPaint)->getCurrentAtlas(&w, &h);
+    int32 w, h;
+    int32 imageID = fntCtx(fontPaint)->getCurrentAtlas(&w, &h);
 
     jint imageInfo[2];
     imageInfo[0] = w;
@@ -225,7 +226,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetGlyph(JNIEnv * jEnv, jclass 
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints(JNIEnv * jEnv, jclass jClass, jlong font, jintArray codePoints) {
     jsize size = jEnv->GetArrayLength(codePoints);
-    std::vector<long> data;
+    std::vector<int32> data;
     fnt(font)->getAllCodePoints(data);
     jEnv->SetIntArrayRegion(codePoints, 0, size, data.data());
 }
@@ -250,7 +251,7 @@ JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetLineGap(JNIEnv * jEnv, jcl
     return lineGap;
 }
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetGlyphCount(JNIEnv * jEnv, jclass jClass, jlong font) {
-    int glyphCount;
+    int32 glyphCount;
     fnt(font)->getMetrics(0, 0, 0, 0, &glyphCount);
     return (jint) glyphCount;
 }
@@ -304,7 +305,6 @@ JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_ReadImage(JNIEnv * jEnv, jcla
     jsize imageSize = jEnv->GetArrayLength(data);
 
     int width, height, nrChannels;
-
     unsigned char *imageDataBuffer = stbi_load_from_memory((unsigned char *)imageBytes, imageSize, &width, &height, &nrChannels, 4);
 
     if (imageDataBuffer == NULL) {

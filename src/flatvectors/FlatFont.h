@@ -14,7 +14,7 @@ class FlatFont {
     stbtt_fontinfo info;
     bool valid;
 
-    int sdf;
+    int32 sdf;
     float scale;
     float size;
     float ascent;
@@ -24,48 +24,48 @@ class FlatFont {
 
     bool coded;
 
-    int cellW;
-    int cellH;
-    int glyphCount;
+    int32 cellW;
+    int32 cellH;
+    int32 glyphCount;
     fvGlyph* glyphs;
 
 public:
-    FlatFont(const void* data, long int length, float size, int sdf);
+    FlatFont(const void* data, int32 length, float size, int32 sdf);
     ~FlatFont();
 
 private:
-    void loadGlyph(int glyphIndex);
+    void loadGlyph(int32 glyphIndex);
 
-    void renderGlyph(int glyphIndex);
+    void renderGlyph(int32 glyphIndex);
 
 public:
     bool isValid();
 
     bool isSdf();
 
-    int getCellW();
+    int32 getCellW();
 
-    int getCellH();
+    int32 getCellH();
 
-    int getGlyphCount();
+    int32 getGlyphCount();
 
-    void getAllCodePoints(std::vector<long int>& codepoints);
+    void getAllCodePoints(std::vector<int32>& codepoints);
 
-    void getGlyphData(long codePoint, float* data);
+    void getGlyphData(int32 codePoint, float* data);
 
-    void getGlyphShape(long codePoint, std::vector<float> &polygon);
+    void getGlyphShape(int32 codePoint, std::vector<float> &polygon);
 
-    void getMetrics(float* ascender, float* descender, float* height, float* lineGap, int* glyphCount);
+    void getMetrics(float* ascender, float* descender, float* height, float* lineGap, int32* glyphCount);
 
-    fvGlyph& getGlyph(long unicode);
+    fvGlyph& getGlyph(int32 unicode);
 
-    fvGlyph& getGlyphRendered(FlatFontRender* font, long unicode, fvPoint* uv, int* recreate);
+    fvGlyph& getGlyphRendered(FlatFontRender* font, int32 unicode, fvPoint* uv, int32* recreate);
 
-    float getKerning(long unicode1, long unicode2);
+    float getKerning(int32 unicode1, int32 unicode2);
 
-    float getTextWidth(const char* str, int strLen, float scale, float spacing);
+    float getTextWidth(const char* str, int32 strLen, float scale, float spacing);
 
-    void getOffset(const char* str, int strLen, float scale, float spacing, float cursorX, int half, float* index, float* width);
+    void getOffset(const char* str, int32 strLen, float scale, float spacing, float cursorX, int32 half, float* index, float* width);
 };
 
 

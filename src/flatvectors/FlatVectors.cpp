@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <cstring>
 #include "FlatVectors.h"
 #include "FlatRender.h"
 #include "FlatFont.h"
@@ -108,7 +109,7 @@ float maxscale(const float* t) {
 float* calcCos() {
     float dtr = PI / 180.0f;
     float* icos = new float[361];
-    for (int i = 0; i < 361; ++i) {
+    for (int32 i = 0; i < 361; ++i) {
         icos[i] = std::cos(i * dtr);
     }
     return icos;
@@ -117,18 +118,18 @@ float* calcCos() {
 float* calcSin() {
     float dtr = PI / 180.0f;
     float* isin = new float[361];
-    for (int i = 0; i < 361; ++i) {
+    for (int32 i = 0; i < 361; ++i) {
         isin[i] = std::sin(i * dtr);
     }
     return isin;
 }
 
 float FlatVectors::fastCos(float a) {
-    return FlatVectors::icos[(int)a];
+    return FlatVectors::icos[(int32)a];
 }
 
 float FlatVectors::fastSin(float a) {
-    return FlatVectors::isin[(int)a];
+    return FlatVectors::isin[(int32)a];
 }
 
 float* FlatVectors::icos = nullptr;
@@ -181,19 +182,19 @@ FlatVectors::~FlatVectors() {
     delete render;
 }
 
-void FlatVectors::ensureSpace(int vertex, int elements) {
+void FlatVectors::ensureSpace(int32 vertex, int32 elements) {
     if (curDrwIndex > 0 && ((curVtxIndex + vertex) * 2 >= 32768 || (curElmIndex + elements) * 3 >= 32768)) {
         flush();
     }
 }
 
-int FlatVectors::addVertex(float x, float y, float u, float v) {
+int32 FlatVectors::addVertex(float x, float y, float u, float v) {
     vtx.push_back({x, y});
     uvs.push_back({u, v});
     return curVtxIndex++;
 }
 
-int FlatVectors::addTriangle(int elA, int elB, int elC) {
+int32 FlatVectors::addTriangle(int32 elA, int32 elB, int32 elC) {
     elm.push_back({elA, elB, elC});
     return curElmIndex++;
 }
@@ -266,8 +267,8 @@ void FlatVectors::fillClose() {
         shapeDiscard();
     } else {
         ensureSpace(0, curVtxIndex - curShapeBeginVtxIndex);
-        int vtx0 = curShapeBeginVtxIndex;
-        for (int i = curShapeBeginVtxIndex + 1; i < curVtxIndex - 1; i++) {
+        int32 vtx0 = curShapeBeginVtxIndex;
+        for (int32 i = curShapeBeginVtxIndex + 1; i < curVtxIndex - 1; i++) {
             addTriangle(vtx0, i, i + 1);
         }
     }
@@ -321,10 +322,10 @@ void FlatVectors::strokeLineTo(float x, float y, bool curve) {
                px1, py1, px2, py2, sx1, sy1, sx2, sy2);
 
     ensureSpace(4, 2);
-    int el0 = addVertex(px1, py1, 0, 0);
-    int el1 = addVertex(px2, py2, 0, 0);
-    int el2 = addVertex(sx1, sy1, 0, 0);
-    int el3 = addVertex(sx2, sy2, 0, 0);
+    int32 el0 = addVertex(px1, py1, 0, 0);
+    int32 el1 = addVertex(px2, py2, 0, 0);
+    int32 el2 = addVertex(sx1, sy1, 0, 0);
+    int32 el3 = addVertex(sx2, sy2, 0, 0);
     addTriangle(el0, el1, el2);
     addTriangle(el1, el3, el2);
 
@@ -357,10 +358,10 @@ void FlatVectors::strokeCap() {
         if (stroke.dash.empty()) {
             if (stroke.cap == CAP_SQUARE) {
                 float w = stroke.width * 0.5;
-                int el0 = addVertex(curPosX - w, curPosY - w, 0, 0);
-                int el1 = addVertex(curPosX + w, curPosY - w, 0, 0);
-                int el2 = addVertex(curPosX + w, curPosY + w, 0, 0);
-                int el3 = addVertex(curPosX - w, curPosY + w, 0, 0);
+                int32 el0 = addVertex(curPosX - w, curPosY - w, 0, 0);
+                int32 el1 = addVertex(curPosX + w, curPosY - w, 0, 0);
+                int32 el2 = addVertex(curPosX + w, curPosY + w, 0, 0);
+                int32 el3 = addVertex(curPosX - w, curPosY + w, 0, 0);
                 addTriangle(el0, el1, el2);
                 addTriangle(el0, el2, el3);
             } else if (stroke.cap == CAP_ROUND) {
@@ -416,7 +417,7 @@ void FlatVectors::strokeCap() {
     }
 }
 
-void FlatVectors::strokeJoin(int v0, int v1, float x1, float y1, float x2, float y2, float x3, float y3, bool cruve) {
+void FlatVectors::strokeJoin(int32 v0, int32 v1, float x1, float y1, float x2, float y2, float x3, float y3, bool cruve) {
     float det = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
 
     fvJoin join = stroke.join;
@@ -486,7 +487,7 @@ void FlatVectors::strokeClose() {
     }
 }
 
-void FlatVectors::strokeBevel(float det, int v0, int v1) {
+void FlatVectors::strokeBevel(float det, int32 v0, int32 v1) {
     if (det >= 0) {
         addTriangle(v0 + 2, v1, v1 + 1);
     } else {
@@ -506,15 +507,15 @@ void FlatVectors::strokeRound(fvPoint from, fvPoint to, fvPoint center) {
 
     float v = (std::abs(w * scale) + 10);
     v = (std::abs(ang) / PI2) * (v < 10 ? 10 : v > 64 ? 64 : v);
-    int n = (int) std::ceil(v < 2 ? 2 : v);
+    int32 n = (int32) std::ceil(v < 2 ? 2 : v);
 
-    int pastEl = addVertex(center.x + std::cos(a1) * w, center.y + std::sin(a1) * w, 0, 0);
-    int cEl = addVertex(center.x, center.y, 0, 0);
-    for (int i = 1; i <= n; i += 1) {
+    int32 pastEl = addVertex(center.x + std::cos(a1) * w, center.y + std::sin(a1) * w, 0, 0);
+    int32 cEl = addVertex(center.x, center.y, 0, 0);
+    for (int32 i = 1; i <= n; i += 1) {
         float u = i / (float) n;
         float ca = a1 + ang * u;
 
-        int el = addVertex(center.x + std::cos(ca) * w, center.y + std::sin(ca) * w, 0, 0);
+        int32 el = addVertex(center.x + std::cos(ca) * w, center.y + std::sin(ca) * w, 0, 0);
         addTriangle(cEl, pastEl, el);
         pastEl = el;
     }
@@ -610,7 +611,7 @@ FlatRender* FlatVectors::getRender() {
     return render;
 }
 
-void FlatVectors::beginFrame(int width, int height) {
+void FlatVectors::beginFrame(int32 width, int32 height) {
     render->begin(width, height, debug);
 }
 
@@ -625,15 +626,15 @@ void FlatVectors::flush() {
     if (curDrwIndex == 0) {
         return;
     }
-    int lastElm = paint.elements;
-    int lastVtx = paint.vertices;
+    int32 lastElm = paint.elements;
+    int32 lastVtx = paint.vertices;
     if (lastElm > 0) {
         render->flush(
                 draws.data(), uniforms.data(), curDrwIndex,
-                reinterpret_cast<int *>(elm.data()), lastElm * 3,
+                reinterpret_cast<int32 *>(elm.data()), lastElm * 3,
                 reinterpret_cast<float *>(vtx.data()), reinterpret_cast<float *>(uvs.data()), lastVtx * 2
         );
-        for (int i = lastElm; i < curElmIndex; ++i) {
+        for (int32 i = lastElm; i < curElmIndex; ++i) {
             elm[i].a -= lastVtx;
             elm[i].b -= lastVtx;
             elm[i].c -= lastVtx;
@@ -660,7 +661,7 @@ void FlatVectors::flush() {
 
 }
 
-void FlatVectors::setColor(fvUniform& color, int img) {
+void FlatVectors::setColor(fvUniform& color, int32 img) {
     uniform = color;
 
     inverseMat(uniform.colorMat, uniform.colorMat);
@@ -687,7 +688,7 @@ void FlatVectors::setTransform(float m00, float m10, float m01, float m11, float
     scale = maxscale(paint.transform);
 }
 
-void FlatVectors::setAntiAliasing(int enabled) {
+void FlatVectors::setAntiAliasing(int32 enabled) {
     paint.antiAlias = enabled;
 }
 
@@ -784,7 +785,7 @@ void FlatVectors::clearClip(bool clip) {
     render->clearClip(clip);
 }
 
-void FlatVectors::text(const char* str, int strLen, float x, float y, float maxWidth, float maxHeight) {
+void FlatVectors::text(const char* str, int32 strLen, float x, float y, float maxWidth, float maxHeight) {
     if (maxWidth == 0) maxWidth = 99999;
     else maxWidth = x + maxWidth;
     if (maxHeight == 0) maxHeight = 99999;
@@ -799,13 +800,13 @@ void FlatVectors::text(const char* str, int strLen, float x, float y, float maxW
 
     begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
 
-    int p = 0, i = 0, f = 0;
-    unsigned long chr = 0, prev = 0;
+    int32 p = 0, i = 0, f = 0;
+    uint32 chr = 0, prev = 0;
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr == '\n') continue;
 
         fvPoint uv;
-        int recreate;
+        int32 recreate;
         fvGlyph& glyph = font->getGlyphRendered(fontRender, chr, &uv, &recreate);
         if (recreate == 2) {
             end();
@@ -816,7 +817,7 @@ void FlatVectors::text(const char* str, int strLen, float x, float y, float maxW
         }
 
         float kern = (f ? font->getKerning(prev, chr) : 0);
-        float advance = std::ceil((glyph.advance + kern) * (scl * spc));
+        float advance = (glyph.advance + kern) * (scl * spc);//std::ceil((glyph.advance + kern) * (scl * spc));
 
         float px = x + kern * scl * spc;
         if (uv.x > -1) {
@@ -842,10 +843,10 @@ void FlatVectors::text(const char* str, int strLen, float x, float y, float maxW
                 }
 
                 ensureSpace(4, 2);
-                int el0 = addVertex(x1, y1, uv.x, uv.y);
-                int el1 = addVertex(x2, y1, uv.x + uvW, uv.y);
-                int el2 = addVertex(x2, y2, uv.x + uvW, uv.y + uvH);
-                int el3 = addVertex(x1, y2, uv.x, uv.y + uvH);
+                int32 el0 = addVertex(x1, y1, uv.x, uv.y);
+                int32 el1 = addVertex(x2, y1, uv.x + uvW, uv.y);
+                int32 el2 = addVertex(x2, y2, uv.x + uvW, uv.y + uvH);
+                int32 el3 = addVertex(x1, y2, uv.x, uv.y + uvH);
                 addTriangle(el0, el1, el2);
                 addTriangle(el0, el2, el3);
             }
@@ -876,13 +877,13 @@ void FlatVectors::ellipse(float x, float y, float width, float height, bool fill
     begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
     float points = scale * std::sqrt(width * width + height * height);
     points = std::ceil((points < 64 ? 64 : points > 256 ? 256 : points) / 4.0f);
-    int n = (int) points;
+    int32 n = (int32) points;
 
     float dtr = PI / 180.0f;
     float hw = width / 2.0f, hh = height / 2.0f;
     float xc = x + hw, yc = y + hh;
 
-    for (int i = 0; i < n ; i++) {
+    for (int32 i = 0; i < n ; i++) {
         float a = (i / (float) n * 360) * dtr;
         if (i == 0) {
             moveTo(xc + std::cos(a) * hw, yc - std::sin(a) * hh);
@@ -905,8 +906,8 @@ void FlatVectors::roundRect(float x, float y, float width, float height, float c
 
     float xc = x + c1, yc = y + c1;
     if (c1 > 0.5 / scale) {
-        int n = std::ceil(4 + (8 * (c1 * scale - 4) / 32.0));
-        for (int i = 0; i <= n; i ++) {
+        int32 n = std::ceil(4 + (8 * (c1 * scale - 4) / 32.0));
+        for (int32 i = 0; i <= n; i ++) {
             float a = (90 + (90 * i / (float)n));
             if (i == 0) {
                 moveTo(xc + fastCos(a) * c1, yc - fastSin(a) * c1);
@@ -919,8 +920,8 @@ void FlatVectors::roundRect(float x, float y, float width, float height, float c
     }
     xc = x + c4, yc = y + height - c4;
     if (c4 > 0.5 / scale) {
-        int n = std::ceil(4 + (8 * (c4 * scale - 4) / 32.0));
-        for (int i = 0; i <= n; i ++) {
+        int32 n = std::ceil(4 + (8 * (c4 * scale - 4) / 32.0));
+        for (int32 i = 0; i <= n; i ++) {
             float a = (180 + (90 * i / (float)n));
             lineTo(xc + fastCos(a) * c4, yc - fastSin(a) * c4);
         }
@@ -929,8 +930,8 @@ void FlatVectors::roundRect(float x, float y, float width, float height, float c
     }
     xc = x + width - c3, yc = y + height - c3;
     if (c3 > 0.5 / scale) {
-        int n = std::ceil(4 + (8 * (c3 * scale - 4) / 32.0));
-        for (int i = 0; i <= n; i ++) {
+        int32 n = std::ceil(4 + (8 * (c3 * scale - 4) / 32.0));
+        for (int32 i = 0; i <= n; i ++) {
             float a = (270 + (90 * i / (float)n));
             lineTo(xc + fastCos(a) * c3, yc - fastSin(a) * c3);
         }
@@ -939,8 +940,8 @@ void FlatVectors::roundRect(float x, float y, float width, float height, float c
     }
     xc = x + width - c2, yc = y + c2;
     if (c2 > 0.5 / scale) {
-        int n = std::ceil(4 + (8 * (c2 * scale - 4) / 32.0));
-        for (int i = 0; i <= n; i ++) {
+        int32 n = std::ceil(4 + (8 * (c2 * scale - 4) / 32.0));
+        for (int32 i = 0; i <= n; i ++) {
             float a = (90 * i / (float)n);
             lineTo(xc + fastCos(a) * c2, yc - fastSin(a) * c2);
         }

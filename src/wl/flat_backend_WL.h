@@ -10,9 +10,9 @@ extern "C" {
 /*
  * Class:     flat_backend_WL
  * Method:    Init
- * Signature: ()J
+ * Signature: ()Z
  */
-JNIEXPORT jlong JNICALL Java_flat_backend_WL_Init
+JNIEXPORT jboolean JNICALL Java_flat_backend_WL_Init
   (JNIEnv *, jclass);
 
 /*
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_Finish
  * Signature: (IIIZ)J
  */
 JNIEXPORT jlong JNICALL Java_flat_backend_WL_WindowCreate
-        (JNIEnv *, jclass, jint, jint, jint, jboolean);
+  (JNIEnv *, jclass, jint, jint, jint, jboolean);
 
 /*
  * Class:     flat_backend_WL
@@ -37,7 +37,7 @@ JNIEXPORT jlong JNICALL Java_flat_backend_WL_WindowCreate
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_WindowAssign
-        (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_WL
@@ -45,13 +45,12 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_WindowAssign
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_WindowDestroy
-        (JNIEnv *, jclass, jlong);
-
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_WL
  * Method:    SwapBuffers
- * Signature: ()V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_SwapBuffers
   (JNIEnv *, jclass, jlong);
@@ -78,7 +77,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetVsync
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_PostEmptyEvent
-        (JNIEnv *, jclass);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     flat_backend_WL
@@ -134,7 +133,7 @@ JNIEXPORT jboolean JNICALL Java_flat_backend_WL_IsDecorated
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL Java_flat_backend_WL_IsTransparent
-        (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_WL
@@ -366,7 +365,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString
  * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString
-        (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_WL
@@ -630,7 +629,48 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetJoystickCallback
  * Signature: (Lflat/backend/WLEnums/ErrorCallback;)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetErrorCallback
-        (JNIEnv *, jclass, jobject);
+  (JNIEnv *, jclass, jobject);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    ShowOpenFile
+ * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT void JNICALL Java_flat_backend_WL_TargetLastModal
+        (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    ShowOpenFile
+ * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFile
+  (JNIEnv *, jclass, jlong, jstring, jstring);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    ShowOpenMultipleFiles
+ * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenMultipleFiles
+  (JNIEnv *, jclass, jlong, jstring, jstring);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    ShowSaveFile
+ * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowSaveFile
+  (JNIEnv *, jclass, jlong, jstring, jstring);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    ShowOpenFolder
+ * Signature: (JLjava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFolder
+  (JNIEnv *, jclass, jlong, jstring);
+
 #ifdef __cplusplus
 }
 #endif

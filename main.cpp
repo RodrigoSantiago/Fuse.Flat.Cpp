@@ -1,12 +1,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
 #include <iostream>
 #include <fstream>
 #include "src/flatvectors/FlatVectors.h"
 #include "src/flatvectors/FlatFont.h"
 #include "src/flatvectors/FlatFontRender.h"
 #include "src/flatvectors/FlatPaints.h"
+#include "nfd.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -37,6 +41,27 @@ unsigned char* readFile(const std::string& filename, std::size_t& fileSize) {
     file.close();
     return buffer;
 }
+
+int main2(GLFWwindow* window)
+{
+    void* win = glfwGetWin32Window(window);
+    nfdchar_t *outPath = NULL;
+    nfdresult_t result = NFD_OpenDialogEx( NULL, NULL, &outPath, win);
+
+    if (result == NFD_OKAY) {
+        puts("Success!");
+        puts(outPath);
+        free(outPath);
+    }
+    else if (result == NFD_CANCEL) {
+        puts("User pressed cancel.");
+    }
+    else {
+        printf("Error: %s\n", NFD_GetError() );
+    }
+    return 0;
+}
+
 
 int main() {
     glfwInit();
@@ -99,6 +124,8 @@ int main() {
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
+
+    main2(window);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
     GLint id = 0;
@@ -200,7 +227,7 @@ int main() {
         fv->end();
 
         //fv->ellipse(300, 0, 100, 100);
-        fv->roundRect(300, 0, 100, 100, 30, 10, 40, 20);
+        fv->roundRect(300, 0, 100, 100, 30, 10, 40, 20, true);
 
         FlatPaints::setColorPaint(color, 0xFFFF00FF);
         fv->setColor(color, 0);

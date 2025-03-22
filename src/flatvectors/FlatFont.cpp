@@ -13,7 +13,7 @@
 #define PADDING 8
 #define PADDING2 16
 
-int _maxCodePoint(stbtt_fontinfo *info){
+int32 _maxCodePoint(stbtt_fontinfo *info){
     stbtt_uint8 *data = info->data;
     stbtt_uint32 index_map = info->index_map;
 
@@ -37,7 +37,7 @@ int _maxCodePoint(stbtt_fontinfo *info){
 
 // Class
 
-FlatFont::FlatFont(const void *data, long length, float size, int sdf) : valid(false), glyphs(0), glyphCount(0), coded(false) {
+FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf) : valid(false), glyphs(0), glyphCount(0), coded(false) {
     this->size = size;
     this->sdf = sdf;
     this->data = new unsigned char[length];
@@ -47,7 +47,7 @@ FlatFont::FlatFont(const void *data, long length, float size, int sdf) : valid(f
         this->valid = true;
         this->glyphCount = info.numGlyphs;
         this->glyphs = new fvGlyph[glyphCount];
-        for (int i = 0; i < glyphCount; ++i) {
+        for (int32 i = 0; i < glyphCount; ++i) {
             glyphs[i] = {};
         }
 
@@ -74,7 +74,7 @@ FlatFont::FlatFont(const void *data, long length, float size, int sdf) : valid(f
 }
 
 FlatFont::~FlatFont() {
-    for (int i = 0; i < glyphCount; ++i) {
+    for (int32 i = 0; i < glyphCount; ++i) {
         delete[] glyphs[i].cell;
     }
     delete[] data;
@@ -83,7 +83,7 @@ FlatFont::~FlatFont() {
 
 // Private
 
-void FlatFont::loadGlyph(int glyphIndex) {
+void FlatFont::loadGlyph(int32 glyphIndex) {
     int c_x1, c_y1, c_x2, c_y2;
     stbtt_GetGlyphBitmapBox(&info, glyphIndex, scale, scale, &c_x1, &c_y1, &c_x2, &c_y2);
 
@@ -107,21 +107,21 @@ void FlatFont::loadGlyph(int glyphIndex) {
     }
 }
 
-void FlatFont::renderGlyph(int glyphIndex) {
+void FlatFont::renderGlyph(int32 glyphIndex) {
     fvGlyph& glyph = glyphs[glyphIndex];
 
     if (glyph.cell == nullptr) {
-        int width = (int) ceil(glyph.w);
-        int height = (int) ceil(glyph.h);
+        int32 width = (int32) ceil(glyph.w);
+        int32 height = (int32) ceil(glyph.h);
 
-        int cellW = width <= this->cellW ? 1 : static_cast<int>(ceil(width / static_cast<double>(this->cellW)));
-        int cellH = height <= this->cellH ? 1 : static_cast<int>(ceil(height / static_cast<double>(this->cellH)));
+        int32 cellW = width <= this->cellW ? 1 : static_cast<int32>(ceil(width / static_cast<double>(this->cellW)));
+        int32 cellH = height <= this->cellH ? 1 : static_cast<int32>(ceil(height / static_cast<double>(this->cellH)));
         cellW *= this->cellW;
         cellH *= this->cellH;
 
-        int len = cellW * cellH;
+        int32 len = cellW * cellH;
         unsigned char *img = new unsigned char[len];
-        for (int i = 0; i < len; ++i) {
+        for (int32 i = 0; i < len; ++i) {
             img[i] = 0;
         }
 
@@ -130,8 +130,8 @@ void FlatFont::renderGlyph(int glyphIndex) {
             unsigned char *bmap = stbtt_GetGlyphSDF(&info, scale, glyphIndex, PADDING, 128, 16
                     , &w, &h, &xof, &yof);
             if (bmap != 0) {
-                for (int y = 0; y < height && y < h; y++) {
-                    for (int x = 0; x < width && x < w; x++) {
+                for (int32 y = 0; y < height && y < h; y++) {
+                    for (int32 x = 0; x < width && x < w; x++) {
                         img[x + y * cellW] = bmap[x + y * w];
                     }
                 }
@@ -158,27 +158,27 @@ bool FlatFont::isSdf() {
     return sdf == 1;
 }
 
-int FlatFont::getCellW() {
+int32 FlatFont::getCellW() {
     return this->cellW;
 }
 
-int FlatFont::getCellH() {
+int32 FlatFont::getCellH() {
     return this->cellH;
 }
 
-int FlatFont::getGlyphCount() {
+int32 FlatFont::getGlyphCount() {
     return this->glyphCount;
 }
 
-void FlatFont::getAllCodePoints(std::vector<long int>& codepoints) {
+void FlatFont::getAllCodePoints(std::vector<int32>& codepoints) {
     if (!coded) {
-        int max = _maxCodePoint(&info);
+        int32 max = _maxCodePoint(&info);
         if (max == 0) {
             max = 0x10FFFF;
         }
 
-        for (long int codePoint = 0; codePoint <= max; codePoint++) {
-            int glyphIndex = stbtt_FindGlyphIndex(&info, codePoint);
+        for (int32 codePoint = 0; codePoint <= max; codePoint++) {
+            int32 glyphIndex = stbtt_FindGlyphIndex(&info, codePoint);
             if (glyphIndex != 0) {
                 glyphs[glyphIndex].unicode = codePoint;
             }
@@ -187,12 +187,12 @@ void FlatFont::getAllCodePoints(std::vector<long int>& codepoints) {
     }
 
     codepoints.reserve(glyphCount);
-    for (int i = 0; i < glyphCount; ++i) {
+    for (int32 i = 0; i < glyphCount; ++i) {
         codepoints[i] = glyphs[i].unicode;
     }
 }
 
-void FlatFont::getGlyphData(long codePoint, float* data) {
+void FlatFont::getGlyphData(int32 codePoint, float* data) {
     fvGlyph& glyph = getGlyph(codePoint);
     data[0] = glyph.advance;
     data[1] = glyph.x;
@@ -201,15 +201,15 @@ void FlatFont::getGlyphData(long codePoint, float* data) {
     data[4] = glyph.h;
 }
 
-void FlatFont::getGlyphShape(long unicode, std::vector<float> &polygon) {
-    int glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
+void FlatFont::getGlyphShape(int32 unicode, std::vector<float> &polygon) {
+    int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
 
     stbtt_vertex* vertices;
-    int num = stbtt_GetGlyphShape(&info, glyphIndex, &vertices);
+    int32 num = stbtt_GetGlyphShape(&info, glyphIndex, &vertices);
 
     if (num > 0) {
         polygon.reserve(num * 7);
-        for (int i = 0; i < num; ++i) {
+        for (int32 i = 0; i < num; ++i) {
             const stbtt_vertex* v = &vertices[i];
 
             switch (v->type) {
@@ -245,7 +245,7 @@ void FlatFont::getGlyphShape(long unicode, std::vector<float> &polygon) {
     }
 }
 
-void FlatFont::getMetrics(float *ascender, float *descender, float *height, float *lineGap, int *glyphCount) {
+void FlatFont::getMetrics(float *ascender, float *descender, float *height, float *lineGap, int32 *glyphCount) {
     if (ascender != 0) *ascender = this->ascent;
     if (descender != 0) *descender = this->descent;
     if (height != 0) *height = this->height;
@@ -253,8 +253,8 @@ void FlatFont::getMetrics(float *ascender, float *descender, float *height, floa
     if (glyphCount != 0) *glyphCount = this->glyphCount;
 }
 
-fvGlyph& FlatFont::getGlyph(long unicode) {
-    int glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
+fvGlyph& FlatFont::getGlyph(int32 unicode) {
+    int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
     fvGlyph& glyph = glyphs[glyphIndex];
 
     if (!glyph.enabled) {
@@ -264,13 +264,13 @@ fvGlyph& FlatFont::getGlyph(long unicode) {
     return glyph;
 }
 
-float FlatFont::getKerning(long unicode1, long unicode2) {
+float FlatFont::getKerning(int32 unicode1, int32 unicode2) {
 
     return stbtt_GetCodepointKernAdvance(&info, unicode1, unicode2) * scale;
 }
 
-fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, long unicode, fvPoint *uv, int *recreate) {
-    int glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
+fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint *uv, int32 *recreate) {
+    int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
 
     fvGlyph& glyph = glyphs[glyphIndex];
     if (!glyph.enabled) {
@@ -289,17 +289,17 @@ fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, long unicode, fvPoint 
     return glyph;
 }
 
-float FlatFont::getTextWidth(const char *str, int strLen, float scale, float spacing) {
+float FlatFont::getTextWidth(const char *str, int32 strLen, float scale, float spacing) {
     float scl = scale * spacing;
 
     float w = 0;
-    int i = 0, f = 0;
-    unsigned long chr = 0, prev = 0;
+    int32 i = 0, f = 0;
+    uint32 chr = 0, prev = 0;
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
             fvGlyph &glyph = getGlyph(chr);
 
-            w += ceil((glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl);
+            w += (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl; // ceil((glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl);
             prev = chr;
             f = 1;
         }
@@ -307,19 +307,19 @@ float FlatFont::getTextWidth(const char *str, int strLen, float scale, float spa
     return w;
 }
 
-void FlatFont::getOffset(const char *str, int strLen, float scale, float spacing, float cursorX, int half,
+void FlatFont::getOffset(const char *str, int32 strLen, float scale, float spacing, float cursorX, int32 half,
                          float *index, float *width) {
     float scl = scale * spacing;
 
     float w = 0;
-    int i = 0, f = 0, pi = 0;
-    unsigned long chr = 0, pchr = 0;
+    int32 i = 0, f = 0, pi = 0;
+    uint32 chr = 0, pchr = 0;
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr == '\n') continue;
 
         fvGlyph &glyph = getGlyph(chr);
 
-        float advance = ceil((glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl);
+        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl; // ceil((glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl);
         if (w + advance > cursorX) {
             if (cursorX <= w + advance * 0.5) {
                 *width = w;

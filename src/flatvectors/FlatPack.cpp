@@ -5,13 +5,13 @@
 #include <cmath>
 #include "FlatPack.h"
 
-FlatPack::FlatPack(int cellWidth, int cellHeight) {
+FlatPack::FlatPack(int32 cellWidth, int32 cellHeight) {
     this->cellWidth = cellWidth;
     this->cellHeight = cellHeight;
 
-    int idealWidth = cellWidth * 4;
-    int idealHeight = cellHeight * 2;
-    int power = 16;
+    int32 idealWidth = cellWidth * 4;
+    int32 idealHeight = cellHeight * 2;
+    int32 power = 16;
     while (power < idealHeight || power * 2 < idealWidth) {
         power += power;
     }
@@ -35,19 +35,19 @@ FlatPack::~FlatPack() {
 
 // Private
 
-int FlatPack::findOpenCell(int cellW, int cellH) {
+int32 FlatPack::findOpenCell(int32 cellW, int32 cellH) {
     bool single = cellW == 1 && cellH == 1;
     bool updateEmpty = false;
 
-    int x = minX;
-    int y = minY;
-    int wc = widthCount;
-    int hc = heightCount;
-    int open = -1;
+    int32 x = minX;
+    int32 y = minY;
+    int32 wc = widthCount;
+    int32 hc = heightCount;
+    int32 open = -1;
     for (; y + cellH <= hc; ++y) {
-        int yOff = y * wc;
+        int32 yOff = y * wc;
         for (; x + cellW <= wc;) {
-            int index = yOff + x;
+            int32 index = yOff + x;
             fvCell rect = matrix[index];
             if (rect.uvPtr == nullptr) {
                 if (!updateEmpty) {
@@ -59,10 +59,10 @@ int FlatPack::findOpenCell(int cellW, int cellH) {
                     return index;
                 }
 
-                int jump = -1;
-                for (int j = 0; j < cellH; ++j) {
-                    int jOff = j * wc;
-                    for (int i = 0; i < cellW; ++i) {
+                int32 jump = -1;
+                for (int32 j = 0; j < cellH; ++j) {
+                    int32 jOff = j * wc;
+                    for (int32 i = 0; i < cellW; ++i) {
                         fvCell iRect = matrix[index + jOff + i];
                         if (iRect.uvPtr != nullptr) {
                             jump = iRect.w;
@@ -86,15 +86,15 @@ int FlatPack::findOpenCell(int cellW, int cellH) {
     return open;
 }
 
-void FlatPack::setCell(int cellW, int cellH, int openCell, fvPoint* point) {
+void FlatPack::setCell(int32 cellW, int32 cellH, int32 openCell, fvPoint* point) {
     (*point).x = openCell % widthCount * cellWidth;
     (*point).y = openCell / widthCount * cellHeight;
 
-    int wc = widthCount;
-    for (int y = 0; y < cellH; ++y) {
-        int yOff = y * wc;
-        for (int x = 0; x < cellW; ++x) {
-            int index = yOff + x;
+    int32 wc = widthCount;
+    for (int32 y = 0; y < cellH; ++y) {
+        int32 yOff = y * wc;
+        for (int32 x = 0; x < cellW; ++x) {
+            int32 index = yOff + x;
             matrix[openCell + index].uvPtr = point;
             matrix[openCell + index].w = cellW;
             matrix[openCell + index].h = cellH;
@@ -104,28 +104,28 @@ void FlatPack::setCell(int cellW, int cellH, int openCell, fvPoint* point) {
 
 // Public
 
-int FlatPack::getWidth() {
+int32 FlatPack::getWidth() {
     return width;
 }
 
-int FlatPack::getHeight() {
+int32 FlatPack::getHeight() {
     return height;
 }
 
-void FlatPack::toCellSize(int w, int h, int *cellW, int *cellH) {
-    *cellW = w <= cellWidth ? 1 : static_cast<int>(ceil(w / static_cast<double>(cellWidth)));
-    *cellH = h <= cellHeight ? 1 : static_cast<int>(ceil(h / static_cast<double>(cellHeight)));
+void FlatPack::toCellSize(int32 w, int32 h, int32 *cellW, int32 *cellH) {
+    *cellW = w <= cellWidth ? 1 : static_cast<int32>(ceil(w / static_cast<double>(cellWidth)));
+    *cellH = h <= cellHeight ? 1 : static_cast<int32>(ceil(h / static_cast<double>(cellHeight)));
     *cellW *= cellWidth;
     *cellH *= cellHeight;
 }
 
-int FlatPack::addRect(int w, int h, fvPoint *point) {
-    int cellW = w <= cellWidth ? 1 : static_cast<int>(ceil(w / static_cast<double>(cellWidth)));
-    int cellH = h <= cellHeight ? 1 : static_cast<int>(ceil(h / static_cast<double>(cellHeight)));
+int32 FlatPack::addRect(int32 w, int32 h, fvPoint *point) {
+    int32 cellW = w <= cellWidth ? 1 : static_cast<int32>(ceil(w / static_cast<double>(cellWidth)));
+    int32 cellH = h <= cellHeight ? 1 : static_cast<int32>(ceil(h / static_cast<double>(cellHeight)));
     (*point).x = -1;
     (*point).y = -1;
 
-    int openCell = findOpenCell(cellW, cellH);
+    int32 openCell = findOpenCell(cellW, cellH);
     if (openCell > -1) {
         setCell(cellW, cellH, openCell, point);
         return 0;
@@ -148,8 +148,8 @@ int FlatPack::addRect(int w, int h, fvPoint *point) {
 
 bool FlatPack::grow() {
 
-    int idealWidth;
-    int idealHeight;
+    int32 idealWidth;
+    int32 idealHeight;
     if (width <= height) {
         idealWidth = width * 2;
         idealHeight = height;
@@ -162,15 +162,15 @@ bool FlatPack::grow() {
         return false;
     }
 
-    int wc = widthCount;
-    int hc = heightCount;
-    int newWidthCount = idealWidth / cellWidth;
-    int newHeightCount = idealHeight / cellHeight;
+    int32 wc = widthCount;
+    int32 hc = heightCount;
+    int32 newWidthCount = idealWidth / cellWidth;
+    int32 newHeightCount = idealHeight / cellHeight;
 
     std::vector<fvCell> newVec = matrix;
     newVec.resize(newWidthCount * newHeightCount);
-    for (int y = 0; y < hc; y++) {
-        for (int x = 0; x < wc; x++) {
+    for (int32 y = 0; y < hc; y++) {
+        for (int32 x = 0; x < wc; x++) {
             newVec[y * newWidthCount + x] = matrix[y * wc + x];
         }
     }
@@ -186,8 +186,8 @@ bool FlatPack::grow() {
 }
 
 void FlatPack::clear() {
-    int size = widthCount * heightCount;
-    for (int i = 0; i < size; ++i) {
+    int32 size = widthCount * heightCount;
+    for (int32 i = 0; i < size; ++i) {
         if (matrix[i].uvPtr != nullptr) {
             (*matrix[i].uvPtr).x = -1;
             (*matrix[i].uvPtr).y = -1;

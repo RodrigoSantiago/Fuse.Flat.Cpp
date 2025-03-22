@@ -2,6 +2,7 @@
 // Created by Rodrigo Santiago on 27/11/2017
 //
 
+#include "../flat_base_types.h"
 #include "flat_backend_GL.h"
 #include <glad/glad.h>
 #include <iostream>
@@ -1137,7 +1138,7 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_ProgramGetAttachedShaders(JNIEnv * j
     glGetProgramiv(id, GL_ATTACHED_SHADERS, &size);
     GLuint shaders[size];
     glGetAttachedShaders(id, size, &count, shaders);
-    for (int i = 0; i < count; i++) {
+    for (int32 i = 0; i < count; i++) {
         jint shader = shaders[i];
         jEnv->SetIntArrayRegion(data, i, 1, &shader);
     }
@@ -1256,11 +1257,11 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_ProgramGetUniformBlockChildren(JNIEn
 JNIEXPORT void JNICALL Java_flat_backend_GL_ProgramSetTFVars(JNIEnv * jEnv, jclass jClass, jint id, jobjectArray names, jint bufferModeFM) {
     jint length = jEnv->GetArrayLength(names);
     const char* cNames[length];
-    for (int i = 0; i < length; i++) {
+    for (int32 i = 0; i < length; i++) {
         cNames[i] = jEnv->GetStringUTFChars((jstring)jEnv->GetObjectArrayElement(names, i), 0);
     }
     glTransformFeedbackVaryings(id, length, cNames, bufferModeFM);
-    for (int i = 0; i < length; i++) {
+    for (int32 i = 0; i < length; i++) {
         jEnv->ReleaseStringUTFChars((jstring)jEnv->GetObjectArrayElement(names, i), 0);
     }
 }
