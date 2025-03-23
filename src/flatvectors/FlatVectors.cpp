@@ -897,8 +897,8 @@ void FlatVectors::rect(float x, float y, float width, float height, bool fill) {
 
 void FlatVectors::ellipse(float x, float y, float width, float height, bool fill) {
     begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
-    float points = scale * std::sqrt(width * width + height * height);
-    points = std::ceil((points < 64 ? 64 : points > 256 ? 256 : points) / 4.0f);
+    float points = scale * std::sqrt(std::max(width, height) * 0.5) * PI2;
+    points = std::ceil((points < 16 ? 16 : points > 128 ? 128 : points));
     int32 n = (int32) points;
 
     float dtr = PI / 180.0f;
@@ -920,7 +920,7 @@ void FlatVectors::ellipse(float x, float y, float width, float height, bool fill
 void FlatVectors::roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4, bool fill) {
     begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
 
-    float max = std::min(width, height) / 2;
+    float max = scale * std::min(width, height) / 2;
     c1 = std::min(max, c1);
     c2 = std::min(max, c2);
     c3 = std::min(max, c3);
