@@ -23,6 +23,10 @@ class FlatRender {
     GLuint shader;
     GLint viewID, matID, texID, fntID, stcID, dbgID;
 
+    int32 maxUniforms;
+    int32 maxElements;
+    int32 maxVertices;
+
 public:
     FlatRender();
     ~FlatRender();
@@ -32,6 +36,9 @@ private:
 
 public:
     int32 renderAlign();
+    int32 getMaxUniforms();
+    int32 getMaxElements();
+    int32 getMaxVertices();
 
     // Render
     void begin(unsigned int32 width, unsigned int32 height, bool debug);

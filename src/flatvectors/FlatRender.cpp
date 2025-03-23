@@ -139,7 +139,7 @@ const char *fragmentSource =
 int32 _get_align() {
     GLint align;
     glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &align);
-    return (GLint) ceil(sizeof(fvUniform) / (float)align) * align;
+    return (GLint) ((sizeof(fvUniform) - 1) / align + 1) * align;
 }
 
 void _render_triangles(int32 pos, int32 length) {
@@ -197,7 +197,17 @@ FlatRender::FlatRender() : paint(0), vertex(0), element(0), curAA(0), curImage0(
     fntID = glGetUniformLocation(shader, "fnt");
     stcID = glGetUniformLocation(shader, "stc");
     dbgID = glGetUniformLocation(shader, "dbg");
-    std::cout << "Renderer: " << glGetError() << std::endl;
+
+    GLint maxUniformBlockSize;
+    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize);
+    GLint maxEboSize;
+    glGetIntegerv(GL_MAX_ELEMENTS_INDICES, &maxEboSize);
+    GLint maxVboSize;
+    glGetIntegerv(GL_MAX_ELEMENTS_VERTICES, &maxVboSize);
+
+    maxUniforms = std::min((int32)512, (int32)(maxUniformBlockSize / renderAlign()));
+    maxElements = std::min((int32)32768, (int32)(maxEboSize));
+    maxVertices = std::min((int32)32768, (int32)(maxVboSize));
 }
 
 FlatRender::~FlatRender() {
@@ -211,6 +221,18 @@ FlatRender::~FlatRender() {
 int32 FlatRender::renderAlign() {
     static int32 align = _get_align();
     return align;
+}
+
+int32 FlatRender::getMaxUniforms() {
+    return maxUniforms;
+}
+
+int32 FlatRender::getMaxElements() {
+    return maxElements;
+}
+
+int32 FlatRender::getMaxVertices() {
+    return maxVertices;
 }
 
 void FlatRender::ensureCapacity(int32 paint, int32 element, int32 vertex) {

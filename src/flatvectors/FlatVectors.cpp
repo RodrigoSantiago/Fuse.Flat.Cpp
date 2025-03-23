@@ -183,7 +183,12 @@ FlatVectors::~FlatVectors() {
 }
 
 void FlatVectors::ensureSpace(int32 vertex, int32 elements) {
-    if (curDrwIndex > 0 && ((curVtxIndex + vertex) * 2 >= 32768 || (curElmIndex + elements) * 3 >= 32768)) {
+    if (curDrwIndex > 0 && (
+                            (curVtxIndex + vertex) * 2 >= render->getMaxVertices() ||
+                            (curElmIndex + elements) * 3 >= render->getMaxElements() ||
+                            (curDrwIndex + 1) >= render->getMaxUniforms()
+                            )
+        ) {
         flush();
     }
 }
@@ -616,9 +621,26 @@ void FlatVectors::beginFrame(int32 width, int32 height) {
 }
 
 void FlatVectors::endFrame() {
-    if (curElmIndex > 0) {
-        flush();
-    }
+    flush();
+
+    curVtxIndex = 0;
+    curElmIndex = 0;
+    curDrwIndex = 0;
+
+    curDrawBeginVtxIndex = 0;
+    curDrawBeginElmIndex = 0;
+    curShapeBeginVtxIndex = 0;
+    curShapeBeginElmIndex = 0;
+
+    strokeFirstLineVtxIndex = 0;
+    prevVtxIndex = 0;
+
+    elm.resize(0);
+    vtx.resize(0);
+    uvs.resize(0);
+    draws.resize(0);
+    uniforms.resize(0);
+
     render->end();
 }
 

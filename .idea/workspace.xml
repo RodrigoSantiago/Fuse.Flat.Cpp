@@ -11,14 +11,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Modal Windows. Some crossplataform fixes">
-      <change afterPath="$PROJECT_DIR$/src/system_unix.cpp" afterDir="false" />
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="More Linux Support. Modals Fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/system_base.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_base.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/system_win.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_win.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,12 +74,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -148,7 +145,8 @@
       <workItem from="1742347941573" duration="1403000" />
       <workItem from="1742474871191" duration="13034000" />
       <workItem from="1742561479809" duration="26525000" />
-      <workItem from="1742642990999" duration="22909000" />
+      <workItem from="1742642990999" duration="26511000" />
+      <workItem from="1742747390483" duration="3795000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -360,7 +358,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742613214783</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="More Linux Support. Modals Fix">
+      <created>1742692388609</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1742692388609</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -378,7 +383,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Removed unnecessary GLGET" />
     <MESSAGE value="Save render on CPU memory" />
     <MESSAGE value="SVG font api improvement" />
     <MESSAGE value="Font alignment show be handle by interface" />
@@ -403,7 +407,8 @@
     <MESSAGE value="Degenerated path fix" />
     <MESSAGE value="Debug removed" />
     <MESSAGE value="Modal Windows. Some crossplataform fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modal Windows. Some crossplataform fixes" />
+    <MESSAGE value="More Linux Support. Modals Fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="More Linux Support. Modals Fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
