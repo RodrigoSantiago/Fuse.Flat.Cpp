@@ -11,38 +11,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Debug removed">
-      <change afterPath="$PROJECT_DIR$/lib/win/libglfw3.a" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/flat_base_types.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/system_base.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/system_win.cpp" afterDir="false" />
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Modal Windows. Some crossplataform fixes">
+      <change afterPath="$PROJECT_DIR$/src/system_unix.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GLFW/glfw3.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GLFW/glfw3.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GLFW/glfw3native.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GLFW/glfw3native.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/libglfw3-32.a" beforeDir="false" afterPath="$PROJECT_DIR$/lib/win/libglfw3-32.a" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/libglfw3.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flat.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatCurves.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatCurves.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPack.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPaints.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatText.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatText.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatText.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatText.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ml/flat_backend_ML.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/ml/flat_backend_ML.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/system_base.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_base.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/system_win.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_win.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.h" afterDir="false" />
     </list>
@@ -83,13 +57,14 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;cmake.loaded.for.project&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Github/Fuse.Flat.Cpp/include&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Github/Fuse.Flat.Cpp/src&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;CPPToolchains&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Github\Fuse.Flat.Cpp\src" />
       <recent name="D:\Github\Fuse.Flat.Cpp\include" />
       <recent name="D:\Github\Fuse.Flat.Cpp\src\objective" />
       <recent name="D:\Github\Fuse.Flat.Cpp\lib" />
@@ -102,12 +77,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Flat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Flat" TARGET_NAME="Flat" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Flat" RUN_TARGET_NAME="Flat">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -172,7 +147,8 @@
       <workItem from="1742305553612" duration="652000" />
       <workItem from="1742347941573" duration="1403000" />
       <workItem from="1742474871191" duration="13034000" />
-      <workItem from="1742561479809" duration="23249000" />
+      <workItem from="1742561479809" duration="26525000" />
+      <workItem from="1742642990999" duration="22909000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -377,7 +353,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742305584310</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Modal Windows. Some crossplataform fixes">
+      <created>1742613214783</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1742613214783</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -395,7 +378,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Text rendering improved" />
     <MESSAGE value="Removed unnecessary GLGET" />
     <MESSAGE value="Save render on CPU memory" />
     <MESSAGE value="SVG font api improvement" />
@@ -420,7 +402,8 @@
     <MESSAGE value="Clipping Fix" />
     <MESSAGE value="Degenerated path fix" />
     <MESSAGE value="Debug removed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Debug removed" />
+    <MESSAGE value="Modal Windows. Some crossplataform fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modal Windows. Some crossplataform fixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -18,7 +18,7 @@ if(WIN32)
     link_directories(lib/win)
     add_definitions(-DWINDOWS_PLATFORM)
     set(SOURCE_FILES
-            src/nfd/nfd_common.c
+            src/nfd/nfd_common.cpp
             src/nfd/nfd_win.cpp
             src/system_win.cpp
             )
@@ -26,7 +26,7 @@ elseif(UNIX)
     link_directories(lib/unix)
     add_definitions(-DUNIX_PLATFORM)
     set(SOURCE_FILES
-            src/nfd/nfd_common.c
+            src/nfd/nfd_common.cpp
             src/nfd/nfd_gtk.cpp
             src/system_unix.cpp)
 endif()

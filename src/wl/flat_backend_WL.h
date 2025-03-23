@@ -636,40 +636,32 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetErrorCallback
  * Method:    ShowOpenFile
  * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT void JNICALL Java_flat_backend_WL_TargetLastModal
-        (JNIEnv *, jclass);
-
-/*
- * Class:     flat_backend_WL
- * Method:    ShowOpenFile
- * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFile
-  (JNIEnv *, jclass, jlong, jstring, jstring);
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowOpenFile
+  (JNIEnv *, jclass, jlong, jstring, jstring, jobject);
 
 /*
  * Class:     flat_backend_WL
  * Method:    ShowOpenMultipleFiles
  * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenMultipleFiles
-  (JNIEnv *, jclass, jlong, jstring, jstring);
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowOpenMultipleFiles
+  (JNIEnv *, jclass, jlong, jstring, jstring, jobject);
 
 /*
  * Class:     flat_backend_WL
  * Method:    ShowSaveFile
  * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowSaveFile
-  (JNIEnv *, jclass, jlong, jstring, jstring);
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowSaveFile
+  (JNIEnv *, jclass, jlong, jstring, jstring, jobject);
 
 /*
  * Class:     flat_backend_WL
  * Method:    ShowOpenFolder
  * Signature: (JLjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFolder
-  (JNIEnv *, jclass, jlong, jstring);
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowOpenFolder
+  (JNIEnv *, jclass, jlong, jstring, jobject);
 
 #ifdef __cplusplus
 }

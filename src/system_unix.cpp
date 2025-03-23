@@ -5,7 +5,7 @@
 #include "system_base.h"
 #include "nfd.h"
 
-#define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
 #include <thread>
 
@@ -14,7 +14,7 @@ void modalLoop() {
 }
 
 void showOpenFile(GLFWwindow* window, const char *sFileFilters, const char *sInitialFolder, jLambda<void(jlong,jstring)> result) {
-    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetWin32Window(window));
+    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetX11Window(window));
     jlong windowId = (jlong)window;
     std::string fileFilters = sFileFilters;
     std::string initialFolder = sInitialFolder;
@@ -33,7 +33,7 @@ void showOpenFile(GLFWwindow* window, const char *sFileFilters, const char *sIni
 }
 
 void showOpenMultipleFiles(GLFWwindow* window, const char *sFileFilters, const char *sInitialFolder, jLambda<void(jlong,jstring)> result) {
-    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetWin32Window(window));
+    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetX11Window(window));
     jlong windowId = (jlong)window;
     std::string fileFilters = sFileFilters;
     std::string initialFolder = sInitialFolder;
@@ -53,7 +53,7 @@ void showOpenMultipleFiles(GLFWwindow* window, const char *sFileFilters, const c
 }
 
 void showSaveFile(GLFWwindow* window, const char *sFileFilters, const char *sInitialFolder, jLambda<void(jlong,jstring)> result) {
-    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetWin32Window(window));
+    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetX11Window(window));
     jlong windowId = (jlong)window;
     std::string fileFilters = sFileFilters;
     std::string initialFolder = sInitialFolder;
@@ -72,7 +72,7 @@ void showSaveFile(GLFWwindow* window, const char *sFileFilters, const char *sIni
 }
 
 void showOpenFolder(GLFWwindow* window, const char *sInitialFolder, jLambda<void(jlong,jstring)> result) {
-    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetWin32Window(window));
+    void* nativeWindow = window == NULL ? NULL : reinterpret_cast<void*>(glfwGetX11Window(window));
     jlong windowId = (jlong)window;
     std::string initialFolder = sInitialFolder;
 

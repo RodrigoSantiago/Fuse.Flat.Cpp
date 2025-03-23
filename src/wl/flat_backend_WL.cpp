@@ -21,62 +21,9 @@ JNIEnv* getJNIEnv() {
     return env;
 }
 
-template<class T>
-class jLambda;
-
-template<class R, class ...Args> class jLambda<R(Args...)> {
-public:
-    jobject obj;
-    jmethodID method;
-
-    jLambda() : obj(nullptr), method (nullptr) {
-
-    }
-
-    jLambda(jobject jobj, jmethodID jmth) : obj(nullptr), method (nullptr) {
-        set(jobj, jmth);
-    }
-
-    jLambda<R(Args...)>& operator=(std::nullptr_t) {
-        set(nullptr, nullptr);
-        return *this;
-    }
-
-    jLambda<R(Args...)>& operator=(jLambda<R(Args...)> other) {
-        set(other.obj, other.method);
-        return *this;
-    }
-
-    void run(Args... args) {
-        getJNIEnv()->CallVoidMethod(obj, method, args...);
-    }
-
-    R bRun(Args... args) {
-        return getJNIEnv()->CallBooleanMethod(obj, method, args...);
-    }
-
-    void set(jobject jobj, jmethodID jmth) {
-        JNIEnv* env = getJNIEnv();
-
-        if (obj != nullptr) {
-            env->DeleteGlobalRef(obj);
-        }
-        if (jobj != nullptr) {
-            obj = env->NewGlobalRef(jobj);
-        } else {
-            obj = nullptr;
-        }
-        method = jmth;
-    }
-
-    ~jLambda() {
-        set(nullptr, nullptr);
-    }
-
-    operator bool() const {
-        return obj != nullptr;
-    }
-};
+void releaseJNIEnv() {
+    jvm->DetachCurrentThread();
+}
 
 static jLambda<void(jlong, jint, jint)> sWindowPosCallback;
 static jLambda<void(jlong, jint, jint)> sWindowSizeCallback;
@@ -288,6 +235,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SwapBuffers(JNIEnv * jEnv, jclass jC
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_HandleEvents(JNIEnv * jEnv, jclass jClass, jdouble wait) {
+    modalLoop();
     if (wait > 0) {
         glfwWaitEventsTimeout(wait);
     } else {
@@ -764,52 +712,56 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetErrorCallback(JNIEnv * jEnv, jcla
     }
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_WL_TargetLastModal(JNIEnv *jEnv, jclass jClass) {
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowOpenFile(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder, jobject callback) {
+    jclass cls = jEnv->GetObjectClass(callback);
+    jmethodID mid = jEnv->GetMethodID(cls, "handle", "(JLjava/lang/String;)V");
+    auto sDialogCallback = jLambda<void(jlong,jstring)>(callback, mid);
 
-}
-
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFile(JNIEnv * jEnv, jclass jClass, jlong window,  jstring fileFilters, jstring initialFolder) {
     const char *sFileFilters = jEnv->GetStringUTFChars(fileFilters, NULL);
     const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
 
-    std::string file = showOpenFile((GLFWwindow*)window, sFileFilters, sInitialFolder);
+    showOpenFile((GLFWwindow*)window, sFileFilters, sInitialFolder, sDialogCallback);
 
     jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
     jEnv->ReleaseStringUTFChars(fileFilters, sFileFilters);
-
-    return file.empty() ? NULL : jEnv->NewStringUTF(file.c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenMultipleFiles(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder) {
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowOpenMultipleFiles(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder, jobject callback) {
+    jclass cls = jEnv->GetObjectClass(callback);
+    jmethodID mid = jEnv->GetMethodID(cls, "handle", "(JLjava/lang/String;)V");
+    auto sDialogCallback = jLambda<void(jlong,jstring)>(callback, mid);
+
     const char *sFileFilters = jEnv->GetStringUTFChars(fileFilters, NULL);
     const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
 
-    std::string files = showOpenMultipleFiles((GLFWwindow*)window, sFileFilters, sInitialFolder);
+    showOpenMultipleFiles((GLFWwindow*)window, sFileFilters, sInitialFolder, sDialogCallback);
 
     jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
     jEnv->ReleaseStringUTFChars(fileFilters, sFileFilters);
-
-    return files.empty() ? NULL : jEnv->NewStringUTF(files.c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowSaveFile(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder) {
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowSaveFile(JNIEnv * jEnv, jclass jClass, jlong window, jstring fileFilters, jstring initialFolder, jobject callback) {
+    jclass cls = jEnv->GetObjectClass(callback);
+    jmethodID mid = jEnv->GetMethodID(cls, "handle", "(JLjava/lang/String;)V");
+    auto sDialogCallback = jLambda<void(jlong,jstring)>(callback, mid);
+
     const char *sFileFilters = jEnv->GetStringUTFChars(fileFilters, NULL);
     const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
 
-    std::string file = showSaveFile((GLFWwindow*)window, sFileFilters, sInitialFolder);
+    showSaveFile((GLFWwindow*)window, sFileFilters, sInitialFolder, sDialogCallback);
 
     jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
     jEnv->ReleaseStringUTFChars(fileFilters, sFileFilters);
-
-    return file.empty() ? NULL : jEnv->NewStringUTF(file.c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_ShowOpenFolder(JNIEnv * jEnv, jclass jClass, jlong window, jstring initialFolder) {
+JNIEXPORT void JNICALL Java_flat_backend_WL_ShowOpenFolder(JNIEnv * jEnv, jclass jClass, jlong window, jstring initialFolder, jobject callback) {
+    jclass cls = jEnv->GetObjectClass(callback);
+    jmethodID mid = jEnv->GetMethodID(cls, "handle", "(JLjava/lang/String;)V");
+    auto sDialogCallback = jLambda<void(jlong,jstring)>(callback, mid);
+
     const char *sInitialFolder = jEnv->GetStringUTFChars(initialFolder, NULL);
 
-    std::string file = showOpenFolder((GLFWwindow*)window, sInitialFolder);
+    showOpenFolder((GLFWwindow*)window, sInitialFolder, sDialogCallback);
 
     jEnv->ReleaseStringUTFChars(initialFolder, sInitialFolder);
-
-    return file.empty() ? NULL : jEnv->NewStringUTF(file.c_str());
 }
