@@ -299,7 +299,7 @@ float FlatFont::getTextWidth(const char *str, int32 strLen, float scale, float s
         if (chr != '\n') {
             fvGlyph &glyph = getGlyph(chr);
 
-            w += (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl; // ceil((glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl);
+            w += (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
             prev = chr;
             f = 1;
         }
@@ -319,7 +319,7 @@ void FlatFont::getOffset(const char *str, int32 strLen, float scale, float spaci
 
         fvGlyph &glyph = getGlyph(chr);
 
-        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl; // ceil((glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl);
+        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
         if (w + advance > cursorX) {
             if (cursorX <= w + advance * 0.5) {
                 *width = w;
@@ -340,4 +340,72 @@ void FlatFont::getOffset(const char *str, int32 strLen, float scale, float spaci
     }
     *width = w;
     *index = pi;
+}
+
+void FlatFont::getOffsetSpace(const char *str, long strLen, float scale, float spacing, float cursorX,
+                              float *index, float *width) {
+    float scl = scale * spacing;
+
+    float w = 0;
+    int32 lastSpace = -1;
+    float lastSpaceW = -1;
+    int32 i = 0, f = 0, pi = 0;
+    uint32 chr = 0, pchr = 0;
+    while (FlatText::utf8loop(str, strLen, i, chr)) {
+        if (chr == '\n') continue;
+
+        fvGlyph &glyph = getGlyph(chr);
+
+        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        if (w + advance > cursorX) {
+            *width = lastSpace == -1 ? w : lastSpaceW;
+            *index = lastSpace == -1 ? pi : lastSpace;
+            return;
+        }
+        w += advance;
+        pchr = chr;
+        pi = i;
+        if (chr == ' ' || chr == '\t') {
+            lastSpace = i;
+            lastSpaceW = w;
+        }
+        f = 1;
+    }
+    *width = w;
+    *index = pi;
+}
+
+int FlatFont::countLineWrap(const char *str, long strLen, float scale, float spacing, float cursorX) {
+    float scl = scale * spacing;
+
+    int32 lines = 1;
+
+    float w = 0;
+    int32 lastSpace = -1;
+    int32 i = 0, f = 0;
+    uint32 chr = 0, pchr = 0;
+    while (FlatText::utf8loop(str, strLen, i, chr)) {
+        if (chr == '\n') {
+            lines++;
+            lastSpace = -1;
+            continue;
+        }
+
+        fvGlyph &glyph = getGlyph(chr);
+
+        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        if (w + advance > cursorX) {
+            lines++;
+            i = lastSpace == -1 ? i : lastSpace;
+            lastSpace = -1;
+            continue;
+        }
+        w += advance;
+        pchr = chr;
+        if (chr == ' ' || chr == '\t') {
+            lastSpace = i;
+        }
+        f = 1;
+    }
+    return lines;
 }

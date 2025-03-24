@@ -355,6 +355,38 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetBuffer
 
 /*
  * Class:     flat_backend_SVG
+ * Method:    FontGetOffsetSpace
+ * Signature: (JLjava/lang/String;FFF[F)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetSpace
+        (JNIEnv *, jclass, jlong, jstring, jfloat, jfloat, jfloat, jfloatArray cursor);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetOffsetBufferSpace
+ * Signature: (JLjava/nio/Buffer;IIFFF[F)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetSpaceBuffer
+        (JNIEnv *, jclass, jlong, jobject, jint, jint, jfloat, jfloat, jfloat, jfloatArray cursor);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetOffsetSpace
+ * Signature: (JLjava/lang/String;FFF[F)V
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetLineWrap
+        (JNIEnv *, jclass, jlong, jstring, jfloat, jfloat, jfloat);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetOffsetBufferSpace
+ * Signature: (JLjava/nio/Buffer;IIFFF[F)V
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetLineWrapBuffer
+        (JNIEnv *, jclass, jlong, jobject, jint, jint, jfloat, jfloat, jfloat);
+
+/*
+ * Class:     flat_backend_SVG
  * Method:    SetFont
  * Signature: (JJ)V
  */

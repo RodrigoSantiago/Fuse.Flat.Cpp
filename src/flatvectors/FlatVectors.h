@@ -58,7 +58,7 @@ public:
     FlatVectors();
     ~FlatVectors();
 private:
-    void ensureSpace(int32 vertex, int32 elements);
+    bool ensureSpace(int32 vertex, int32 elements);
     int32 addVertex(float x, float y, float u, float v);
     int32 addTriangle(int32 elA, int32 elB, int32 elC);
     bool equals(float x, float y);

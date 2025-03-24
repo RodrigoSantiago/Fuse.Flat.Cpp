@@ -66,6 +66,10 @@ public:
     float getTextWidth(const char* str, int32 strLen, float scale, float spacing);
 
     void getOffset(const char* str, int32 strLen, float scale, float spacing, float cursorX, int32 half, float* index, float* width);
+
+    void getOffsetSpace(const char* str, int32 strLen, float scale, float spacing, float cursorX, float* index, float* width);
+
+    int countLineWrap(const char* str, int32 strLen, float scale, float spacing, float maxWidth);
 };
 
 

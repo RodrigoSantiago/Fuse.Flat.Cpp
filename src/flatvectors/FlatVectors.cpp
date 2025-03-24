@@ -182,7 +182,7 @@ FlatVectors::~FlatVectors() {
     delete render;
 }
 
-void FlatVectors::ensureSpace(int32 vertex, int32 elements) {
+bool FlatVectors::ensureSpace(int32 vertex, int32 elements) {
     if (curDrwIndex > 0 && (
                             (curVtxIndex + vertex) * 2 >= render->getMaxVertices() ||
                             (curElmIndex + elements) * 3 >= render->getMaxElements() ||
@@ -191,6 +191,11 @@ void FlatVectors::ensureSpace(int32 vertex, int32 elements) {
         ) {
         flush();
     }
+    return !(
+            (curVtxIndex + vertex) * 2 >= render->getMaxVertices() ||
+            (curElmIndex + elements) * 3 >= render->getMaxElements() ||
+            (curDrwIndex + 1) >= render->getMaxUniforms()
+    );
 }
 
 int32 FlatVectors::addVertex(float x, float y, float u, float v) {
@@ -818,8 +823,6 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
     float scl = fontScale;
     float spc = fontSpacing;
 
-    float start = x;
-
     begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
 
     int32 p = 0, i = 0, f = 0;
@@ -839,7 +842,7 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
         }
 
         float kern = (f ? font->getKerning(prev, chr) : 0);
-        float advance = (glyph.advance + kern) * (scl * spc);//std::ceil((glyph.advance + kern) * (scl * spc));
+        float advance = (glyph.advance + kern) * (scl * spc);
 
         float px = x + kern * scl * spc;
         if (uv.x > -1) {
@@ -864,7 +867,11 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
                     uvH *= ha / hb;
                 }
 
-                ensureSpace(4, 2);
+                if (!ensureSpace(4, 2)) {
+                    end();
+                    flush();
+                    begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
+                }
                 int32 el0 = addVertex(x1, y1, uv.x, uv.y);
                 int32 el1 = addVertex(x2, y1, uv.x + uvW, uv.y);
                 int32 el2 = addVertex(x2, y2, uv.x + uvW, uv.y + uvH);

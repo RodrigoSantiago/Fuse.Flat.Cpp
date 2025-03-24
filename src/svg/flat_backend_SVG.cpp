@@ -279,6 +279,31 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetBuffer(JNIEnv * jEnv, 
     fnt(font)->getOffset(chars, length, scale, spacing, x, half, data, data + 1);
     jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
 }
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetSpace(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloat scale, jfloat spacing, jfloat x, jfloatArray cursor) {
+    const char *chars = jEnv->GetStringUTFChars(characters, 0);
+    float data[2] = {0, 1};
+    fnt(font)->getOffsetSpace(chars, jEnv->GetStringUTFLength(characters), scale, spacing, x, data, data + 1);
+    jEnv->ReleaseStringUTFChars(characters, chars);
+    jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
+
+}
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetSpaceBuffer(JNIEnv * jEnv, jclass jClass, jlong font, jobject characters, jint offset, jint length, jfloat scale, jfloat spacing, jfloat x, jfloatArray cursor) {
+    const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
+    float data[2] = {0, 1};
+    fnt(font)->getOffsetSpace(chars, length, scale, spacing, x, data, data + 1);
+    jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
+}
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetLineWrap(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloat scale, jfloat spacing, jfloat x) {
+    const char *chars = jEnv->GetStringUTFChars(characters, 0);
+    jint count = fnt(font)->countLineWrap(chars, jEnv->GetStringUTFLength(characters), scale, spacing, x);
+    jEnv->ReleaseStringUTFChars(characters, chars);
+    return count;
+
+}
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetLineWrapBuffer(JNIEnv * jEnv, jclass jClass, jlong font, jobject characters, jint offset, jint length, jfloat scale, jfloat spacing, jfloat x) {
+    const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
+    return fnt(font)->countLineWrap(chars, length, scale, spacing, x);
+}
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFont(JNIEnv * jEnv, jclass jClass, jlong context, jlong fontPaint) {
     ctx(context)->setFont(fntCtx(fontPaint));
 }
