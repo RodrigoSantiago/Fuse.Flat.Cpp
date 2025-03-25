@@ -11,15 +11,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Ellipse improvement">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Bitmap font fix. More fonts methods">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +140,7 @@
       <workItem from="1742561479809" duration="26525000" />
       <workItem from="1742642990999" duration="26511000" />
       <workItem from="1742747390483" duration="10301000" />
-      <workItem from="1742827964909" duration="3171000" />
+      <workItem from="1742827964909" duration="5049000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -379,7 +373,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742770785928</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="Bitmap font fix. More fonts methods">
+      <created>1742850609817</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1742850609817</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -397,7 +398,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Font alignment show be handle by interface" />
     <MESSAGE value="Better SDF Font shadow" />
     <MESSAGE value="Text width\height improvement" />
     <MESSAGE value="Fix alpha blending" />
@@ -422,7 +422,8 @@
     <MESSAGE value="More Linux Support. Modals Fix" />
     <MESSAGE value="Buffers limits" />
     <MESSAGE value="Ellipse improvement" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ellipse improvement" />
+    <MESSAGE value="Bitmap font fix. More fonts methods" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bitmap font fix. More fonts methods" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

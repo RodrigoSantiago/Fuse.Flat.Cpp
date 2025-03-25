@@ -5,8 +5,8 @@
 #include "flat_backend_WL.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <cstring>
-#include <string>
+#include <vector>
+#include <algorithm>
 #include "../system_base.h"
 
 static JavaVM *jvm;
@@ -42,6 +42,7 @@ static jLambda<void(jlong, jdouble, jdouble)> sScrollCallback;
 static jLambda<void(jlong, jobjectArray)> sDropCallback;
 static jLambda<void(jlong, jint, jint)> sJoystickCallback;
 static jLambda<void(jstring)> sErrorCallback;
+static std::vector<GLFWwindow*> glfwWindows;
 
 namespace {
     void WindowPosCallback(GLFWwindow *a, int b, int c) {
@@ -185,10 +186,13 @@ JNIEXPORT jlong JNICALL Java_flat_backend_WL_WindowCreate(JNIEnv * jEnv, jclass,
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_SAMPLES, samples);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, transparent ? GLFW_TRUE : GLFW_FALSE);
-    GLFWwindow *window = glfwCreateWindow(width, height, "", nullptr, nullptr);
+
+    GLFWwindow *share = glfwWindows.empty() ? nullptr : glfwWindows[0];
+    GLFWwindow *window = glfwCreateWindow(width, height, "", nullptr, share);
     if (window == nullptr) {
         return 0;
     }
+    glfwWindows.push_back(window);
 
     glfwMakeContextCurrent(window);
 
@@ -227,6 +231,10 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_WindowAssign(JNIEnv * jEnv, jclass j
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_WindowDestroy(JNIEnv * jEnv, jclass jClass, jlong win) {
+    auto it = std::find(glfwWindows.begin(), glfwWindows.end(), (GLFWwindow*) win);
+    if (it != glfwWindows.end()) {
+        glfwWindows.erase(it);
+    }
     glfwDestroyWindow((GLFWwindow*) win);
 }
 
