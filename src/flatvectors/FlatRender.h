@@ -19,9 +19,10 @@ class FlatRender {
     int32 curAA;
     GLuint curImage0;
     GLuint curImage1;
+    GLuint curImage2;
 
     GLuint shader;
-    GLint viewID, matID, texID, fntID, stcID, dbgID;
+    GLint viewID, matID, texID, fntID, emjID, stcID, dbgID;
 
     int32 maxUniforms;
     int32 maxElements;

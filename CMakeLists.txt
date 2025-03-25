@@ -47,7 +47,8 @@ list(APPEND SOURCE_FILES
         src/flatvectors/FlatText.cpp
         src/flatvectors/FlatCurves.cpp
         src/flatvectors/FlatImage.cpp
-        src/flatvectors/FlatStroke.cpp)
+        src/flatvectors/FlatStroke.cpp
+        src/flatvectors/FlatEmoji.cpp)
 
 add_library(Flat SHARED ${SOURCE_FILES})
 #add_executable(Flat ${SOURCE_FILES} main.cpp)

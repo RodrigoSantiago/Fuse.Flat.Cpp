@@ -7,7 +7,14 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <algorithm>
+#include <codecvt>
+#include <locale>
 #include "../system_base.h"
+
+std::wstring utf8ToUtf16(const std::string& utf8Str) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.from_bytes(utf8Str);
+}
 
 static JavaVM *jvm;
 static bool loadGlad = false;
@@ -23,6 +30,26 @@ JNIEnv* getJNIEnv() {
 
 void releaseJNIEnv() {
     jvm->DetachCurrentThread();
+}
+
+jstring newStringFromUTF8(JNIEnv* jEnv, const char* utf8) {
+    if (utf8 == NULL) {
+        return NULL;
+    }
+
+    std::wstring utf16Str = utf8ToUtf16(utf8);
+    return jEnv->NewString((const jchar*)utf16Str.c_str(), utf16Str.length());
+}
+
+std::string newUTF8FromString(JNIEnv* env, jstring javaString) {
+    const jchar* raw = env->GetStringChars(javaString, NULL);
+    jsize length = env->GetStringLength(javaString);
+
+    std::wstring result(reinterpret_cast<const wchar_t*>(raw), length);
+    env->ReleaseStringChars(javaString, raw);
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.to_bytes(result);
 }
 
 static jLambda<void(jlong, jint, jint)> sWindowPosCallback;
@@ -116,7 +143,7 @@ namespace {
             JNIEnv* env = getJNIEnv();
             jobjectArray arr = env->NewObjectArray(b, env->FindClass("java/lang/String"), nullptr);
             for (int i = 0; i < b; i++) {
-                jstring str = env->NewStringUTF(c[i]);
+                jstring str = newStringFromUTF8(env, c[i]);
                 env->SetObjectArrayElement(arr, i, str);
                 env->DeleteLocalRef(str);
             }
@@ -130,7 +157,7 @@ namespace {
     }
 
     void ErrorCallback(int a, const char* description) {
-        if (sErrorCallback)sErrorCallback.run(getJNIEnv()->NewStringUTF(description));
+        if (sErrorCallback)sErrorCallback.run(newStringFromUTF8(getJNIEnv(), description));
     }
 }
 
@@ -451,7 +478,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetInputMode(JNIEnv * jEnv, jclass j
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString(JNIEnv * jEnv, jclass jClass, jlong win, jstring clipboard) {
     jboolean isCopy;
     const char *sClipboard = jEnv->GetStringUTFChars(clipboard, &isCopy);
-    glfwSetClipboardString((GLFWwindow*) win, sClipboard);
+    glfwSetClipboardString((GLFWwindow*) win, newUTF8FromString(jEnv, clipboard).c_str());
     jEnv->ReleaseStringUTFChars(clipboard, sClipboard);
 }
 
@@ -460,7 +487,7 @@ JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString(JNIEnv * jEnv,
     if (clipboard == NULL) {
         return NULL;
     }
-    return jEnv->NewStringUTF(clipboard);
+    return newStringFromUTF8(jEnv, clipboard);
 }
 
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetKeyName(JNIEnv * jEnv, jclass jClass, jint key, jint scancode) {
@@ -468,7 +495,7 @@ JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetKeyName(JNIEnv * jEnv, jclass 
     if (name == NULL) {
         return NULL;
     }
-    return jEnv->NewStringUTF(name);
+    return newStringFromUTF8(jEnv, name);
 }
 
 JNIEXPORT jint JNICALL Java_flat_backend_WL_GetKey(JNIEnv * jEnv, jclass jClass, jlong win, jint key) {
@@ -547,7 +574,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_GetJoystickButtons(JNIEnv * jEnv, jc
 }
 
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetJoystickName(JNIEnv * jEnv, jclass jClass, jint joy) {
-    return jEnv->NewStringUTF(glfwGetJoystickName(joy));
+    return newStringFromUTF8(jEnv, glfwGetJoystickName(joy));
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetWindowPosCallback(JNIEnv * jEnv, jclass jClass, jobject callback) {

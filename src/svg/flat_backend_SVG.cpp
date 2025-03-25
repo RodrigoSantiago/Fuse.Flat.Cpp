@@ -12,6 +12,7 @@
 #include "../flatvectors/FlatFont.h"
 #include "../flatvectors/FlatFontRender.h"
 #include "../flatvectors/FlatImage.h"
+#include "../flatvectors/FlatEmoji.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -188,6 +189,22 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontLoad(JNIEnv * jEnv, jclass jCl
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload(JNIEnv * jEnv, jclass jClass, jlong font) {
     delete(fnt(font));
+}
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontCreateEmoji(JNIEnv * jEnv, jclass jClass, jint textureId, jintArray sequence) {
+    int32 length = jEnv->GetArrayLength(sequence);
+    int32* _data = (int32*) jEnv->GetPrimitiveArrayCritical(sequence, 0);
+
+    // Clear Before
+    delete FlatVectors::getEmoji();
+
+    FlatEmoji* emoji = new FlatEmoji(textureId, _data, length);
+    FlatVectors::setEmoji(emoji);
+    jEnv->ReleasePrimitiveArrayCritical(sequence, _data, 0);
+}
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontDestroyEmoji(JNIEnv * jEnv, jclass jClass) {
+    FlatEmoji* emoji = FlatVectors::getEmoji();
+    delete emoji;
+    FlatVectors::setEmoji(nullptr);
 }
 JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate(JNIEnv * jEnv, jclass jClass, jlong context, jlong font) {
     FlatFontRender* fontCtx = new FlatFontRender(fnt(font), ctx(context)->getRender());

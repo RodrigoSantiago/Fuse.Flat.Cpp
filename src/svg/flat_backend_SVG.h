@@ -234,6 +234,22 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload
 
 /*
  * Class:     flat_backend_SVG
+ * Method:    FontCreateEmoji
+ * Signature: (JI[I)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontCreateEmoji
+        (JNIEnv *, jclass, jint, jintArray);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontCreateEmoji
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontDestroyEmoji
+        (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_SVG
  * Method:    FontPaintCreate
  * Signature: (JJ)V
  */

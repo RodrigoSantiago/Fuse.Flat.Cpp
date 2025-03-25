@@ -13,6 +13,7 @@ class FlatVectors {
     static bool debug;
     static float* icos;
     static float* isin;
+    static FlatEmoji* emoji;
 
     FlatRender* render;
 
@@ -91,6 +92,8 @@ private:
     void pushToRender();
 public:
     static void setDebug(bool debug);
+    static FlatEmoji* getEmoji();
+    static void setEmoji(FlatEmoji* emoji);
 
     FlatRender* getRender();
 

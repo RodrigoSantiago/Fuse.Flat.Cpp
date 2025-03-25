@@ -22,7 +22,7 @@ void showOpenFile(GLFWwindow* window, const char *sFileFilters, const char *sIni
     std::thread localThread([=]() mutable {
         std::string nfdResult = NFD_OpenDialog(fileFilters.c_str(), initialFolder.c_str(), nativeWindow);
         if (!nfdResult.empty()) {
-            result.run(windowId, getJNIEnv()->NewStringUTF(nfdResult.c_str()));
+            result.run(windowId, newStringFromUTF8(getJNIEnv(), nfdResult.c_str()));
         } else {
             result.run(windowId, nullptr);
         }
@@ -41,7 +41,7 @@ void showOpenMultipleFiles(GLFWwindow* window, const char *sFileFilters, const c
     std::thread localThread([result, windowId, nativeWindow, fileFilters, initialFolder]() mutable {
         std::string nfdResult = NFD_OpenDialogMultiple(fileFilters.c_str(), initialFolder.c_str(), nativeWindow);
         if (!nfdResult.empty()) {
-            result.run(windowId, getJNIEnv()->NewStringUTF(nfdResult.c_str()));
+            result.run(windowId, newStringFromUTF8(getJNIEnv(), nfdResult.c_str()));
         } else {
             result.run(windowId, nullptr);
         }
@@ -61,7 +61,7 @@ void showSaveFile(GLFWwindow* window, const char *sFileFilters, const char *sIni
     std::thread localThread([result, windowId, nativeWindow, fileFilters, initialFolder]() mutable {
         std::string nfdResult = NFD_SaveDialog(fileFilters.c_str(), initialFolder.c_str(), nativeWindow);
         if (!nfdResult.empty()) {
-            result.run(windowId, getJNIEnv()->NewStringUTF(nfdResult.c_str()));
+            result.run(windowId, newStringFromUTF8(getJNIEnv(), nfdResult.c_str()));
         } else {
             result.run(windowId, nullptr);
         }
@@ -79,7 +79,7 @@ void showOpenFolder(GLFWwindow* window, const char *sInitialFolder, jLambda<void
     std::thread localThread([result, windowId, nativeWindow, initialFolder]() mutable {
         std::string nfdResult = NFD_PickFolder(initialFolder.c_str(), nativeWindow);
         if (!nfdResult.empty()) {
-            result.run(windowId, getJNIEnv()->NewStringUTF(nfdResult.c_str()));
+            result.run(windowId, newStringFromUTF8(getJNIEnv(), nfdResult.c_str()));
         } else {
             result.run(windowId, nullptr);
         }

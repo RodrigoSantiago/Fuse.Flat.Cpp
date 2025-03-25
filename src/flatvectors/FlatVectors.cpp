@@ -11,6 +11,7 @@
 #include "FlatFontRender.h"
 #include "FlatText.h"
 #include "FlatCurves.h"
+#include "FlatEmoji.h"
 
 // Local Private
 
@@ -135,6 +136,8 @@ float FlatVectors::fastSin(float a) {
 float* FlatVectors::icos = nullptr;
 
 float* FlatVectors::isin = nullptr;
+
+FlatEmoji* FlatVectors::emoji = nullptr;
 
 // Class
 
@@ -617,6 +620,14 @@ void FlatVectors::setDebug(bool debug) {
     FlatVectors::debug = debug;
 }
 
+FlatEmoji* FlatVectors::getEmoji() {
+    return emoji;
+}
+
+void FlatVectors::setEmoji(FlatEmoji* emoji) {
+    FlatVectors::emoji = emoji;
+}
+
 FlatRender* FlatVectors::getRender() {
     return render;
 }
@@ -738,6 +749,7 @@ void FlatVectors::setFontBlur(float fblur) {
 void FlatVectors::begin(fvPathOp pathOp, fvWindingRule pathRule) {
     paint.pathOp = pathOp;
     paint.pathRule = pathRule;
+    paint.emojis = 0;
     lastStep = CLOSE;
     if (paint.pathOp == STROKE) {
         strokeBegin();
@@ -825,7 +837,7 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
 
     begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
 
-    int32 p = 0, i = 0, f = 0;
+    int32 i = 0, f = 0;
     uint32 chr = 0, prev = 0;
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr == '\n') continue;
@@ -841,6 +853,42 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
             begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
         }
 
+        // ---- Emoji ---- //
+        if (chr != 0 && glyph.unicode == 0 && emoji != nullptr) {
+            fvPoint ptr = emoji->getEmojiUv(str, strLen, i, chr);
+            if (ptr.x >= 0) {
+                const float w = 64.0 / 4096.0;
+                float advance = font->getSize() * scl;
+
+                float x1 = x;
+                float y1 = y + advance;
+                float x2 = x + advance;
+                float y2 = y;
+
+                if (!ensureSpace(4, 2)) {
+                    end();
+                    flush();
+                    begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
+                }
+                paint.emojis = 1;
+                int32 el0 = addVertex(x1, y1, ptr.x - 2    , ptr.y + w - 2);
+                int32 el1 = addVertex(x2, y1, ptr.x + w - 2, ptr.y + w - 2);
+                int32 el2 = addVertex(x2, y2, ptr.x + w - 2, ptr.y - 2);
+                int32 el3 = addVertex(x1, y2, ptr.x - 2    , ptr.y - 2);
+                addTriangle(el0, el1, el2);
+                addTriangle(el0, el2, el3);
+
+                x += advance;
+                if (x > maxWidth) {
+                    break;
+                }
+                prev = 0;
+                f = 0;     // no kerning again
+                continue;
+            }
+        }
+
+        // ---- Character ---- //
         float kern = (f ? font->getKerning(prev, chr) : 0);
         float advance = (glyph.advance + kern) * (scl * spc);
 
@@ -887,7 +935,6 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
 
         prev = chr;
         f = 1;
-        p = i;
     }
     end();
 }

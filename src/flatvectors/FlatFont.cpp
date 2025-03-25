@@ -6,6 +6,8 @@
 #include "FlatRender.h"
 #include "FlatFontRender.h"
 #include "FlatText.h"
+#include "FlatVectors.h"
+#include "FlatEmoji.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
@@ -83,7 +85,7 @@ FlatFont::~FlatFont() {
 
 // Private
 
-void FlatFont::loadGlyph(int32 glyphIndex) {
+void FlatFont::loadGlyph(int32 glyphIndex, int32 unicode) {
     int c_x1, c_y1, c_x2, c_y2;
     stbtt_GetGlyphBitmapBox(&info, glyphIndex, scale, scale, &c_x1, &c_y1, &c_x2, &c_y2);
 
@@ -93,6 +95,7 @@ void FlatFont::loadGlyph(int32 glyphIndex) {
     fvGlyph& glyph = glyphs[glyphIndex];
     glyph.enabled = 1;
     glyph.advance = ax * scale;
+    glyph.unicode = glyphIndex == 0 ? 0 : unicode;
 
     if (c_x2 - c_x1 <= 0 || c_y2 - c_y1 <= 0) {
         glyph.x = 0;
@@ -168,6 +171,10 @@ int32 FlatFont::getCellH() {
 
 int32 FlatFont::getGlyphCount() {
     return this->glyphCount;
+}
+
+float FlatFont::getSize() {
+    return this->size;
 }
 
 void FlatFont::getAllCodePoints(std::vector<int32>& codepoints) {
@@ -258,7 +265,7 @@ fvGlyph& FlatFont::getGlyph(int32 unicode) {
     fvGlyph& glyph = glyphs[glyphIndex];
 
     if (!glyph.enabled) {
-        loadGlyph(glyphIndex);
+        loadGlyph(glyphIndex, unicode);
     }
 
     return glyph;
@@ -274,7 +281,7 @@ fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint
 
     fvGlyph& glyph = glyphs[glyphIndex];
     if (!glyph.enabled) {
-        loadGlyph(glyphIndex);
+        loadGlyph(glyphIndex, unicode);
     }
 
     if (!font->isGlyphRendered(glyphIndex)) {
@@ -289,6 +296,10 @@ fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint
     return glyph;
 }
 
+fvPoint FlatFont::getEmojiUv(const char* str, int32 strLen, int32& i, uint32& out) {
+    return {-1, -1};
+}
+
 float FlatFont::getTextWidth(const char *str, int32 strLen, float scale, float spacing) {
     float scl = scale * spacing;
 
@@ -298,8 +309,18 @@ float FlatFont::getTextWidth(const char *str, int32 strLen, float scale, float s
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr != '\n') {
             fvGlyph &glyph = getGlyph(chr);
-
-            w += (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
+            float advance;
+            if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
+                fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
+                if (p.x >= 0) {
+                    advance = size * scl;
+                } else {
+                    advance = (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
+                }
+            } else {
+                advance = (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
+            }
+            w += advance;
             prev = chr;
             f = 1;
         }
@@ -318,8 +339,17 @@ void FlatFont::getOffset(const char *str, int32 strLen, float scale, float spaci
         if (chr == '\n') continue;
 
         fvGlyph &glyph = getGlyph(chr);
-
-        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        float advance;
+        if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
+            fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
+            if (p.x >= 0) {
+                advance = size * scl;
+            } else {
+                advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+            }
+        } else {
+            advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        }
         if (w + advance > cursorX) {
             if (cursorX <= w + advance * 0.5) {
                 *width = w;
@@ -356,7 +386,18 @@ void FlatFont::getOffsetSpace(const char *str, long strLen, float scale, float s
 
         fvGlyph &glyph = getGlyph(chr);
 
-        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        float advance;
+        if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
+            fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
+            if (p.x >= 0) {
+                advance = size * scl;
+            } else {
+                advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+            }
+        } else {
+            advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        }
+
         if (w + advance > cursorX) {
             *width = lastSpace == -1 ? w : lastSpaceW;
             *index = lastSpace == -1 ? pi : lastSpace;
@@ -393,7 +434,18 @@ int FlatFont::countLineWrap(const char *str, long strLen, float scale, float spa
 
         fvGlyph &glyph = getGlyph(chr);
 
-        float advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        float advance;
+        if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
+            fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
+            if (p.x >= 0) {
+                advance = size * scl;
+            } else {
+                advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+            }
+        } else {
+            advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+        }
+
         if (w + advance > cursorX) {
             lines++;
             i = lastSpace == -1 ? i : lastSpace;

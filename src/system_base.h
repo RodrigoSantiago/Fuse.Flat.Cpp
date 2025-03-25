@@ -11,6 +11,8 @@
 
 JNIEnv* getJNIEnv();
 void releaseJNIEnv();
+jstring newStringFromUTF8(JNIEnv* jEnv, const char* urf8);
+std::string newUTF8FromString(JNIEnv* env, jstring javaString);
 
 template<class T>
 class jLambda;

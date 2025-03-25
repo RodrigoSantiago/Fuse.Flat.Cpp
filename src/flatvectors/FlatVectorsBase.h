@@ -17,6 +17,7 @@ class FlatPaints;
 class FlatText;
 class FlatCurves;
 class FlatImage;
+class FlatEmoji;
 
 enum fvPathStep {
     MOVE, LINE, CLOSE
@@ -72,6 +73,7 @@ typedef struct fvPaint {
     uint32 image0;
     int32 antiAlias;
     int32 convex;
+    int32 emojis;
     float transform[12];
 } fvPaint;
 

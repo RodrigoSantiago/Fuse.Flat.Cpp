@@ -34,7 +34,7 @@ public:
     ~FlatFont();
 
 private:
-    void loadGlyph(int32 glyphIndex);
+    void loadGlyph(int32 glyphIndex, int32 unicode);
 
     void renderGlyph(int32 glyphIndex);
 
@@ -49,6 +49,8 @@ public:
 
     int32 getGlyphCount();
 
+    float getSize();
+
     void getAllCodePoints(std::vector<int32>& codepoints);
 
     void getGlyphData(int32 codePoint, float* data);
@@ -60,6 +62,8 @@ public:
     fvGlyph& getGlyph(int32 unicode);
 
     fvGlyph& getGlyphRendered(FlatFontRender* font, int32 unicode, fvPoint* uv, int32* recreate);
+
+    fvPoint getEmojiUv(const char* str, int32 strLen, int32& i, uint32& out);
 
     float getKerning(int32 unicode1, int32 unicode2);
 

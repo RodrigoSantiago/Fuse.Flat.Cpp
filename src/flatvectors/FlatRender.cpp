@@ -4,6 +4,8 @@
 
 #include "FlatRender.h"
 #include "FlatFontRender.h"
+#include "FlatVectors.h"
+#include "FlatEmoji.h"
 #include <iostream>
 #include <cmath>
 
@@ -15,9 +17,11 @@ const char *vertexSource =
         "uniform mat3 mat;\n"
         "out vec2 oPos;\n"
         "out vec2 oTex;\n"
+        "out float oEmj;\n"
         "void main() {\n"
         "   oPos = iPos;\n"
-        "   oTex = iTex;\n"
+        "   oTex = iTex.x < 0 ? vec2(2 + iTex.x, 2 + iTex.y) : iTex;\n"
+        "   oEmj = iTex.x < 0 ? 1 : 0;\n"
         "   vec2 pos;\n"
         "   pos.x = iPos.x * mat[0][0] + iPos.y * mat[0][2] + mat[1][1];\n"
         "   pos.y = iPos.x * mat[0][1] + iPos.y * mat[1][0] + mat[1][2];\n"
@@ -40,9 +44,11 @@ const char *fragmentSource =
         "uniform int dbg;\n"
         "uniform sampler2D tex;\n"
         "uniform sampler2D fnt;\n"
+        "uniform sampler2D emj;\n"
         "uniform vec2 fntSize;\n"
         "in vec2 oPos;\n"
         "in vec2 oTex;\n"
+        "in float oEmj;\n"
         "float roundrect(vec2 pt, vec2 ext, float rad) {\n"
         "	 vec2 ext2 = ext - vec2(rad,rad);\n"
         "	 vec2 d = abs(pt) - ext2;\n"
@@ -69,6 +75,10 @@ const char *fragmentSource =
         "void main() {\n"
         "    if (stc == 1) {\n"
         "        FragColor = vec4(1);\n"
+        "    } else if (oEmj > 0 && dbg != 1) {\n"
+        "        vec4 emjCol = texture(emj, oTex);\n"
+        "        emjCol.a *= colors[0].a;\n"
+        "        FragColor = emjCol;\n"
         "    } else {\n"
         "        vec4 color = colors[0], texel = vec4(0);\n"
         "        if (data[3] > 0) {\n"
@@ -195,6 +205,7 @@ FlatRender::FlatRender() : paint(0), vertex(0), element(0), curAA(0), curImage0(
     matID = glGetUniformLocation(shader, "mat");
     texID = glGetUniformLocation(shader, "tex");
     fntID = glGetUniformLocation(shader, "fnt");
+    emjID = glGetUniformLocation(shader, "emj");
     stcID = glGetUniformLocation(shader, "stc");
     dbgID = glGetUniformLocation(shader, "dbg");
 
@@ -275,6 +286,7 @@ void FlatRender::begin(unsigned int32 width, unsigned int32 height, bool dbg) {
     glUniform2f(viewID, width, height);
     glUniform1i(texID, 0);
     glUniform1i(fntID, 1);
+    glUniform1i(emjID, 2);
     glUniform1i(stcID, 0);
     glUniform1i(dbgID, debug ? 1 : 0);
 
@@ -312,6 +324,11 @@ void FlatRender::end() {
 
     if (curImage1 != 0) {
         glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    if (curImage2 != 0) {
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -407,11 +424,22 @@ void FlatRender::flush(
                 glBindTexture(GL_TEXTURE_2D, curImage0);
             }
 
-            GLuint fntImg = curPaint.pathOp == TEXT && curPaint.font != nullptr ? curPaint.font->getImage() : 0;
+            GLuint fntImg = curPaint.pathOp == TEXT && curPaint.font != nullptr ?
+                    curPaint.font->getImage() : 0;
+
             if (curImage1 != fntImg) {
                 curImage1 = fntImg;
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, curImage1);
+            }
+
+            GLuint emjImg = curPaint.pathOp == TEXT && curPaint.emojis && FlatVectors::getEmoji() != nullptr ?
+                    FlatVectors::getEmoji()->getEmojiImage() : 0;
+
+            if (curImage2 != emjImg) {
+                curImage2 = emjImg;
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, curImage2);
             }
 
             if (debug) {
@@ -528,6 +556,10 @@ uint32 FlatRender::resizeFontTexture(uint32 oldImageID, int32 oldWidth, int32 ol
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, oldWidth, oldHeight, GL_RED, GL_UNSIGNED_BYTE, oldData);
 
     free(oldData);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    curImage2 = 0;
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
