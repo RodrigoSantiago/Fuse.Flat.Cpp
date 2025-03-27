@@ -5,6 +5,7 @@
 #include "flat_backend_SVG.h"
 #include <memory>
 
+#include "../java_base.h"
 #include "../flat_base_types.h"
 #include "../flatvectors/FlatVectorsBase.h"
 #include "../flatvectors/FlatVectors.h"
@@ -109,10 +110,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintBoxGradient(JNIEnv * jEnv, 
     }
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage(JNIEnv * jEnv, jclass jClass, jlong context, jint imageID, jint color, jfloatArray data, jint cycleMethod) {
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage(JNIEnv * jEnv, jclass jClass, jlong context, jint imageID, jint color, jfloatArray data, jint cycleMethod, jboolean nearest) {
     float* _data = (float*) jEnv->GetPrimitiveArrayCritical(data, 0);
     fvUniform uniform;
-    FlatPaints::setImagePaint(uniform, _data, color, cycleMethod);
+    FlatPaints::setImagePaint(uniform, _data, color, cycleMethod, nearest);
     ctx(context)->setColor(uniform, imageID);
     jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
 }
@@ -190,6 +191,9 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontLoad(JNIEnv * jEnv, jclass jCl
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload(JNIEnv * jEnv, jclass jClass, jlong font) {
     delete(fnt(font));
 }
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontSetEmojiEnabled(JNIEnv * jEnv, jclass jClass, jboolean enabled) {
+    FlatVectors::setEmojiRender(enabled);
+}
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontCreateEmoji(JNIEnv * jEnv, jclass jClass, jint textureId, jintArray sequence) {
     int32 length = jEnv->GetArrayLength(sequence);
     int32* _data = (int32*) jEnv->GetPrimitiveArrayCritical(sequence, 0);
@@ -246,6 +250,18 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints(JNIEnv * jEnv,
     std::vector<int32> data;
     fnt(font)->getAllCodePoints(data);
     jEnv->SetIntArrayRegion(codePoints, 0, size, data.data());
+}
+JNIEXPORT jstring JNICALL Java_flat_backend_SVG_FontGetName(JNIEnv * jEnv, jclass jClass, jlong font) {
+    return newStringFromUTF8(jEnv, fnt(font)->getName().c_str());
+}
+JNIEXPORT jboolean JNICALL Java_flat_backend_SVG_FontIsBold(JNIEnv * jEnv, jclass jClass, jlong font) {
+    return fnt(font)->isBold();
+}
+JNIEXPORT jboolean JNICALL Java_flat_backend_SVG_FontIsItalic(JNIEnv * jEnv, jclass jClass, jlong font) {
+    return fnt(font)->isItalic();
+}
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetWeight(JNIEnv * jEnv, jclass jClass, jlong font) {
+    return fnt(font)->getWeight();
 }
 JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetHeight(JNIEnv * jEnv, jclass jClass, jlong font) {
     jfloat height;

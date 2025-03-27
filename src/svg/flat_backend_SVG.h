@@ -107,10 +107,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintBoxGradient
 /*
  * Class:     flat_backend_SVG
  * Method:    SetPaintImage
- * Signature: (JII[FI)V
+ * Signature: (JII[FIZ)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage
-  (JNIEnv *, jclass, jlong, jint, jint, jfloatArray, jint);
+  (JNIEnv *, jclass, jlong, jint, jint, jfloatArray, jint, jboolean);
 
 /*
  * Class:     flat_backend_SVG
@@ -222,7 +222,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_RoundRect
  * Signature: ([BFI)J
  */
 JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontLoad
-        (JNIEnv *, jclass, jbyteArray, jfloat, jint);
+  (JNIEnv *, jclass, jbyteArray, jfloat, jint);
 
 /*
  * Class:     flat_backend_SVG
@@ -230,7 +230,15 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontLoad
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload
-        (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontSetEmojiEnabled
+ * Signature: (JZ)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_FontSetEmojiEnabled
+  (JNIEnv *, jclass, jboolean);
 
 /*
  * Class:     flat_backend_SVG
@@ -238,7 +246,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontUnload
  * Signature: (JI[I)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontCreateEmoji
-        (JNIEnv *, jclass, jint, jintArray);
+  (JNIEnv *, jclass, jint, jintArray);
 
 /*
  * Class:     flat_backend_SVG
@@ -246,7 +254,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontCreateEmoji
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontDestroyEmoji
-        (JNIEnv *, jclass);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     flat_backend_SVG
@@ -296,6 +304,38 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetGlyph
  */
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints
   (JNIEnv *, jclass, jlong, jintArray);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetName
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_flat_backend_SVG_FontGetName
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontIsBold
+ * Signature: (J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_flat_backend_SVG_FontIsBold
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontIsBold
+ * Signature: (J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_flat_backend_SVG_FontIsItalic
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetWeight
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetWeight
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     flat_backend_SVG

@@ -5,9 +5,8 @@
 #include <cmath>
 #include "FlatPack.h"
 
-FlatPack::FlatPack(int32 cellWidth, int32 cellHeight) {
-    this->cellWidth = cellWidth;
-    this->cellHeight = cellHeight;
+FlatPack::FlatPack(int32 cellWidth, int32 cellHeight, int32 maxWidth, int32 maxHeight)
+    : cellWidth(cellWidth), cellHeight(cellHeight), maxWidth(maxWidth), maxHeight(maxHeight) {
 
     int32 idealWidth = cellWidth * 4;
     int32 idealHeight = cellHeight * 2;
@@ -158,7 +157,7 @@ bool FlatPack::grow() {
         idealHeight = height * 2;
     }
 
-    if (idealWidth > 4096 || idealHeight > 4096) {
+    if (idealWidth > maxWidth || idealHeight > maxHeight) {
         return false;
     }
 

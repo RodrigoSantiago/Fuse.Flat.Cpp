@@ -15,6 +15,8 @@ typedef struct fvCell {
 } fvCell;
 
 class FlatPack {
+    int32 maxWidth;
+    int32 maxHeight;
     int32 cellWidth;
     int32 cellHeight;
     int32 width;
@@ -27,7 +29,7 @@ class FlatPack {
     std::vector<fvCell> matrix;
 
 public:
-    FlatPack(int32 cellWidth, int32 cellHeight);
+    FlatPack(int32 cellWidth, int32 cellHeight, int32 maxWidth, int32 maxHeight);
 
     ~FlatPack();
 private:

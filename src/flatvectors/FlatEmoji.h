@@ -40,13 +40,15 @@ namespace std {
 
 class FlatEmoji {
     GLuint image;
-    uint32 min;
-    uint32 max;
     std::unordered_map<UnicodeCollection, fvPoint> unicodes;
 public:
     FlatEmoji(GLuint image, int32* data, int32 length);
 
     ~FlatEmoji();
+
+    static bool isEmoji(uint32 chr);
+
+    static void readEmoji(const char *str, int32 strLen, int32 &i, uint32 &chr);
 
     GLuint getEmojiImage();
 

@@ -13,6 +13,7 @@ class FlatFont {
     unsigned char* data;
     stbtt_fontinfo info;
     bool valid;
+    std::string name;
 
     int32 sdf;
     float scale;
@@ -23,6 +24,10 @@ class FlatFont {
     float height;
 
     bool coded;
+    bool bold;
+    bool italic;
+    int32 weight;
+    int32 invalidGlyphIndex;
 
     int32 cellW;
     int32 cellH;
@@ -49,6 +54,14 @@ public:
 
     int32 getGlyphCount();
 
+    std::string getName();
+
+    bool isBold();
+
+    bool isItalic();
+
+    int32 getWeight();
+
     float getSize();
 
     void getAllCodePoints(std::vector<int32>& codepoints);
@@ -63,8 +76,6 @@ public:
 
     fvGlyph& getGlyphRendered(FlatFontRender* font, int32 unicode, fvPoint* uv, int32* recreate);
 
-    fvPoint getEmojiUv(const char* str, int32 strLen, int32& i, uint32& out);
-
     float getKerning(int32 unicode1, int32 unicode2);
 
     float getTextWidth(const char* str, int32 strLen, float scale, float spacing);
@@ -73,7 +84,7 @@ public:
 
     void getOffsetSpace(const char* str, int32 strLen, float scale, float spacing, float cursorX, float* index, float* width);
 
-    int countLineWrap(const char* str, int32 strLen, float scale, float spacing, float maxWidth);
+    int32 countLineWrap(const char* str, int32 strLen, float scale, float spacing, float maxWidth);
 };
 
 

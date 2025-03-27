@@ -2127,6 +2127,37 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_TransformFeedbackBegin
 JNIEXPORT void JNICALL Java_flat_backend_GL_TransformFeedbackEnd
   (JNIEnv *, jclass);
 
+/*
+ * Class:     flat_backend_GL
+ * Method:    GetMaxTextureSize
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxTextureSize
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_GL
+ * Method:    GetMaxElementsVertices
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxElementsVertices
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_GL
+ * Method:    GetMaxElementsIndices
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxElementsIndices
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_GL
+ * Method:    GetMaxUniformBlockSize
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxUniformBlockSize
+  (JNIEnv *, jclass);
 #ifdef __cplusplus
 }
 #endif

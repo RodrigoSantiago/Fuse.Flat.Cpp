@@ -373,7 +373,6 @@ std::string NFD_SaveDialog( const nfdchar_t *filterList,
 }
 
 std::string NFD_PickFolder( const nfdchar_t *defaultPath,
-                            nfdchar_t **outPath,
                             void* parentWindow )
 {
     GtkWidget *dialog;

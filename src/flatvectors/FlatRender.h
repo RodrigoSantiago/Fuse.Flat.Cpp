@@ -24,6 +24,7 @@ class FlatRender {
     GLuint shader;
     GLint viewID, matID, texID, fntID, emjID, stcID, dbgID;
 
+    int32 maxTextureSize;
     int32 maxUniforms;
     int32 maxElements;
     int32 maxVertices;
@@ -37,6 +38,7 @@ private:
 
 public:
     int32 renderAlign();
+    int32 getMaxTextureSize();
     int32 getMaxUniforms();
     int32 getMaxElements();
     int32 getMaxVertices();

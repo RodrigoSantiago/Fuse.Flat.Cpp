@@ -47,7 +47,7 @@ void FlatPaints::setColorPaint(fvUniform& uniform, int32 color) {
     uniform.cycleType = 0;
 }
 
-void FlatPaints::setImagePaint(fvUniform& uniform, float* affineImg, int32 color, int32 cycleMethod) {
+void FlatPaints::setImagePaint(fvUniform& uniform, float* affineImg, int32 color, int32 cycleMethod, int32 nearest) {
     uniform = {};
     uniform.type = 1;
     if (affineImg != 0) {
@@ -71,7 +71,7 @@ void FlatPaints::setImagePaint(fvUniform& uniform, float* affineImg, int32 color
     uniform.colors[1] = ((color >> 16) & 0xFF) / 255.f;
     uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
     uniform.colors[3] = ((color >> 0) & 0xFF) / 255.f;
-    uniform.cycleType = cycleMethod;
+    uniform.cycleType = cycleMethod + (nearest ? 3 : 0);
 }
 
 void FlatPaints::setLinearGradientPaint(fvUniform& uniform, float* affine,

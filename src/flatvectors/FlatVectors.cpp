@@ -133,11 +133,15 @@ float FlatVectors::fastSin(float a) {
     return FlatVectors::isin[(int32)a];
 }
 
+bool FlatVectors::debug = false;
+
 float* FlatVectors::icos = nullptr;
 
 float* FlatVectors::isin = nullptr;
 
 FlatEmoji* FlatVectors::emoji = nullptr;
+
+bool FlatVectors::emojiRender = false;
 
 // Class
 
@@ -614,10 +618,16 @@ void FlatVectors::pushToRender() {
     curDrwIndex++;
 }
 
-bool FlatVectors::debug = false;
-
 void FlatVectors::setDebug(bool debug) {
     FlatVectors::debug = debug;
+}
+
+void FlatVectors::setEmojiRender(bool enabled) {
+    FlatVectors::emojiRender = enabled;
+}
+
+bool FlatVectors::isEmojiRender() {
+    return emojiRender;
 }
 
 FlatEmoji* FlatVectors::getEmoji() {
@@ -842,6 +852,62 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr == '\n') continue;
 
+        // ---- Emoji ---- //
+        if (FlatEmoji::isEmoji(chr)) {
+            const float w = 64.0 / 4096.0;
+            float advance = font->getSize() * scl;
+
+            if (emoji != nullptr) {
+                fvPoint ptr = emoji->getEmojiUv(str, strLen, i, chr);
+                if (ptr.x >= 0) {
+                    float x1 = x;
+                    float y1 = y;
+                    float x2 = x + advance;
+                    float y2 = y + advance;
+
+                    if (x1 < maxWidth && y1 < maxHeight) {
+                        float uvW = w;
+                        float uvH = w;
+                        if (x2 > maxWidth) {
+                            float wb = x2 - x1;
+                            x2 = maxWidth;
+                            float wa = x2 - x1;
+                            uvW *= wa / wb;
+                        }
+                        if (y2 > maxHeight) {
+                            float hb = y2 - y1;
+                            y2 = maxHeight;
+                            float ha = y2 - y1;
+                            uvH *= ha / hb;
+                        }
+
+                        if (!ensureSpace(4, 2)) {
+                            end();
+                            flush();
+                            begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
+                        }
+                        paint.emojis = 1;
+                        int32 el0 = addVertex(x1, y1, ptr.x - 2, ptr.y - 2);
+                        int32 el1 = addVertex(x2, y1, ptr.x + uvW - 2, ptr.y - 2);
+                        int32 el2 = addVertex(x2, y2, ptr.x + uvW - 2, ptr.y + uvH - 2);
+                        int32 el3 = addVertex(x1, y2, ptr.x - 2, ptr.y + uvH - 2);
+                        addTriangle(el0, el1, el2);
+                        addTriangle(el0, el2, el3);
+                    }
+                }
+            }
+
+            x += advance;
+            if (x > maxWidth) {
+                break;
+            }
+            prev = 0;
+            f = 0;     // no kerning again
+            continue;
+        }
+
+        // ---- Character ---- //
+
         fvPoint uv;
         int32 recreate;
         fvGlyph& glyph = font->getGlyphRendered(fontRender, chr, &uv, &recreate);
@@ -853,42 +919,6 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
             begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
         }
 
-        // ---- Emoji ---- //
-        if (chr != 0 && glyph.unicode == 0 && emoji != nullptr) {
-            fvPoint ptr = emoji->getEmojiUv(str, strLen, i, chr);
-            if (ptr.x >= 0) {
-                const float w = 64.0 / 4096.0;
-                float advance = font->getSize() * scl;
-
-                float x1 = x;
-                float y1 = y + advance;
-                float x2 = x + advance;
-                float y2 = y;
-
-                if (!ensureSpace(4, 2)) {
-                    end();
-                    flush();
-                    begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
-                }
-                paint.emojis = 1;
-                int32 el0 = addVertex(x1, y1, ptr.x - 2    , ptr.y + w - 2);
-                int32 el1 = addVertex(x2, y1, ptr.x + w - 2, ptr.y + w - 2);
-                int32 el2 = addVertex(x2, y2, ptr.x + w - 2, ptr.y - 2);
-                int32 el3 = addVertex(x1, y2, ptr.x - 2    , ptr.y - 2);
-                addTriangle(el0, el1, el2);
-                addTriangle(el0, el2, el3);
-
-                x += advance;
-                if (x > maxWidth) {
-                    break;
-                }
-                prev = 0;
-                f = 0;     // no kerning again
-                continue;
-            }
-        }
-
-        // ---- Character ---- //
         float kern = (f ? font->getKerning(prev, chr) : 0);
         float advance = (glyph.advance + kern) * (scl * spc);
 

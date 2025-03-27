@@ -10,7 +10,7 @@
 class FlatPaints {
 public:
     static void setColorPaint(fvUniform& uniform, int32 color);
-    static void setImagePaint(fvUniform& uniform, float* affineImg, int32 color, int32 cycleMethod);
+    static void setImagePaint(fvUniform& uniform, float* affineImg, int32 color, int32 cycleMethod, int32 nearest);
     static void setLinearGradientPaint(fvUniform& uniform, float* affine,
                                        float x1, float y1, float x2, float y2,
                                        int32 count, float* stops, int32* colors, int32 cycleMethod);

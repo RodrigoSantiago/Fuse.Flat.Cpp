@@ -39,7 +39,9 @@ int32 _maxCodePoint(stbtt_fontinfo *info){
 
 // Class
 
-FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf) : valid(false), glyphs(0), glyphCount(0), coded(false) {
+FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf)
+    : valid(false), glyphs(0), glyphCount(0), coded(false), invalidGlyphIndex(0) {
+
     this->size = size;
     this->sdf = sdf;
     this->data = new unsigned char[length];
@@ -72,6 +74,30 @@ FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf) : vali
         if (cellH > ceil(this->height * 1.01 + PADDING2) * 2) {
             cellH = ceil(this->height * 1.01 + PADDING2);
         }
+        invalidGlyphIndex = stbtt_FindGlyphIndex(&info, 0xFFFD);
+
+        int len;
+        char * fName = stbtt_GetFontNameDefault(&info, &len);
+        name = std::string(fName, len);
+        STBTT_free(fName, &info.userdata);
+
+        int head_offset = stbtt__find_table(info.data, info.fontstart, "head");
+        if (head_offset != 0) {
+            unsigned short macStyle = ttUSHORT(info.data + head_offset + 44);
+            this->bold = (macStyle & 0x01) != 0;
+            this->italic = (macStyle & 0x02) != 0;
+        } else {
+            this->bold = false;
+            this->italic = false;
+        }
+
+        int os2TableOffset = stbtt__find_table(info.data, info.fontstart, "OS/2");
+        if (os2TableOffset != 0) {
+            this->weight = (info.data[os2TableOffset + 4] << 8) | info.data[os2TableOffset + 5];
+        } else {
+            this->weight = this->bold ? 7 : 5;
+        }
+
     }
 }
 
@@ -173,6 +199,22 @@ int32 FlatFont::getGlyphCount() {
     return this->glyphCount;
 }
 
+std::string FlatFont::getName() {
+    return this->name;
+}
+
+bool FlatFont::isBold() {
+    return this->bold;
+}
+
+bool FlatFont::isItalic() {
+    return this->italic;
+}
+
+int32 FlatFont::getWeight() {
+    return this->weight;
+}
+
 float FlatFont::getSize() {
     return this->size;
 }
@@ -262,6 +304,9 @@ void FlatFont::getMetrics(float *ascender, float *descender, float *height, floa
 
 fvGlyph& FlatFont::getGlyph(int32 unicode) {
     int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
+    if (unicode != 0 && glyphIndex == 0) {
+        glyphIndex = invalidGlyphIndex;
+    }
     fvGlyph& glyph = glyphs[glyphIndex];
 
     if (!glyph.enabled) {
@@ -278,6 +323,9 @@ float FlatFont::getKerning(int32 unicode1, int32 unicode2) {
 
 fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint *uv, int32 *recreate) {
     int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
+    if (unicode != 0 && glyphIndex == 0) {
+        glyphIndex = invalidGlyphIndex;
+    }
 
     fvGlyph& glyph = glyphs[glyphIndex];
     if (!glyph.enabled) {
@@ -296,10 +344,6 @@ fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint
     return glyph;
 }
 
-fvPoint FlatFont::getEmojiUv(const char* str, int32 strLen, int32& i, uint32& out) {
-    return {-1, -1};
-}
-
 float FlatFont::getTextWidth(const char *str, int32 strLen, float scale, float spacing) {
     float scl = scale * spacing;
 
@@ -307,23 +351,17 @@ float FlatFont::getTextWidth(const char *str, int32 strLen, float scale, float s
     int32 i = 0, f = 0;
     uint32 chr = 0, prev = 0;
     while (FlatText::utf8loop(str, strLen, i, chr)) {
-        if (chr != '\n') {
+        if (chr == '\n') continue;
+        if (FlatEmoji::isEmoji(chr)) {
+            FlatEmoji::readEmoji(str, strLen, i, chr);
+            w += size * scl;
+            f = 0;
+        } else {
             fvGlyph &glyph = getGlyph(chr);
-            float advance;
-            if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
-                fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
-                if (p.x >= 0) {
-                    advance = size * scl;
-                } else {
-                    advance = (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
-                }
-            } else {
-                advance = (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
-            }
-            w += advance;
-            prev = chr;
+            w += (glyph.advance + (f ? getKerning(prev, chr) : 0)) * scl;
             f = 1;
         }
+        prev = chr;
     }
     return w;
 }
@@ -338,17 +376,15 @@ void FlatFont::getOffset(const char *str, int32 strLen, float scale, float spaci
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr == '\n') continue;
 
-        fvGlyph &glyph = getGlyph(chr);
         float advance;
-        if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
-            fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
-            if (p.x >= 0) {
-                advance = size * scl;
-            } else {
-                advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
-            }
+        if (FlatEmoji::isEmoji(chr)) {
+            FlatEmoji::readEmoji(str, strLen, i, chr);
+            advance = size * scl;
+            f = 0;
         } else {
+            fvGlyph &glyph = getGlyph(chr);
             advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+            f = 1;
         }
         if (w + advance > cursorX) {
             if (cursorX <= w + advance * 0.5) {
@@ -366,13 +402,12 @@ void FlatFont::getOffset(const char *str, int32 strLen, float scale, float spaci
         w += advance;
         pchr = chr;
         pi = i;
-        f = 1;
     }
     *width = w;
     *index = pi;
 }
 
-void FlatFont::getOffsetSpace(const char *str, long strLen, float scale, float spacing, float cursorX,
+void FlatFont::getOffsetSpace(const char *str, int32 strLen, float scale, float spacing, float cursorX,
                               float *index, float *width) {
     float scl = scale * spacing;
 
@@ -384,18 +419,15 @@ void FlatFont::getOffsetSpace(const char *str, long strLen, float scale, float s
     while (FlatText::utf8loop(str, strLen, i, chr)) {
         if (chr == '\n') continue;
 
-        fvGlyph &glyph = getGlyph(chr);
-
         float advance;
-        if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
-            fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
-            if (p.x >= 0) {
-                advance = size * scl;
-            } else {
-                advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
-            }
+        if (FlatEmoji::isEmoji(chr)) {
+            FlatEmoji::readEmoji(str, strLen, i, chr);
+            advance = size * scl;
+            f = 0;
         } else {
+            fvGlyph &glyph = getGlyph(chr);
             advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+            f = 1;
         }
 
         if (w + advance > cursorX) {
@@ -410,13 +442,12 @@ void FlatFont::getOffsetSpace(const char *str, long strLen, float scale, float s
             lastSpace = i;
             lastSpaceW = w;
         }
-        f = 1;
     }
     *width = w;
     *index = pi;
 }
 
-int FlatFont::countLineWrap(const char *str, long strLen, float scale, float spacing, float cursorX) {
+int32 FlatFont::countLineWrap(const char *str, int32 strLen, float scale, float spacing, float cursorX) {
     float scl = scale * spacing;
 
     int32 lines = 1;
@@ -432,18 +463,15 @@ int FlatFont::countLineWrap(const char *str, long strLen, float scale, float spa
             continue;
         }
 
-        fvGlyph &glyph = getGlyph(chr);
-
         float advance;
-        if (chr != 0 && glyph.unicode == 0 && FlatVectors::getEmoji() != nullptr) {
-            fvPoint p = FlatVectors::getEmoji()->getEmojiUv(str, strLen, i, chr);
-            if (p.x >= 0) {
-                advance = size * scl;
-            } else {
-                advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
-            }
+        if (FlatEmoji::isEmoji(chr)) {
+            FlatEmoji::readEmoji(str, strLen, i, chr);
+            advance = size * scl;
+            f = 0;
         } else {
+            fvGlyph &glyph = getGlyph(chr);
             advance = (glyph.advance + (f ? getKerning(pchr, chr) : 0)) * scl;
+            f = 1;
         }
 
         if (w + advance > cursorX) {
@@ -457,7 +485,6 @@ int FlatFont::countLineWrap(const char *str, long strLen, float scale, float spa
         if (chr == ' ' || chr == '\t') {
             lastSpace = i;
         }
-        f = 1;
     }
     return lines;
 }

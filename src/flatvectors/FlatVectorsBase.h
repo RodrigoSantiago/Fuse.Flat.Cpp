@@ -6,6 +6,7 @@
 #define FLAT_FLATVECTORSBASE_H
 
 #include <vector>
+#include <iostream>
 #include "../flat_base_types.h"
 
 class FlatVectors;

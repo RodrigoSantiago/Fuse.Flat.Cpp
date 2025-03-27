@@ -19,7 +19,7 @@ FlatFontRender::FlatFontRender(FlatFont *font, FlatRender *render) : imageID(0) 
         renderState[i] = {-1, -1};
     }
 
-    pack = new FlatPack(font->getCellW(), font->getCellH());
+    pack = new FlatPack(font->getCellW(), font->getCellH(), render->getMaxTextureSize(), render->getMaxTextureSize());
 }
 
 FlatFontRender::~FlatFontRender() {

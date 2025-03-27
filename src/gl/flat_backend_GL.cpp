@@ -1516,3 +1516,27 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_TransformFeedbackBegin(JNIEnv * jEnv
 JNIEXPORT void JNICALL Java_flat_backend_GL_TransformFeedbackEnd(JNIEnv * jEnv, jclass jClass) {
     glEndTransformFeedback();
 }
+
+//---------------------------
+//    Limits
+//---------------------------
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxTextureSize(JNIEnv *, jclass) {
+    GLint maxTexSize;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+    return maxTexSize;
+}
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxElementsVertices(JNIEnv *, jclass) {
+    GLint maxVboSize;
+    glGetIntegerv(GL_MAX_ELEMENTS_VERTICES, &maxVboSize);
+    return maxVboSize;
+}
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxElementsIndices(JNIEnv *, jclass) {
+    GLint maxEboSize;
+    glGetIntegerv(GL_MAX_ELEMENTS_INDICES, &maxEboSize);
+    return maxEboSize;
+}
+JNIEXPORT jint JNICALL Java_flat_backend_GL_GetMaxUniformBlockSize(JNIEnv *, jclass) {
+    GLint maxUniformBlockSize;
+    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize);
+    return maxUniformBlockSize;
+}
