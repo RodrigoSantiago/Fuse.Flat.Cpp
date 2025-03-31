@@ -81,6 +81,14 @@ JNIEXPORT jint JNICALL Java_flat_backend_GL_GetClearStencil
 
 /*
  * Class:     flat_backend_GL
+ * Method:    SetReadBuffer
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_GL_SetReadBuffer
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     flat_backend_GL
  * Method:    ReadPixels
  * Signature: (IIIIIJ)V
  */

@@ -90,7 +90,9 @@ JNIEXPORT jint JNICALL Java_flat_backend_GL_GetClearStencil(JNIEnv * jEnv, jclas
     glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &mask);
     return mask;
 }
-
+JNIEXPORT void JNICALL Java_flat_backend_GL_SetReadBuffer(JNIEnv * jEnv, jclass jClass, jint faceFG) {
+    glReadBuffer(faceFG);
+}
 JNIEXPORT void JNICALL Java_flat_backend_GL_ReadPixels(JNIEnv * jEnv, jclass jClass, jint x, jint y, jint width, jint height, jint typeDT, jlong offset) {
     glReadPixels(x, y, width, height, GL_RGBA, typeDT, (void *) offset);
 }
@@ -124,6 +126,11 @@ JNIEXPORT void JNICALL Java_flat_backend_GL_ReadPixelsBuffer(JNIEnv * jEnv, jcla
 //---------------------------
 
 JNIEXPORT void JNICALL Java_flat_backend_GL_SetDebug (JNIEnv * jEnv, jclass jClass, jboolean debug) {
+    GLint redBits, greenBits, blueBits, alphaBits;
+    glGetIntegerv(GL_RED_BITS, &redBits);
+    glGetIntegerv(GL_GREEN_BITS, &greenBits);
+    glGetIntegerv(GL_BLUE_BITS, &blueBits);
+    glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
     glPolygonMode(GL_FRONT_AND_BACK, debug ? GL_LINE : GL_FILL);
 }
 

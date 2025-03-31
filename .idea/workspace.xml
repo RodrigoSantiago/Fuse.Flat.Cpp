@@ -11,7 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Emojis Improvement">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Stencil Fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" afterDir="false" />
     </list>
@@ -145,7 +145,7 @@
       <workItem from="1743000843873" duration="18080000" />
       <workItem from="1743098191771" duration="1895000" />
       <workItem from="1743286352562" duration="5222000" />
-      <workItem from="1743349847987" duration="7854000" />
+      <workItem from="1743349847987" duration="11159000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -406,7 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1743113690438</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Stencil Fix">
+      <created>1743383280480</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1743383280480</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -424,7 +431,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improved shadow" />
     <MESSAGE value="Text cursor improved" />
     <MESSAGE value="Text aliasing fix" />
     <MESSAGE value="Implemented some missing GL and GLFW methods" />
@@ -449,49 +455,50 @@
     <MESSAGE value="Shared Textures" />
     <MESSAGE value="Emojis!" />
     <MESSAGE value="Emojis Improvement" />
-    <option name="LAST_COMMIT_MESSAGE" value="Emojis Improvement" />
+    <MESSAGE value="Stencil Fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Stencil Fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>943</line>
+          <line>956</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>985</line>
+          <line>998</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>990</line>
+          <line>1003</line>
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1397</line>
+          <line>1410</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1406</line>
+          <line>1419</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1426</line>
+          <line>1439</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>994</line>
+          <line>1007</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1013</line>
+          <line>1026</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
       </breakpoints>
