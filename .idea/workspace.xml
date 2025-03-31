@@ -11,30 +11,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Emojis!">
-      <change afterPath="$PROJECT_DIR$/src/java_base.h" afterDir="false" />
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Emojis Improvement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/stb_truetype.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/stb_truetype.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatEmoji.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatEmoji.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatEmoji.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatEmoji.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPack.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPack.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPaints.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gl/flat_backend_GL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/gl/flat_backend_GL.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nfd/nfd_gtk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/nfd/nfd_gtk.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/system_base.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_base.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +143,9 @@
       <workItem from="1742827964909" duration="11920000" />
       <workItem from="1742912720239" duration="27313000" />
       <workItem from="1743000843873" duration="18080000" />
-      <workItem from="1743098191771" duration="686000" />
+      <workItem from="1743098191771" duration="1895000" />
+      <workItem from="1743286352562" duration="5222000" />
+      <workItem from="1743349847987" duration="7854000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -418,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742935849316</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="Emojis Improvement">
+      <created>1743113690438</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1743113690438</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -436,7 +424,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix alpha blending" />
     <MESSAGE value="Improved shadow" />
     <MESSAGE value="Text cursor improved" />
     <MESSAGE value="Text aliasing fix" />
@@ -461,49 +448,50 @@
     <MESSAGE value="Bitmap font fix. More fonts methods" />
     <MESSAGE value="Shared Textures" />
     <MESSAGE value="Emojis!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Emojis!" />
+    <MESSAGE value="Emojis Improvement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Emojis Improvement" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>937</line>
+          <line>943</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>979</line>
+          <line>985</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>984</line>
+          <line>990</line>
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1391</line>
+          <line>1397</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1400</line>
+          <line>1406</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1420</line>
+          <line>1426</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>988</line>
+          <line>994</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
-          <line>1007</line>
+          <line>1013</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
       </breakpoints>

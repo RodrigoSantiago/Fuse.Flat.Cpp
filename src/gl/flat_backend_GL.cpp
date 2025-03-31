@@ -20,6 +20,12 @@ void convertImageType(jint &_format, GLenum &dafaFormat, GLenum &dataType) {
     } else if (_format == GL_RGBA) {
         dafaFormat = GL_RGBA;
         dataType = GL_UNSIGNED_BYTE;
+    } else if (_format == GL_RGBA16F) {
+        dafaFormat = GL_RGBA;
+        dataType = GL_HALF_FLOAT;
+    } else if (_format == GL_RGBA32F) {
+        dafaFormat = GL_RGBA;
+        dataType = GL_FLOAT;
     } else if (_format == GL_DEPTH_COMPONENT32F) {
         dafaFormat = GL_DEPTH_COMPONENT;
         dataType = GL_FLOAT;
