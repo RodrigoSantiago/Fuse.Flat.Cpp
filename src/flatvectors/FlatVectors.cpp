@@ -644,10 +644,6 @@ FlatRender* FlatVectors::getRender() {
 
 void FlatVectors::beginFrame(int32 width, int32 height) {
     render->begin(width, height, debug);
-    std::cout << curVtxIndex << ", " << curElmIndex << ", "  << curDrwIndex << std::endl;
-    std::cout << curDrawBeginVtxIndex << ", " << curDrawBeginElmIndex << std::endl;
-    std::cout << curShapeBeginVtxIndex << ", " << curShapeBeginElmIndex << std::endl;
-    std::cout << elm.size() << ", " << vtx.size() << std::endl;
 }
 
 void FlatVectors::endFrame() {
