@@ -33,6 +33,7 @@ class FlatFont {
     int32 cellH;
     int32 glyphCount;
     fvGlyph* glyphs;
+    FlatFontRender* fontRender;
 
 public:
     FlatFont(const void* data, int32 length, float size, int32 sdf);
@@ -64,6 +65,12 @@ public:
 
     float getSize();
 
+    void setupRender(FlatRender* render);
+
+    int32 getImage();
+
+    int32 getCurrentAtlas(int32* w, int32* l);
+
     void getAllCodePoints(std::vector<int32>& codepoints);
 
     void getGlyphData(int32 codePoint, float* data);
@@ -74,7 +81,7 @@ public:
 
     fvGlyph& getGlyph(int32 unicode);
 
-    fvGlyph& getGlyphRendered(FlatFontRender* font, int32 unicode, fvPoint* uv, int32* recreate);
+    fvGlyph& getGlyphRendered(FlatRender* render, int32 unicode, fvPoint* uv, int32* recreate);
 
     float getKerning(int32 unicode1, int32 unicode2);
 

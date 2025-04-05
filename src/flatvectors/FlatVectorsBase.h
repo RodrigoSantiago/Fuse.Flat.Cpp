@@ -70,7 +70,7 @@ typedef struct fvPaint {
     fvWindingRule pathRule;
     int32 elements;
     int32 vertices;
-    FlatFontRender* font;
+    FlatFont* font;
     uint32 image0;
     int32 antiAlias;
     int32 convex;

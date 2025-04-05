@@ -40,7 +40,7 @@ int32 _maxCodePoint(stbtt_fontinfo *info){
 // Class
 
 FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf)
-    : valid(false), glyphs(0), glyphCount(0), coded(false), invalidGlyphIndex(0) {
+    : valid(false), fontRender(nullptr), glyphs(0), glyphCount(0), coded(false), invalidGlyphIndex(0) {
 
     this->size = size;
     this->sdf = sdf;
@@ -102,6 +102,9 @@ FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf)
 }
 
 FlatFont::~FlatFont() {
+    if (fontRender != nullptr) {
+        delete fontRender;
+    }
     for (int32 i = 0; i < glyphCount; ++i) {
         delete[] glyphs[i].cell;
     }
@@ -219,6 +222,20 @@ float FlatFont::getSize() {
     return this->size;
 }
 
+void FlatFont::setupRender(FlatRender* render) {
+    if (fontRender == nullptr) {
+        fontRender = new FlatFontRender(this, render->getMaxTextureSize(), render->getMaxTextureSize());
+    }
+}
+
+int32 FlatFont::getImage() {
+    return fontRender == nullptr ? 0 : fontRender->getImage();
+}
+
+int32 FlatFont::getCurrentAtlas(int32* w, int32* l) {
+    return fontRender == nullptr ? 0 : fontRender->getCurrentAtlas(w, l);
+}
+
 void FlatFont::getAllCodePoints(std::vector<int32>& codepoints) {
     if (!coded) {
         int32 max = _maxCodePoint(&info);
@@ -244,10 +261,10 @@ void FlatFont::getAllCodePoints(std::vector<int32>& codepoints) {
 void FlatFont::getGlyphData(int32 codePoint, float* data) {
     fvGlyph& glyph = getGlyph(codePoint);
     data[0] = glyph.advance;
-    data[1] = glyph.x;
-    data[2] = glyph.y;
-    data[3] = glyph.w;
-    data[4] = glyph.h;
+    data[1] = glyph.x + PADDING;
+    data[2] = glyph.y + PADDING;
+    data[3] = glyph.w - PADDING2;
+    data[4] = glyph.h - PADDING2;
 }
 
 void FlatFont::getGlyphShape(int32 unicode, std::vector<float> &polygon) {
@@ -264,29 +281,29 @@ void FlatFont::getGlyphShape(int32 unicode, std::vector<float> &polygon) {
             switch (v->type) {
                 case STBTT_vmove:
                     polygon.push_back(0);
-                    polygon.push_back(v->x / size);
-                    polygon.push_back(-v->y / size);
+                    polygon.push_back(v->x * scale);
+                    polygon.push_back(height - v->y * scale);
                     break;
                 case STBTT_vline:
                     polygon.push_back(1);
-                    polygon.push_back(v->x / size);
-                    polygon.push_back(-v->y / size);
+                    polygon.push_back(v->x * scale);
+                    polygon.push_back(height - v->y * scale);
                     break;
                 case STBTT_vcurve:
                     polygon.push_back(2);
-                    polygon.push_back(v->cx / size);
-                    polygon.push_back(-v->cy / size);
-                    polygon.push_back(v->x / size);
-                    polygon.push_back(-v->y / size);
+                    polygon.push_back(v->cx * scale);
+                    polygon.push_back(height - v->cy * scale);
+                    polygon.push_back(v->x * scale);
+                    polygon.push_back(height - v->y * scale);
                     break;
                 case STBTT_vcubic:
                     polygon.push_back(3);
-                    polygon.push_back(v->cx1 / size);
-                    polygon.push_back(-v->cy1 / size);
-                    polygon.push_back(v->cx / size);
-                    polygon.push_back(-v->cy / size);
-                    polygon.push_back(v->x / size);
-                    polygon.push_back(-v->y / size);
+                    polygon.push_back(v->cx1 * scale);
+                    polygon.push_back(height - v->cy1 * scale);
+                    polygon.push_back(v->cx * scale);
+                    polygon.push_back(height - v->cy * scale);
+                    polygon.push_back(v->x * scale);
+                    polygon.push_back(height - v->y * scale);
                     break;
             }
         }
@@ -321,7 +338,7 @@ float FlatFont::getKerning(int32 unicode1, int32 unicode2) {
     return stbtt_GetCodepointKernAdvance(&info, unicode1, unicode2) * scale;
 }
 
-fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint *uv, int32 *recreate) {
+fvGlyph& FlatFont::getGlyphRendered(FlatRender* render, int32 unicode, fvPoint *uv, int32 *recreate) {
     int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
     if (unicode != 0 && glyphIndex == 0) {
         glyphIndex = invalidGlyphIndex;
@@ -332,15 +349,15 @@ fvGlyph& FlatFont::getGlyphRendered(FlatFontRender *font, int32 unicode, fvPoint
         loadGlyph(glyphIndex, unicode);
     }
 
-    if (!font->isGlyphRendered(glyphIndex)) {
+    if (!fontRender->isGlyphRendered(glyphIndex)) {
         if (glyph.cell == nullptr) {
             renderGlyph(glyphIndex);
         }
 
-        *recreate = font->renderGlyph(glyph, glyphIndex);
+        *recreate = fontRender->renderGlyph(render, glyph, glyphIndex);
     }
 
-    (*uv) = font->getUv(glyphIndex);
+    (*uv) = fontRender->getUv(glyphIndex);
     return glyph;
 }
 

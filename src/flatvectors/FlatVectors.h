@@ -108,7 +108,7 @@ public:
     void setStroke(FlatStroke& stroke);
     void setTransform(float m00, float m10, float m01, float m11, float m02, float m12);
     void setAntiAliasing(int32 enabled);
-    void setFont(FlatFontRender* fontRender);
+    void setFont(FlatFont* font);
     void setFontScale(float fscale);
     void setFontSpacing(float fspacing);
     void setFontBlur(float fblur);

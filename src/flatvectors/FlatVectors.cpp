@@ -598,7 +598,7 @@ void FlatVectors::pushToRender() {
     fvUniform push = uniform;
 
     if (paint.pathOp == TEXT) {
-        if (paint.font->getFont()->isSdf()) {
+        if (paint.font->isSdf()) {
             push.extra[3] = fontBlur;
         } else {
             push.extra[3] = -1;
@@ -644,6 +644,10 @@ FlatRender* FlatVectors::getRender() {
 
 void FlatVectors::beginFrame(int32 width, int32 height) {
     render->begin(width, height, debug);
+    std::cout << curVtxIndex << ", " << curElmIndex << ", "  << curDrwIndex << std::endl;
+    std::cout << curDrawBeginVtxIndex << ", " << curDrawBeginElmIndex << std::endl;
+    std::cout << curShapeBeginVtxIndex << ", " << curShapeBeginElmIndex << std::endl;
+    std::cout << elm.size() << ", " << vtx.size() << std::endl;
 }
 
 void FlatVectors::endFrame() {
@@ -740,8 +744,8 @@ void FlatVectors::setAntiAliasing(int32 enabled) {
     paint.antiAlias = enabled;
 }
 
-void FlatVectors::setFont(FlatFontRender *fontRender) {
-    paint.font = fontRender;
+void FlatVectors::setFont(FlatFont *font) {
+    paint.font = font;
 }
 
 void FlatVectors::setFontScale(float fscale) {
@@ -840,8 +844,9 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
     if (maxHeight == 0) maxHeight = 99999;
     else maxHeight = y + maxHeight;
 
-    FlatFontRender* fontRender = paint.font;
-    FlatFont* font = fontRender->getFont();
+    FlatFont* font = paint.font;
+    font->setupRender(render);
+
     float scl = fontScale;
     float spc = fontSpacing;
 
@@ -910,12 +915,12 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
 
         fvPoint uv;
         int32 recreate;
-        fvGlyph& glyph = font->getGlyphRendered(fontRender, chr, &uv, &recreate);
+        fvGlyph& glyph = font->getGlyphRendered(render, chr, &uv, &recreate);
         if (recreate == 2) {
             end();
             flush();
 
-            font->getGlyphRendered(fontRender, chr, &uv, &recreate);
+            font->getGlyphRendered(render, chr, &uv, &recreate);
             begin(fvPathOp::TEXT, fvWindingRule::EVEN_ODD);
         }
 

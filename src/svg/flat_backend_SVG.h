@@ -258,26 +258,10 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontDestroyEmoji
 
 /*
  * Class:     flat_backend_SVG
- * Method:    FontPaintCreate
- * Signature: (JJ)V
- */
-JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate
-  (JNIEnv *, jclass, jlong, jlong);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    FontPaintDestroy
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontPaintDestroy
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     flat_backend_SVG
- * Method:    FontPaintGetAtlas
+ * Method:    FontGetAtlas
  * Signature: (J[I)V
  */
-JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas
+JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontGetAtlas
   (JNIEnv *, jclass, jlong, jintArray);
 
 /*

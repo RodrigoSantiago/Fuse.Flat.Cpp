@@ -9,9 +9,8 @@
 #include "FlatRender.h"
 #include "FlatPack.h"
 
-FlatFontRender::FlatFontRender(FlatFont *font, FlatRender *render) : imageID(0) {
+FlatFontRender::FlatFontRender(FlatFont *font, int32 maxWidth, int32 maxHeight) : imageID(0) {
     this->font = font;
-    this->render = render;
 
     int32 len = font->getGlyphCount();
     renderState = new fvPoint [len];
@@ -19,11 +18,14 @@ FlatFontRender::FlatFontRender(FlatFont *font, FlatRender *render) : imageID(0) 
         renderState[i] = {-1, -1};
     }
 
-    pack = new FlatPack(font->getCellW(), font->getCellH(), render->getMaxTextureSize(), render->getMaxTextureSize());
+    pack = new FlatPack(font->getCellW(), font->getCellH(), maxWidth, maxHeight);
 }
 
 FlatFontRender::~FlatFontRender() {
-    render->destroyFontTexture(imageID);
+    if (imageID != 0) {
+        GLuint imgID = imageID;
+        glDeleteTextures(1, &imgID);
+    }
     delete[] renderState;
     delete pack;
 }
@@ -32,7 +34,7 @@ FlatFont* FlatFontRender::getFont() {
     return font;
 }
 
-int32 FlatFontRender::renderGlyph(fvGlyph& glyph, int32 glyphIndex) {
+int32 FlatFontRender::renderGlyph(FlatRender* render, fvGlyph& glyph, int32 glyphIndex) {
     int32 width = (int32) ceil(glyph.w);
     int32 height = (int32) ceil(glyph.h);
 

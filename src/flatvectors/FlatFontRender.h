@@ -9,20 +9,19 @@
 
 class FlatFontRender {
     FlatFont* font;
-    FlatRender* render;
 
     FlatPack* pack;
     fvPoint* renderState;
     uint32 imageID;
 
 public:
-    FlatFontRender(FlatFont* font, FlatRender* render);
+    FlatFontRender(FlatFont* font, int32 maxWidth, int32 maxHeight);
 
     ~FlatFontRender();
 
     FlatFont* getFont();
 
-    int32 renderGlyph(fvGlyph& glyph, int32 glyphIndex);
+    int32 renderGlyph(FlatRender* render, fvGlyph& glyph, int32 glyphIndex);
 
     bool isGlyphRendered(int32 glyphIndex);
 

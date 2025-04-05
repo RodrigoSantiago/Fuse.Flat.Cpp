@@ -3,6 +3,7 @@
 //
 
 #include "FlatRender.h"
+#include "FlatFont.h"
 #include "FlatFontRender.h"
 #include "FlatVectors.h"
 #include "FlatEmoji.h"
@@ -230,7 +231,7 @@ FlatRender::FlatRender() : paint(0), vertex(0), element(0), curAA(0), curImage0(
 }
 
 FlatRender::~FlatRender() {
-    glDeleteBuffers(1, &vao);
+    glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
     glDeleteBuffers(1, &ubo);

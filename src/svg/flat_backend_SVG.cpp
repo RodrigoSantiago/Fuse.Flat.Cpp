@@ -25,10 +25,6 @@ FlatVectors* ctx(jlong ctx) {
 FlatFont* fnt(jlong ctx) {
     return  reinterpret_cast<FlatFont*>(ctx);
 }
-
-FlatFontRender* fntCtx(jlong ctx) {
-    return  reinterpret_cast<FlatFontRender*>(ctx);
-}
 //---------------------------
 //         Context
 //---------------------------
@@ -210,16 +206,9 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontDestroyEmoji(JNIEnv * jEnv, jcl
     delete emoji;
     FlatVectors::setEmoji(nullptr);
 }
-JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintCreate(JNIEnv * jEnv, jclass jClass, jlong context, jlong font) {
-    FlatFontRender* fontCtx = new FlatFontRender(fnt(font), ctx(context)->getRender());
-    return reinterpret_cast<jlong>(fontCtx);
-}
-JNIEXPORT void JNICALL Java_flat_backend_SVG_FontPaintDestroy(JNIEnv * jEnv, jclass jClass, jlong fontPaint) {
-    delete(fntCtx(fontPaint));
-}
-JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontPaintGetAtlas(JNIEnv * jEnv, jclass jClass, jlong fontPaint, jintArray size) {
+JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontGetAtlas(JNIEnv * jEnv, jclass jClass, jlong font, jintArray size) {
     int32 w, h;
-    int32 imageID = fntCtx(fontPaint)->getCurrentAtlas(&w, &h);
+    int32 imageID = fnt(font)->getCurrentAtlas(&w, &h);
 
     jint imageInfo[2];
     imageInfo[0] = w;
@@ -241,9 +230,9 @@ JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape(JNIEnv * j
     }
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetGlyph(JNIEnv * jEnv, jclass jClass, jlong font, jint codePoint, jfloatArray glyph) {
-    float data[8];
+    float data[5];
     fnt(font)->getGlyphData(codePoint, data);
-    jEnv->SetFloatArrayRegion(glyph, 0, 8, (jfloat *)data);
+    jEnv->SetFloatArrayRegion(glyph, 0, 5, (jfloat *)data);
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetAllCodePoints(JNIEnv * jEnv, jclass jClass, jlong font, jintArray codePoints) {
     jsize size = jEnv->GetArrayLength(codePoints);
@@ -337,8 +326,8 @@ JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetLineWrapBuffer(JNIEnv * jEnv
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
     return fnt(font)->countLineWrap(chars, length, scale, spacing, x);
 }
-JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFont(JNIEnv * jEnv, jclass jClass, jlong context, jlong fontPaint) {
-    ctx(context)->setFont(fntCtx(fontPaint));
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFont(JNIEnv * jEnv, jclass jClass, jlong context, jlong font) {
+    ctx(context)->setFont(fnt(font));
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontScale(JNIEnv * jEnv, jclass jClass, jlong context, jfloat scale) {
     ctx(context)->setFontScale(scale);
