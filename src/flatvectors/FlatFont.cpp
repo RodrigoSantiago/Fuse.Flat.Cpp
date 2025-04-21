@@ -321,7 +321,7 @@ void FlatFont::getMetrics(float *ascender, float *descender, float *height, floa
 
 fvGlyph& FlatFont::getGlyph(int32 unicode) {
     int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
-    if (unicode != 0 && glyphIndex == 0) {
+    if (unicode != 0 && unicode != '\t' && glyphIndex == 0) {
         glyphIndex = invalidGlyphIndex;
     }
     fvGlyph& glyph = glyphs[glyphIndex];
@@ -340,7 +340,7 @@ float FlatFont::getKerning(int32 unicode1, int32 unicode2) {
 
 fvGlyph& FlatFont::getGlyphRendered(FlatRender* render, int32 unicode, fvPoint *uv, int32 *recreate) {
     int32 glyphIndex = stbtt_FindGlyphIndex(&info, unicode);
-    if (unicode != 0 && glyphIndex == 0) {
+    if (unicode != 0 && unicode != '\t' && glyphIndex == 0) {
         glyphIndex = invalidGlyphIndex;
     }
 

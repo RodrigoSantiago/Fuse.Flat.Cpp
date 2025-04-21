@@ -217,6 +217,22 @@ JNIEXPORT jint JNICALL Java_flat_backend_WL_GetClientHeight
 
 /*
  * Class:     flat_backend_WL
+ * Method:    GetMonitorWidth
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_WL_GetMonitorWidth
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    GetMonitorHeight
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_flat_backend_WL_GetMonitorHeight
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_WL
  * Method:    GetPhysicalWidth
  * Signature: (J)D
  */

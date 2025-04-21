@@ -385,6 +385,26 @@ JNIEXPORT jint JNICALL Java_flat_backend_WL_GetClientHeight(JNIEnv * jEnv, jclas
     return h;
 }
 
+JNIEXPORT jint JNICALL Java_flat_backend_WL_GetMonitorWidth(JNIEnv * jEnv, jclass jClass, jlong win) {
+    GLFWwindow* window = (GLFWwindow*) win;
+
+    int pw, ph, px, py;
+    GLFWmonitor* monitor = findMonitor(window);
+    glfwGetMonitorWorkarea(monitor, &px, &py, &pw, &ph);
+
+    return pw;
+}
+
+JNIEXPORT jint JNICALL Java_flat_backend_WL_GetMonitorHeight(JNIEnv * jEnv, jclass jClass, jlong win) {
+    GLFWwindow* window = (GLFWwindow*) win;
+
+    int pw, ph, px, py;
+    GLFWmonitor* monitor = findMonitor(window);
+    glfwGetMonitorWorkarea(monitor, &px, &py, &pw, &ph);
+
+    return ph;
+}
+
 JNIEXPORT jdouble JNICALL Java_flat_backend_WL_GetPhysicalWidth(JNIEnv * jEnv, jclass jClass, jlong win) {
     GLFWwindow* window = (GLFWwindow*) win;
 
