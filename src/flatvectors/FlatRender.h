@@ -17,6 +17,7 @@ class FlatRender {
 
     bool debug;
     int32 curAA;
+    fvBlendMode curBm;
     GLuint curImage0;
     GLuint curImage1;
     GLuint curImage2;

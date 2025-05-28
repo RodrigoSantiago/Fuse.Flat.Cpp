@@ -114,6 +114,9 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage(JNIEnv * jEnv, jclass
     jEnv->ReleasePrimitiveArrayCritical(data, _data, 0);
 }
 
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetBlendMode(JNIEnv * jEnv, jclass jClass, jlong context, jint blendMode) {
+    ctx(context)->setBlendMode((fvBlendMode) blendMode);
+}
 //---------------------------
 //         Transforms
 //---------------------------

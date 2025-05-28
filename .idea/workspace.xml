@@ -11,18 +11,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="ReadBuffer">
+    <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="Monitor Size. Tab fix.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFontRender.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +155,16 @@
       <workItem from="1743349847987" duration="12438000" />
       <workItem from="1743431240306" duration="1375000" />
       <workItem from="1743772271482" duration="2872000" />
-      <workItem from="1743864901338" duration="6577000" />
+      <workItem from="1743864901338" duration="7740000" />
+      <workItem from="1744140255778" duration="2715000" />
+      <workItem from="1745241241499" duration="1320000" />
+      <workItem from="1745700266622" duration="774000" />
+      <workItem from="1747687189994" duration="2173000" />
+      <workItem from="1747760852977" duration="5187000" />
+      <workItem from="1747836622955" duration="1803000" />
+      <workItem from="1748093518952" duration="4359000" />
+      <workItem from="1748192732140" duration="1141000" />
+      <workItem from="1748435487821" duration="843000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -439,7 +446,28 @@
       <option name="project" value="LOCAL" />
       <updated>1743392387255</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Some segment fault fix">
+      <created>1743881052762</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1743881052763</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Some segments fault fix">
+      <created>1743881513957</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1743881513957</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Monitor Size. Tab fix.">
+      <created>1745241398085</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1745241398085</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -457,9 +485,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Text aliasing fix" />
-    <MESSAGE value="Implemented some missing GL and GLFW methods" />
-    <MESSAGE value="Empty Shapes fix" />
     <MESSAGE value="Better paint JNI methods" />
     <MESSAGE value="Image Pattern CycleMethod" />
     <MESSAGE value="Painters improvement" />
@@ -482,7 +507,10 @@
     <MESSAGE value="Emojis Improvement" />
     <MESSAGE value="Stencil Fix" />
     <MESSAGE value="ReadBuffer" />
-    <option name="LAST_COMMIT_MESSAGE" value="ReadBuffer" />
+    <MESSAGE value="Some segment fault fix" />
+    <MESSAGE value="Some segments fault fix" />
+    <MESSAGE value="Monitor Size. Tab fix." />
+    <option name="LAST_COMMIT_MESSAGE" value="Monitor Size. Tab fix." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -496,16 +524,6 @@
           <url>file://$PROJECT_DIR$/src/gl/flat_backend_GL.cpp</url>
           <line>992</line>
           <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/wl/flat_backend_WL.cpp</url>
-          <line>260</line>
-          <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/wl/flat_backend_WL.cpp</url>
-          <line>209</line>
-          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

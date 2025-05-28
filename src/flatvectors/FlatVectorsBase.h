@@ -40,6 +40,22 @@ enum fvWindingRule {
     EVEN_ODD, NON_ZERO
 };
 
+enum fvBlendMode {
+    CLEAR,
+    SRC,
+    DST,
+    SRC_OVER,
+    DST_OVER,
+    SRC_IN,
+    DST_IN,
+    SRC_OUT,
+    DST_OUT,
+    SRC_ATOP,
+    DST_ATOP,
+    XOR,
+    ADD, SUB, MUL, LIGHTEN, DARKEN
+};
+
 typedef struct fvPoint {
     float x;
     float y;
@@ -68,6 +84,7 @@ typedef struct fvUniform {
 typedef struct fvPaint {
     fvPathOp pathOp;
     fvWindingRule pathRule;
+    fvBlendMode blendMode;
     int32 elements;
     int32 vertices;
     FlatFont* font;

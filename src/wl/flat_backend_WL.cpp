@@ -559,7 +559,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_DestroyCursor(JNIEnv * jEnv, jclass 
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetCursor(JNIEnv * jEnv, jclass jClass, jlong win, jlong cursor) {
-    glfwSetCursor((GLFWwindow*) win, (GLFWcursor *) cursor);
+    glfwSetCursor((GLFWwindow *) win, (GLFWcursor *) cursor);
 }
 
 JNIEXPORT jint JNICALL Java_flat_backend_WL_JoystickPresent(JNIEnv * jEnv, jclass jClass, jint joy) {

@@ -114,6 +114,14 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetPaintImage
 
 /*
  * Class:     flat_backend_SVG
+ * Method:    SetBlendMode
+ * Signature: (JI)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_SetBlendMode
+  (JNIEnv *, jclass, jlong, jint);
+
+/*
+ * Class:     flat_backend_SVG
  * Method:    TransformIdentity
  * Signature: (J)V
  */

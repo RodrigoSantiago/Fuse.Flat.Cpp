@@ -180,6 +180,7 @@ FlatVectors::FlatVectors() : paint(), uniform(), stroke() {
     paint.transform[3] = 1;
     paint.transform[4] = 0;
     paint.transform[5] = 0;
+    paint.blendMode = fvBlendMode::SRC_OVER;
     scale = maxscale(paint.transform);
 
     render = new FlatRender();
@@ -756,6 +757,10 @@ void FlatVectors::setFontBlur(float fblur) {
     fontBlur = fblur < 0 ? 0 : fblur > 1 ? 1 : fblur;
 }
 
+void FlatVectors::setBlendMode(fvBlendMode blendMode) {
+    paint.blendMode = blendMode;
+}
+
 void FlatVectors::begin(fvPathOp pathOp, fvWindingRule pathRule) {
     paint.pathOp = pathOp;
     paint.pathRule = pathRule;
@@ -1005,7 +1010,7 @@ void FlatVectors::ellipse(float x, float y, float width, float height, bool fill
 void FlatVectors::roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4, bool fill) {
     begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
 
-    float max = scale * std::min(width, height) / 2;
+    float max = std::min(width, height) / 2;
     c1 = std::min(max, c1);
     c2 = std::min(max, c2);
     c3 = std::min(max, c3);

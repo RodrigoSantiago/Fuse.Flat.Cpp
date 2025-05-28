@@ -162,6 +162,105 @@ void _render_triangles(int32 pos, int32 length) {
     glDrawElements(GL_TRIANGLES, (GLsizei) (length), GL_UNSIGNED_INT, (void*) (pos * sizeof(int32)));
 }
 
+void _setBlendMode(fvBlendMode blendMode) {
+    if (blendMode == SUB) {
+        glBlendEquationSeparate(GL_FUNC_REVERSE_SUBTRACT, GL_FUNC_ADD);
+    } else if (blendMode == DARKEN) {
+        glBlendEquationSeparate(GL_MIN, GL_FUNC_ADD);
+    } else if (blendMode == LIGHTEN) {
+        glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
+    } else {
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+    }
+    switch (blendMode) {
+        case SRC_OVER:
+            glBlendFuncSeparate(
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA,
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case DST_OVER:
+            glBlendFuncSeparate(
+                    GL_ONE_MINUS_DST_ALPHA, GL_ONE,
+                    GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+            break;
+        case SRC_IN:
+            glBlendFuncSeparate(
+                    GL_DST_ALPHA, GL_ZERO,
+                    GL_DST_ALPHA, GL_ZERO);
+            break;
+        case DST_IN:
+            glBlendFuncSeparate(
+                    GL_ZERO, GL_SRC_ALPHA,
+                    GL_ZERO, GL_SRC_ALPHA);
+            break;
+        case SRC_OUT:
+            glBlendFuncSeparate(
+                    GL_ONE_MINUS_DST_ALPHA, GL_ZERO,
+                    GL_ONE_MINUS_DST_ALPHA, GL_ZERO);
+            break;
+        case DST_OUT:
+            glBlendFuncSeparate(
+                    GL_ZERO, GL_ONE_MINUS_SRC_ALPHA,
+                    GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case SRC_ATOP:
+            glBlendFuncSeparate(
+                    GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+                    GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case DST_ATOP:
+            glBlendFuncSeparate(
+                    GL_ONE_MINUS_DST_ALPHA, GL_SRC_ALPHA,
+                    GL_ONE_MINUS_DST_ALPHA, GL_SRC_ALPHA);
+            break;
+        case XOR:
+            glBlendFuncSeparate(
+                    GL_ONE_MINUS_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+                    GL_ONE_MINUS_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case CLEAR:
+            glBlendFuncSeparate(
+                    GL_ZERO, GL_ZERO,
+                    GL_ZERO, GL_ZERO);
+            break;
+        case SRC:
+            glBlendFuncSeparate(
+                    GL_ONE, GL_ZERO,
+                    GL_ONE, GL_ZERO);
+            break;
+        case DST:
+            glBlendFuncSeparate(
+                    GL_ZERO, GL_ONE,
+                    GL_ZERO, GL_ONE);
+            break;
+        case ADD:
+            glBlendFuncSeparate(
+                    GL_ONE, GL_ONE,
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case SUB:
+            glBlendFuncSeparate(
+                    GL_ONE, GL_ONE,
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case MUL:
+            glBlendFuncSeparate(
+                    GL_DST_COLOR, GL_ZERO,
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case DARKEN:
+            glBlendFuncSeparate(
+                    GL_ONE, GL_ONE,
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case LIGHTEN:
+            glBlendFuncSeparate(
+                    GL_ONE, GL_ONE,
+                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+    }
+}
+
 // Class
 
 FlatRender::FlatRender() : paint(0), vertex(0), element(0), curAA(0), curImage0(0), curImage1(0) {
@@ -294,6 +393,7 @@ void FlatRender::begin(unsigned int32 width, unsigned int32 height, bool dbg) {
     curImage0 = 0;
     curImage1 = 0;
     debug = dbg;
+    curBm = fvBlendMode::SRC_OVER;
 
     glUseProgram(shader);
     glUniform2f(viewID, width, height);
@@ -319,6 +419,7 @@ void FlatRender::begin(unsigned int32 width, unsigned int32 height, bool dbg) {
     glStencilMask(0xFF);
 
     glEnable(GL_BLEND);
+    glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
     glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glActiveTexture(GL_TEXTURE0);
@@ -391,6 +492,10 @@ void FlatRender::flush(
         }
 
         if (curPaint.pathOp == CLIP || curPaint.pathOp == UNCLIP) {
+            if (curBm != fvBlendMode::SRC_OVER) {
+                curBm = fvBlendMode::SRC_OVER;
+                _setBlendMode(curBm);
+            }
             glColorMask(0, 0, 0, 0);
             glUniform1i(stcID, 1);
 
@@ -431,6 +536,11 @@ void FlatRender::flush(
             glColorMask(1, 1, 1, 1);
             glUniform1i(stcID, 0);
         } else {
+            if (curBm != curPaint.blendMode) {
+                curBm = curPaint.blendMode;
+                _setBlendMode(curBm);
+            }
+
             if (curImage0 != curPaint.image0) {
                 curImage0 = curPaint.image0;
                 glActiveTexture(GL_TEXTURE0);

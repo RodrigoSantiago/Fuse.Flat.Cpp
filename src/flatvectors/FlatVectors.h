@@ -112,6 +112,7 @@ public:
     void setFontScale(float fscale);
     void setFontSpacing(float fspacing);
     void setFontBlur(float fblur);
+    void setBlendMode(fvBlendMode blendMode);
 
     void begin(fvPathOp pathOp, fvWindingRule pathRule);
     void end();
