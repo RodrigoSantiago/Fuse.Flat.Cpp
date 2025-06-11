@@ -37,6 +37,8 @@ class FlatVectors {
     int32 curShapeBeginElmIndex;  // INDEX
     float curPosX;
     float curPosY;
+    float strokeDashStartPosX;
+    float strokeDashStartPosY;
     float strokeStartPosX;
     float strokeStartPosY;
     int32 strokeFirstLineVtxIndex;

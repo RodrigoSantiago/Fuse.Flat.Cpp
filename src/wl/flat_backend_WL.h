@@ -385,6 +385,22 @@ JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString
 
 /*
  * Class:     flat_backend_WL
+ * Method:    GetClipboardString
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     flat_backend_WL
+ * Method:    GetClipboardString
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     flat_backend_WL
  * Method:    GetKeyName
  * Signature: (II)Ljava/lang/String;
  */

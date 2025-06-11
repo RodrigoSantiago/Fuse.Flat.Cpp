@@ -330,6 +330,8 @@ void FlatVectors::strokeMoveTo(float x, float y) {
 
 void FlatVectors::strokeLineTo(float x, float y, bool curve) {
     if (lastStep == CLOSE) {
+        strokeDashStartPosX = x;
+        strokeDashStartPosY = y;
         strokeMoveTo(x, y);
     }
 
@@ -490,13 +492,16 @@ void FlatVectors::strokeJoin(int32 v0, int32 v1, float x1, float y1, float x2, f
 }
 
 void FlatVectors::strokeClose() {
-    if (lastStep == MOVE) {
+    if (!stroke.dash.empty()) {
+        strokeDashTo(strokeDashStartPosX, strokeDashStartPosY, false);
+    } else if (lastStep == MOVE) {
         strokeCap();
 
     } else if (lastStep == LINE) {
         strokeLineTo(strokeStartPosX, strokeStartPosY, false);
         strokeJoin(prevVtxIndex, strokeFirstLineVtxIndex,
-                   prevLineStartPosX, prevLineStartPosY, curPosX, curPosY, strokeFirstLinePosX, strokeFirstLinePosY, false);
+                   prevLineStartPosX, prevLineStartPosY, curPosX, curPosY,
+                   strokeFirstLinePosX, strokeFirstLinePosY, false);
     }
 
     lastStep = CLOSE;
@@ -785,6 +790,8 @@ void FlatVectors::end() {
 
 void FlatVectors::moveTo(float x, float y) {
     if (paint.pathOp == STROKE) {
+        strokeDashStartPosX = x;
+        strokeDashStartPosY = y;
         strokeMoveTo(x, y);
     } else {
         fillMoveTo(x, y);
@@ -986,25 +993,30 @@ void FlatVectors::rect(float x, float y, float width, float height, bool fill) {
 }
 
 void FlatVectors::ellipse(float x, float y, float width, float height, bool fill) {
+    fvJoin before = stroke.join;
+    stroke.join = JOIN_ROUND;
     begin(fill ? fvPathOp::CONVEX : fvPathOp::STROKE, fvWindingRule::EVEN_ODD);
-    float points = scale * std::sqrt(std::max(width, height) * 0.5) * PI2;
-    points = std::ceil((points < 16 ? 16 : points > 128 ? 128 : points));
-    int32 n = (int32) points;
+    float cx = x + width / 2;
+    float cy = y + height / 2;
+    float rx = width / 2;
+    float ry = height / 2;
 
-    float dtr = PI / 180.0f;
-    float hw = width / 2.0f, hh = height / 2.0f;
-    float xc = x + hw, yc = y + hh;
+    const float kappa = 0.5522847498f;
 
-    for (int32 i = 0; i < n ; i++) {
-        float a = (i / (float) n * 360) * dtr;
-        if (i == 0) {
-            moveTo(xc + std::cos(a) * hw, yc - std::sin(a) * hh);
-        } else {
-            lineTo(xc + std::cos(a) * hw, yc - std::sin(a) * hh);
-        }
-    }
+    float ox = rx * kappa;
+    float oy = ry * kappa;
+
+    float x0 = cx - rx, y0 = cy - ry;
+    float x1 = cx + rx, y1 = cy + ry;
+
+    moveTo(cx, y0);
+    cubicTo(cx + ox, y0, x1, cy - oy, x1, cy);
+    cubicTo(x1, cy + oy, cx + ox, y1, cx, y1);
+    cubicTo(cx - ox, y1, x0, cy + oy, x0, cy);
+    cubicTo(x0, cy - oy, cx - ox, y0, cx, y0);
     close();
     end();
+    stroke.join = before;
 }
 
 void FlatVectors::roundRect(float x, float y, float width, float height, float c1, float c2, float c3, float c4, bool fill) {

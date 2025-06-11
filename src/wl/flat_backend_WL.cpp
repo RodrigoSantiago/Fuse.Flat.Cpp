@@ -510,6 +510,109 @@ JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString(JNIEnv * jEnv,
     return newStringFromUTF8(jEnv, clipboard);
 }
 
+JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage(JNIEnv * jEnv, jclass jClass, jlong win, jobject imageData) {
+    jclass imageDataClass = jEnv->GetObjectClass(imageData);
+
+    jmethodID getWidthMethod = jEnv->GetMethodID(imageDataClass, "getWidth", "()I");
+    jmethodID getHeightMethod = jEnv->GetMethodID(imageDataClass, "getHeight", "()I");
+    jmethodID getChannelsMethod = jEnv->GetMethodID(imageDataClass, "getChannels", "()I");
+    jmethodID getDataMethod = jEnv->GetMethodID(imageDataClass, "getData", "()[B");
+
+    Image image;
+    image.width = jEnv->CallIntMethod(imageData, getWidthMethod);
+    image.height = jEnv->CallIntMethod(imageData, getHeightMethod);
+    image.channels = 4;
+    long channels = jEnv->CallIntMethod(imageData, getChannelsMethod);
+    if (channels > 4) {
+        jEnv->DeleteLocalRef(imageDataClass);
+        return;
+    }
+
+    jbyteArray javaDataArray = (jbyteArray)jEnv->CallObjectMethod(imageData, getDataMethod);
+    if (jEnv->ExceptionCheck() || javaDataArray == NULL) {
+        jEnv->DeleteLocalRef(imageDataClass);
+        return;
+    }
+
+    jbyte* javaBytes = jEnv->GetByteArrayElements(javaDataArray, NULL);
+    if (jEnv->ExceptionCheck() || javaBytes == NULL) {
+        jEnv->DeleteLocalRef(javaDataArray);
+        jEnv->DeleteLocalRef(imageDataClass);
+        return;
+    }
+
+    image.bytes.reserve(image.width * image.height * image.channels);
+    if (channels == 1) {
+        for (int y = 0; y < image.height; ++y) {
+            for (int x = 0; x < image.width; ++x) {
+                long pixelIndexB = (long)(y * image.width + x);
+                image.bytes.push_back(javaBytes[pixelIndexB]); // B (Java) -> B (C++)
+                image.bytes.push_back(javaBytes[pixelIndexB]); // G (Java) -> G (C++)
+                image.bytes.push_back(javaBytes[pixelIndexB]); // R (Java) -> R (C++)
+                image.bytes.push_back(0xFF); // A (Java) -> A (C++)
+            }
+        }
+    } else if (channels == 2) {
+        for (int y = 0; y < image.height; ++y) {
+            for (int x = 0; x < image.width; ++x) {
+                long pixelIndexB = (long)(y * image.width + x) * 2;
+                image.bytes.push_back(javaBytes[pixelIndexB + 0]); // B (Java) -> B (C++)
+                image.bytes.push_back(javaBytes[pixelIndexB + 1]); // G (Java) -> G (C++)
+                image.bytes.push_back(0); // R (Java) -> R (C++)
+                image.bytes.push_back(0xFF); // A (Java) -> A (C++)
+            }
+        }
+    } else if (channels == 3) {
+        for (int y = 0; y < image.height; ++y) {
+            for (int x = 0; x < image.width; ++x) {
+                long pixelIndexB = (long)(y * image.width + x) * 3;
+                image.bytes.push_back(javaBytes[pixelIndexB + 0]); // B (Java) -> B (C++)
+                image.bytes.push_back(javaBytes[pixelIndexB + 1]); // G (Java) -> G (C++)
+                image.bytes.push_back(javaBytes[pixelIndexB + 2]); // R (Java) -> R (C++)
+                image.bytes.push_back(0xFF); // A (Java) -> A (C++)
+            }
+        }
+    } else if (channels == 4) {
+        for (int y = 0; y < image.height; ++y) {
+            for (int x = 0; x < image.width; ++x) {
+                long pixelIndex = (long)(y * image.width + x) * image.channels; // 4 bytes por pixel (RGBA)
+                image.bytes.push_back(javaBytes[pixelIndex + 0]); // B (Java) -> B (C++)
+                image.bytes.push_back(javaBytes[pixelIndex + 1]); // G (Java) -> G (C++)
+                image.bytes.push_back(javaBytes[pixelIndex + 2]); // R (Java) -> R (C++)
+                image.bytes.push_back(javaBytes[pixelIndex + 3]); // A (Java) -> A (C++)
+            }
+        }
+    }
+
+    setClipboardImage(image);
+
+    jEnv->ReleaseByteArrayElements(javaDataArray, javaBytes, JNI_ABORT);
+    jEnv->DeleteLocalRef(javaDataArray);
+    jEnv->DeleteLocalRef(imageDataClass);
+}
+
+JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage(JNIEnv * jEnv, jclass jClass, jlong win) {
+    Image image;
+    if (getClipboardImage(image) == 1) {
+        jclass imageDataClass = jEnv->FindClass("flat/graphics/image/ImageData");
+        if (jEnv->ExceptionCheck()) return nullptr;
+
+        jmethodID constructor = jEnv->GetMethodID(imageDataClass, "<init>", "([BIII)V");
+        if (jEnv->ExceptionCheck()) return nullptr;
+
+        jbyteArray jni_data = jEnv->NewByteArray(image.bytes.size());
+        jEnv->SetByteArrayRegion(jni_data, 0, image.bytes.size(), reinterpret_cast<const jbyte*>(image.bytes.data()));
+
+        jobject imageDataObject = jEnv->NewObject(imageDataClass, constructor, jni_data, image.width, image.height, image.channels);
+
+        jEnv->DeleteLocalRef(jni_data);
+        jEnv->DeleteLocalRef(imageDataClass);
+
+        return imageDataObject;
+    }
+    return NULL;
+}
+
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetKeyName(JNIEnv * jEnv, jclass jClass, jint key, jint scancode) {
     const char* name = glfwGetKeyName(key, scancode);
     if (name == NULL) {
