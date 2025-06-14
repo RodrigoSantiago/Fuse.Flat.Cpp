@@ -29,8 +29,7 @@ void multiply(float* t, const float* s) {
 void FlatPaints::setColorPaint(fvUniform& uniform, int32 color) {
     uniform = {};
     uniform.type = 0;
-    
-    identity(uniform.imageMat);
+
     identity(uniform.colorMat);
 
     uniform.shape[0] = 0;
@@ -39,7 +38,7 @@ void FlatPaints::setColorPaint(fvUniform& uniform, int32 color) {
     uniform.shape[3] = 0;
 
     uniform.stopCount = 0;
-    uniform.joinType = 0;
+    uniform.filter = 0;
     uniform.colors[0] = ((color >> 24) & 0xFF) / 255.f;
     uniform.colors[1] = ((color >> 16) & 0xFF) / 255.f;
     uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
@@ -49,16 +48,14 @@ void FlatPaints::setColorPaint(fvUniform& uniform, int32 color) {
 
 void FlatPaints::setImagePaint(fvUniform& uniform, float* affineImg, int32 color, int32 cycleMethod, int32 nearest) {
     uniform = {};
-    uniform.type = 1;
+    uniform.type = 2;
     if (affineImg != 0) {
         for (int32 i = 0; i < 6; i++) {
-            uniform.imageMat[i] = affineImg[i];
+            uniform.colorMat[i] = affineImg[i];
         }
     } else {
-        identity(uniform.imageMat);
+        identity(uniform.colorMat);
     }
-
-    identity(uniform.colorMat);
 
     uniform.shape[0] = 0;
     uniform.shape[1] = 0;
@@ -66,20 +63,19 @@ void FlatPaints::setImagePaint(fvUniform& uniform, float* affineImg, int32 color
     uniform.shape[3] = 0;
 
     uniform.stopCount = 0;
-    uniform.joinType = 0;
+    uniform.filter = nearest ? 1 : 0;
     uniform.colors[0] = ((color >> 24) & 0xFF) / 255.f;
     uniform.colors[1] = ((color >> 16) & 0xFF) / 255.f;
     uniform.colors[2] = ((color >> 8) & 0xFF) / 255.f;
     uniform.colors[3] = ((color >> 0) & 0xFF) / 255.f;
-    uniform.cycleType = cycleMethod + (nearest ? 3 : 0);
+    uniform.cycleType = cycleMethod;
 }
 
 void FlatPaints::setLinearGradientPaint(fvUniform& uniform, float* affine,
                                         float x1, float y1, float x2, float y2,
                                         int32 count, float* stops, int32* colors, int32 cycleMethod) {
     uniform = {};
-    uniform.type = 0;
-    identity(uniform.imageMat);
+    uniform.type = count == 0 ? 0 : 1;
 
     float dx, dy, d;
     const float large = 1e5;
@@ -109,13 +105,16 @@ void FlatPaints::setLinearGradientPaint(fvUniform& uniform, float* affine,
     uniform.shape[3] = d < 1.0f ? 1.0f : d;
 
     uniform.stopCount = count - 1;
-    uniform.joinType = 0;
+    uniform.filter = 0;
     for (int32 i = 0; i < count; i++) {
         uniform.stops[i] = stops[i];
         uniform.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
         uniform.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
         uniform.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
         uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
+    }
+    for (int32 i = count; i < 16; i++) {
+        uniform.stops[i] = 2.0;
     }
     uniform.cycleType = cycleMethod;
 }
@@ -124,8 +123,7 @@ void FlatPaints::setRadialGradientPaint(fvUniform& uniform, float* affine,
                                         float x, float y, float rIn, float rOut, float fx, float fy,
                                         int32 count, float* stops, int32* colors, int32 cycleMethod) {
     uniform = {};
-    uniform.type = 0;
-    identity(uniform.imageMat);
+    uniform.type = count == 0 ? 0 : 1;
 
     float r = (rIn+rOut)*0.5f;
     float f = (rOut-rIn);
@@ -144,13 +142,16 @@ void FlatPaints::setRadialGradientPaint(fvUniform& uniform, float* affine,
     uniform.shape[3] = f < 1.0f ? 1.0f : f;
 
     uniform.stopCount = count - 1;
-    uniform.joinType = 0;
+    uniform.filter = 0;
     for (int32 i = 0; i < count; i++) {
         uniform.stops[i] = stops[i];
         uniform.colors[i * 4] = ((colors[i] >> 24) & 0xFF) / 255.f;
         uniform.colors[i * 4 + 1] = ((colors[i] >> 16) & 0xFF) / 255.f;
         uniform.colors[i * 4 + 2] = ((colors[i] >> 8) & 0xFF) / 255.f;
         uniform.colors[i * 4 + 3] = ((colors[i] >> 0) & 0xFF) / 255.f;
+    }
+    for (int32 i = count; i < 16; i++) {
+        uniform.stops[i] = 2.0;
     }
     uniform.cycleType = cycleMethod;
 
@@ -164,8 +165,7 @@ void FlatPaints::setRadialGradientPaint(fvUniform& uniform, float* affine,
 void FlatPaints::setBoxGradientPaint(fvUniform& uniform, float* affine,
                                      float x, float y, float w, float h, float r, float f, float a, int32 c) {
     uniform = {};
-    uniform.type = 0;
-    identity(uniform.imageMat);
+    uniform.type = 1;
 
     uniform.colorMat[0] = 1.0f;
     uniform.colorMat[1] = 0.0f;
@@ -183,7 +183,7 @@ void FlatPaints::setBoxGradientPaint(fvUniform& uniform, float* affine,
     uniform.shape[3] = f < 1.0f ? 1.0f : f;
 
     uniform.stopCount = 1;
-    uniform.joinType = 0;
+    uniform.filter = 0;
 
     uniform.stops[0] = 0;
     uniform.colors[0] = ((c >> 24) & 0xFF) / 255.f;
@@ -196,6 +196,9 @@ void FlatPaints::setBoxGradientPaint(fvUniform& uniform, float* affine,
     uniform.colors[5] = ((c >> 16) & 0xFF) / 255.f;
     uniform.colors[6] = ((c >> 8) & 0xFF) / 255.f;
     uniform.colors[7] = 0;
+    for (int32 i = 2; i < 16; i++) {
+        uniform.stops[i] = 2.0;
+    }
 
-    uniform.cycleType = 3;
+    uniform.cycleType = 4;
 }

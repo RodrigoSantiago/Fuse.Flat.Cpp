@@ -52,6 +52,38 @@ std::string newUTF8FromString(JNIEnv* env, jstring javaString) {
     return converter.to_bytes(result);
 }
 
+int convertIndex(const char* utf8, int byteOffset) {
+    int utf16Index = 0;
+    int i = 0;
+
+    while (i < byteOffset) {
+        unsigned char c = utf8[i];
+
+        if (c < 0x80) {
+            // 1 byte (ASCII)
+            i += 1;
+            utf16Index += 1;
+        } else if ((c >> 5) == 0x6) {
+            // 2 bytes
+            i += 2;
+            utf16Index += 1;
+        } else if ((c >> 4) == 0xE) {
+            // 3 bytes
+            i += 3;
+            utf16Index += 1;
+        } else if ((c >> 3) == 0x1E) {
+            // 4 bytes (surrogate pair in UTF-16)
+            i += 4;
+            utf16Index += 2;
+        } else {
+            // Malformed UTF-8
+            break;
+        }
+    }
+
+    return utf16Index;
+}
+
 static jLambda<void(jlong, jint, jint)> sWindowPosCallback;
 static jLambda<void(jlong, jint, jint)> sWindowSizeCallback;
 static jLambda<bool(jlong)> sWindowCloseCallback;

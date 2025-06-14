@@ -146,7 +146,10 @@ int getClipboardImage(Image& imagem) {
     HGLOBAL hData = NULL;
     UINT clipboardFormat = 0;
 
-    if (IsClipboardFormatAvailable(CF_DIB)) {
+    if (IsClipboardFormatAvailable(CF_DIBV5)) {
+        hData = GetClipboardData(CF_DIBV5);
+        clipboardFormat = CF_DIBV5;
+    } else if (IsClipboardFormatAvailable(CF_DIB)) {
         hData = GetClipboardData(CF_DIB);
         clipboardFormat = CF_DIB;
     } else if (IsClipboardFormatAvailable(CF_BITMAP)) {
@@ -163,7 +166,7 @@ int getClipboardImage(Image& imagem) {
     char* pRawPixels = NULL;
     HGLOBAL hDibMemory = NULL;
 
-    if (clipboardFormat == CF_DIB) {
+    if (clipboardFormat == CF_DIB || clipboardFormat == CF_DIBV5) {
         BITMAPINFO* pBmi = static_cast<BITMAPINFO*>(GlobalLock(hData));
         if (pBmi == NULL) {
             CloseClipboard();
@@ -178,6 +181,7 @@ int getClipboardImage(Image& imagem) {
         } else if (pBmi->bmiHeader.biBitCount <= 8) {
             colorTableSize = (1 << pBmi->bmiHeader.biBitCount) * sizeof(RGBQUAD);
         }
+
         pRawPixels = (char*)pBmi + pBmi->bmiHeader.biSize + colorTableSize;
 
     } else if (clipboardFormat == CF_BITMAP) {
@@ -200,7 +204,7 @@ int getClipboardImage(Image& imagem) {
     } else if (bmiHeader.biBitCount == 32) {
         imagem.channels = 4;
     } else {
-        if (clipboardFormat == CF_DIB) GlobalUnlock(hData);
+        if (clipboardFormat == CF_DIB || clipboardFormat == CF_DIBV5) GlobalUnlock(hData);
         if (hDibMemory) GlobalFree(hDibMemory);
         CloseClipboard();
         return -1;
@@ -228,13 +232,11 @@ int getClipboardImage(Image& imagem) {
     for (long y = 0; y < imagem.height; ++y) {
         for (long x = 0; x < imagem.width; ++x) {
             long p = (y * imagem.width + x) * imagem.channels;
-            char past = imagem.bytes[p];
-            imagem.bytes[p] = imagem.bytes[p + 2];
-            imagem.bytes[p + 2] = past;
+            std::swap(imagem.bytes[p], imagem.bytes[p + 2]);  // BGR -> RGB
         }
     }
 
-    if (clipboardFormat == CF_DIB) {
+    if (clipboardFormat == CF_DIB || clipboardFormat == CF_DIBV5) {
         GlobalUnlock(hData);
     }
     if (hDibMemory) {

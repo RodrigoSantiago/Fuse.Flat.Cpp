@@ -280,6 +280,13 @@ JNIEXPORT jlong JNICALL Java_flat_backend_SVG_FontGetAtlas
 JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape
   (JNIEnv *, jclass, jlong, jint);
 
+/*
+ * Class:     flat_backend_SVG
+ * Method:    FontGetKerning
+ * Signature: (J)F
+ */
+JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetKerning
+  (JNIEnv *, jclass, jlong, jint, jint);
 
 /*
  * Class:     flat_backend_SVG

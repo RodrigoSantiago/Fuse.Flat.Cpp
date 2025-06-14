@@ -53,7 +53,7 @@ enum fvBlendMode {
     SRC_ATOP,
     DST_ATOP,
     XOR,
-    ADD, SUB, MUL, LIGHTEN, DARKEN
+    ADD, SUB, MUL, LIGHTEN, DARKEN, REV_SUB
 };
 
 typedef struct fvPoint {
@@ -69,12 +69,11 @@ typedef struct fvTriangle {
 
 typedef struct fvUniform {
     // Buffer
-    float type;                 // [0] - Color|Grad, [1] - Color + Image, [2] - Text + Color, [3] - Text + Color + Image
-    float joinType;             // Round / Bevel
-    float cycleType;            // Clamp / Cycle / Reflect
+    float type;                 // [0] - Color, [1] - Grad, [2] - Image, [3] - Text
+    float filter;               // [0] - Linear/Default, [1] - Nearest
+    float cycleType;            // Clamp / Cycle / Reflect / Empty
     float stopCount;            // 0 -- 16
     float colorMat[12];
-    float imageMat[12];
     float shape[4];             // Extent[0,1], Radius [2], Feather [3]
     float extra[4];             // Focus[0,1], Circle/Rect/Shadow/StrokeShadow[2], Blur [3]
     float stops[16];

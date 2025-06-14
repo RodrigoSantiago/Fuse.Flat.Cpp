@@ -610,11 +610,7 @@ void FlatVectors::pushToRender() {
             push.extra[3] = -1;
         }
 
-        if (push.type == 0) {
-            push.type = 2;
-        } else if (push.type == 1) {
-            push.type = 3;
-        }
+        push.type = 3;
     }
 
     uniforms.resize((curDrwIndex + 1) * render->renderAlign());
@@ -720,9 +716,6 @@ void FlatVectors::setColor(fvUniform& color, int32 img) {
 
     inverseMat(uniform.colorMat, uniform.colorMat);
     affineToMat3(uniform.colorMat, uniform.colorMat);
-
-    inverseMat(uniform.imageMat, uniform.imageMat);
-    affineToMat3(uniform.imageMat, uniform.imageMat);
 
     paint.image0 = img;
 }
@@ -873,10 +866,10 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
             if (emoji != nullptr) {
                 fvPoint ptr = emoji->getEmojiUv(str, strLen, i, chr);
                 if (ptr.x >= 0) {
-                    float x1 = x;
-                    float y1 = y;
-                    float x2 = x + advance;
-                    float y2 = y + advance;
+                    float x1 = paint.antiAlias ? x : lround(x);
+                    float y1 = paint.antiAlias ? y : lround(y);
+                    float x2 = x1 + advance;
+                    float y2 = y1 + advance;
 
                     if (x1 < maxWidth && y1 < maxHeight) {
                         float uvW = w;
@@ -939,6 +932,9 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
         if (uv.x > -1) {
             float x1 = px + glyph.x * scl;
             float y1 = y + glyph.y * scl;
+            if (paint.antiAlias == 0) {
+                x1 = lround(x1);
+            }
             float x2 = x1 + glyph.w * scl;
             float y2 = y1 + glyph.h * scl;
 

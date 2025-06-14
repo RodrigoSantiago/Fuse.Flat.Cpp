@@ -232,6 +232,9 @@ JNIEXPORT jfloatArray JNICALL Java_flat_backend_SVG_FontGetGlyphShape(JNIEnv * j
         return imageArray;
     }
 }
+JNIEXPORT jfloat JNICALL Java_flat_backend_SVG_FontGetKerning(JNIEnv * jEnv, jclass jClass, jlong font, jint unicodeA, jint unicodeB) {
+    return fnt(font)->getKerning(unicodeA, unicodeB);
+}
 JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetGlyph(JNIEnv * jEnv, jclass jClass, jlong font, jint codePoint, jfloatArray glyph) {
     float data[5];
     fnt(font)->getGlyphData(codePoint, data);
@@ -294,6 +297,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffset(JNIEnv * jEnv, jclass
     const char *chars = jEnv->GetStringUTFChars(characters, 0);
     float data[2] = {0, 1};
     fnt(font)->getOffset(chars, jEnv->GetStringUTFLength(characters), scale, spacing, x, half, data, data + 1);
+    data[0] = convertIndex(chars, static_cast<int>(data[0]));
     jEnv->ReleaseStringUTFChars(characters, chars);
     jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
 
@@ -308,6 +312,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetSpace(JNIEnv * jEnv, j
     const char *chars = jEnv->GetStringUTFChars(characters, 0);
     float data[2] = {0, 1};
     fnt(font)->getOffsetSpace(chars, jEnv->GetStringUTFLength(characters), scale, spacing, x, data, data + 1);
+    data[0] = convertIndex(chars, static_cast<int>(data[0]));
     jEnv->ReleaseStringUTFChars(characters, chars);
     jEnv->SetFloatArrayRegion(cursor, 0, 2, (jfloat *)data);
 
@@ -321,6 +326,7 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_FontGetOffsetSpaceBuffer(JNIEnv * j
 JNIEXPORT jint JNICALL Java_flat_backend_SVG_FontGetLineWrap(JNIEnv * jEnv, jclass jClass, jlong font, jstring characters, jfloat scale, jfloat spacing, jfloat x) {
     const char *chars = jEnv->GetStringUTFChars(characters, 0);
     jint count = fnt(font)->countLineWrap(chars, jEnv->GetStringUTFLength(characters), scale, spacing, x);
+    count = convertIndex(chars, static_cast<int>(count));
     jEnv->ReleaseStringUTFChars(characters, chars);
     return count;
 
