@@ -116,6 +116,14 @@ void FlatPaints::setLinearGradientPaint(fvUniform& uniform, float* affine,
     for (int32 i = count; i < 16; i++) {
         uniform.stops[i] = 2.0;
     }
+    if (count > 0) {
+        for (int32 i = count; i < 16; i++) {
+            uniform.colors[i * 4] = ((colors[count - 1] >> 24) & 0xFF) / 255.f;
+            uniform.colors[i * 4 + 1] = ((colors[count - 1] >> 16) & 0xFF) / 255.f;
+            uniform.colors[i * 4 + 2] = ((colors[count - 1] >> 8) & 0xFF) / 255.f;
+            uniform.colors[i * 4 + 3] = ((colors[count - 1] >> 0) & 0xFF) / 255.f;
+        }
+    }
     uniform.cycleType = cycleMethod;
 }
 
@@ -152,6 +160,14 @@ void FlatPaints::setRadialGradientPaint(fvUniform& uniform, float* affine,
     }
     for (int32 i = count; i < 16; i++) {
         uniform.stops[i] = 2.0;
+    }
+    if (count > 0) {
+        for (int32 i = count; i < 16; i++) {
+            uniform.colors[i * 4] = ((colors[count - 1] >> 24) & 0xFF) / 255.f;
+            uniform.colors[i * 4 + 1] = ((colors[count - 1] >> 16) & 0xFF) / 255.f;
+            uniform.colors[i * 4 + 2] = ((colors[count - 1] >> 8) & 0xFF) / 255.f;
+            uniform.colors[i * 4 + 3] = ((colors[count - 1] >> 0) & 0xFF) / 255.f;
+        }
     }
     uniform.cycleType = cycleMethod;
 
@@ -199,6 +215,11 @@ void FlatPaints::setBoxGradientPaint(fvUniform& uniform, float* affine,
     for (int32 i = 2; i < 16; i++) {
         uniform.stops[i] = 2.0;
     }
-
+    for (int32 i = 2; i < 16; i++) {
+        uniform.colors[i * 4] = ((c >> 24) & 0xFF) / 255.f;
+        uniform.colors[i * 4 + 1] = ((c >> 16) & 0xFF) / 255.f;
+        uniform.colors[i * 4 + 2] = ((c >> 8) & 0xFF) / 255.f;
+        uniform.colors[i * 4 + 3] = 0;
+    }
     uniform.cycleType = 4;
 }

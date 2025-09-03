@@ -136,7 +136,7 @@ const char *fragmentSource =
         "           FragColor = vec4(0.0);"
         "           return;"
         "        }"
-        "        if (int(data[1]) == 1) tPt = (floor(tPt * sz) + 0.5) / vec2(sz);"
+        "        if (int(data[1]) == 1) tPt = (round(tPt * sz - 0.5) + 0.5) / vec2(sz);"
         "        vec4 color = colors[0] * texture(tex, tPt);"
         "        FragColor = vec4(color.rgb * color.a, color.a);"
         "        return;"

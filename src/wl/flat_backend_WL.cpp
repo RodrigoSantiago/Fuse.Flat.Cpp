@@ -472,7 +472,9 @@ JNIEXPORT jdouble JNICALL Java_flat_backend_WL_GetDpi(JNIEnv * jEnv, jclass jCla
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetSizeLimits(JNIEnv * jEnv, jclass jClass, jlong win, jint minWidth, jint minHeight, jint maxWidth, jint maxHeight) {
-    glfwSetWindowSizeLimits((GLFWwindow*) win, minWidth, minHeight, maxWidth, maxHeight);
+    glfwSetWindowSizeLimits((GLFWwindow*) win,
+                            minWidth <= 0 ? GLFW_DONT_CARE : minWidth, minHeight <= 0 ? GLFW_DONT_CARE : minHeight,
+                            maxWidth <= 0 ? GLFW_DONT_CARE : maxWidth, maxHeight <= 0 ? GLFW_DONT_CARE : maxHeight);
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_Show(JNIEnv * jEnv, jclass jClass, jlong win) {
@@ -527,22 +529,22 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetInputMode(JNIEnv * jEnv, jclass j
     glfwSetInputMode((GLFWwindow*) win, mode, value);
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString(JNIEnv * jEnv, jclass jClass, jlong win, jstring clipboard) {
+JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString(JNIEnv * jEnv, jclass jClass, jstring clipboard) {
     jboolean isCopy;
     const char *sClipboard = jEnv->GetStringUTFChars(clipboard, &isCopy);
-    glfwSetClipboardString((GLFWwindow*) win, newUTF8FromString(jEnv, clipboard).c_str());
+    glfwSetClipboardString(0, newUTF8FromString(jEnv, clipboard).c_str());
     jEnv->ReleaseStringUTFChars(clipboard, sClipboard);
 }
 
-JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString(JNIEnv * jEnv, jclass jClass, jlong win) {
-    const char* clipboard = glfwGetClipboardString((GLFWwindow*) win);
+JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString(JNIEnv * jEnv, jclass jClass) {
+    const char* clipboard = glfwGetClipboardString(0);
     if (clipboard == NULL) {
         return NULL;
     }
     return newStringFromUTF8(jEnv, clipboard);
 }
 
-JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage(JNIEnv * jEnv, jclass jClass, jlong win, jobject imageData) {
+JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage(JNIEnv * jEnv, jclass jClass, jobject imageData) {
     jclass imageDataClass = jEnv->GetObjectClass(imageData);
 
     jmethodID getWidthMethod = jEnv->GetMethodID(imageDataClass, "getWidth", "()I");
@@ -623,7 +625,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage(JNIEnv * jEnv, jcl
     jEnv->DeleteLocalRef(imageDataClass);
 }
 
-JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage(JNIEnv * jEnv, jclass jClass, jlong win) {
+JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage(JNIEnv * jEnv, jclass jClass) {
     Image image;
     if (getClipboardImage(image) == 1) {
         jclass imageDataClass = jEnv->FindClass("flat/graphics/image/ImageData");

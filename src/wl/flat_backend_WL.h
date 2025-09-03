@@ -370,10 +370,10 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetInputMode
 /*
  * Class:     flat_backend_WL
  * Method:    SetClipboardString
- * Signature: (JLjava/lang/String;)V
+ * Signature: (Jjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString
-  (JNIEnv *, jclass, jlong, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     flat_backend_WL
@@ -381,7 +381,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString
  * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString
-  (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     flat_backend_WL
@@ -389,7 +389,7 @@ JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString
  * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage
-  (JNIEnv *, jclass, jlong, jobject);
+  (JNIEnv *, jclass, jobject);
 
 /*
  * Class:     flat_backend_WL
@@ -397,7 +397,7 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage
  * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage
-  (JNIEnv *, jclass, jlong);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     flat_backend_WL
