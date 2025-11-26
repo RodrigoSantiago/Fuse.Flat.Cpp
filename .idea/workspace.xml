@@ -13,8 +13,19 @@
   <component name="ChangeListManager">
     <list default="true" id="bf161435-f28a-4645-bb15-630450fb734d" name="Changes" comment="General performance improvement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatFont.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatPaints.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatRender.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectors.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/flatvectors/FlatVectorsBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/svg/flat_backend_SVG.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/system_base.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_base.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/system_unix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_unix.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/system_win.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/system_win.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/wl/flat_backend_WL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/wl/flat_backend_WL.h" afterDir="false" />
     </list>
@@ -182,7 +193,22 @@
       <workItem from="1752505164539" duration="1361000" />
       <workItem from="1753403315073" duration="800000" />
       <workItem from="1756871284787" duration="1201000" />
-      <workItem from="1756873571007" duration="1627000" />
+      <workItem from="1756873571007" duration="5229000" />
+      <workItem from="1756921211877" duration="1886000" />
+      <workItem from="1756992226448" duration="1228000" />
+      <workItem from="1757013500092" duration="615000" />
+      <workItem from="1757029696765" duration="4532000" />
+      <workItem from="1757042492484" duration="601000" />
+      <workItem from="1757177065223" duration="38000" />
+      <workItem from="1759157742226" duration="4923000" />
+      <workItem from="1759237829894" duration="6507000" />
+      <workItem from="1759290516771" duration="607000" />
+      <workItem from="1759324891481" duration="69000" />
+      <workItem from="1760635865488" duration="2389000" />
+      <workItem from="1760679151182" duration="1064000" />
+      <workItem from="1764010126462" duration="1284000" />
+      <workItem from="1764076819076" duration="3386000" />
+      <workItem from="1764167442149" duration="2125000" />
     </task>
     <task id="LOCAL-00001" summary="Backend improved">
       <created>1695987278622</created>
@@ -506,7 +532,14 @@
       <option name="project" value="LOCAL" />
       <updated>1749922605961</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="General performance improvement">
+      <created>1756903359349</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1756903359349</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

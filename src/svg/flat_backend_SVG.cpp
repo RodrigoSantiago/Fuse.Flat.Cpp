@@ -349,12 +349,16 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_SetFontBlur(JNIEnv * jEnv, jclass j
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawText(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jstring characters, jfloat maxWidth, jfloat maxHeight) {
     const char *chars = jEnv->GetStringUTFChars(characters, 0);
-    ctx(context)->text(chars, jEnv->GetStringUTFLength(characters), x, y, maxWidth, maxHeight);
+    ctx(context)->text(chars, jEnv->GetStringUTFLength(characters), x, y, maxWidth, maxHeight, false);
     jEnv->ReleaseStringUTFChars(characters, chars);
 }
 JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawTextBuffer(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jobject characters, jint offset, jint length, jfloat maxWidth, jfloat maxHeight) {
     const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
-    ctx(context)->text(chars, length, x, y, maxWidth, maxHeight);
+    ctx(context)->text(chars, length, x, y, maxWidth, maxHeight, false);
+}
+JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawTextStyledBuffer(JNIEnv * jEnv, jclass jClass, jlong context, jfloat x, jfloat y, jobject characters, jint offset, jint length, jfloat maxWidth, jfloat maxHeight) {
+    const char * chars = (const char *) (jEnv->GetDirectBufferAddress(characters)) + offset;
+    ctx(context)->text(chars, length, x, y, maxWidth, maxHeight, true);
 }
 JNIEXPORT jbyteArray JNICALL Java_flat_backend_SVG_ReadImage(JNIEnv * jEnv, jclass jClass, jbyteArray data, jintArray imageData) {
     jbyte *imageBytes = jEnv->GetByteArrayElements(data, NULL);

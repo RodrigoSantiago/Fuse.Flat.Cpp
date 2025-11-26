@@ -537,11 +537,16 @@ JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardString(JNIEnv * jEnv, jc
 }
 
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetClipboardString(JNIEnv * jEnv, jclass jClass) {
-    const char* clipboard = glfwGetClipboardString(0);
-    if (clipboard == NULL) {
-        return NULL;
+    std::string fileList = getClipboardFileList();
+    if (fileList.empty()) {
+        const char *clipboard = glfwGetClipboardString(0);
+        if (clipboard != NULL) {
+            return newStringFromUTF8(jEnv, clipboard);
+        }
+    } else {
+        return newStringFromUTF8(jEnv, fileList.c_str());
     }
-    return newStringFromUTF8(jEnv, clipboard);
+    return NULL;
 }
 
 JNIEXPORT void JNICALL Java_flat_backend_WL_SetClipboardImage(JNIEnv * jEnv, jclass jClass, jobject imageData) {
@@ -645,6 +650,10 @@ JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage(JNIEnv * jEnv, 
         return imageDataObject;
     }
     return NULL;
+}
+
+JNIEXPORT void JNICALL Java_flat_backend_WL_ClearClipboard(JNIEnv * jEnv, jclass jClass) {
+    clearClipboard();
 }
 
 JNIEXPORT jstring JNICALL Java_flat_backend_WL_GetKeyName(JNIEnv * jEnv, jclass jClass, jint key, jint scancode) {

@@ -610,7 +610,7 @@ void FlatVectors::pushToRender() {
             push.extra[3] = -1;
         }
 
-        push.type = 3;
+        push.type = 4;
     }
 
     uniforms.resize((curDrwIndex + 1) * render->renderAlign());
@@ -839,7 +839,7 @@ void FlatVectors::clearClip(bool clip) {
     render->clearClip(clip);
 }
 
-void FlatVectors::text(const char* str, int32 strLen, float x, float y, float maxWidth, float maxHeight) {
+void FlatVectors::text(const char* str, int32 strLen, float x, float y, float maxWidth, float maxHeight, bool mono) {
     if (maxWidth == 0) maxWidth = 99999;
     else maxWidth = x + maxWidth;
     if (maxHeight == 0) maxHeight = 99999;
@@ -861,13 +861,14 @@ void FlatVectors::text(const char* str, int32 strLen, float x, float y, float ma
         // ---- Emoji ---- //
         if (FlatEmoji::isEmoji(chr)) {
             const float w = 64.0 / 4096.0;
-            float advance = font->getSize() * scl;
+            float advance = (mono ? font->getMonoWidth() : font->getSize()) * scl;
 
             if (emoji != nullptr) {
                 fvPoint ptr = emoji->getEmojiUv(str, strLen, i, chr);
                 if (ptr.x >= 0) {
                     float x1 = paint.antiAlias ? x : lround(x);
                     float y1 = paint.antiAlias ? y : lround(y);
+                    if (mono) y1 += std::max(0.0f, (font->getSize() * scl - advance) / 2.0f);
                     float x2 = x1 + advance;
                     float y2 = y1 + advance;
 

@@ -401,6 +401,14 @@ JNIEXPORT jobject JNICALL Java_flat_backend_WL_GetClipboardImage
 
 /*
  * Class:     flat_backend_WL
+ * Method:    ClearClipboard
+ * Signature: (J)V;
+ */
+JNIEXPORT void JNICALL Java_flat_backend_WL_ClearClipboard
+        (JNIEnv *, jclass);
+
+/*
+ * Class:     flat_backend_WL
  * Method:    GetKeyName
  * Signature: (II)Ljava/lang/String;
  */

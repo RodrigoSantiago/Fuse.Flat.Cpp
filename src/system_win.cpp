@@ -306,3 +306,56 @@ void setClipboardImage(Image& imageData) {
 
     CloseClipboard();
 }
+
+std::string getClipboardFileList() {
+    std::string result;
+
+    if (!OpenClipboard(nullptr))
+        return result;
+
+    if (!IsClipboardFormatAvailable(CF_HDROP)) {
+        CloseClipboard();
+        return result;
+    }
+
+    HDROP hDrop = static_cast<HDROP>(GetClipboardData(CF_HDROP));
+    if (!hDrop) {
+        CloseClipboard();
+        return result;
+    }
+
+    UINT fileCount = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
+    if (fileCount == 0) {
+        CloseClipboard();
+        return result;
+    }
+
+    std::vector<std::string> paths;
+    for (UINT i = 0; i < fileCount; ++i) {
+        wchar_t wpath[MAX_PATH];
+        DragQueryFileW(hDrop, i, wpath, MAX_PATH);
+
+        int size_needed = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, nullptr, 0, nullptr, nullptr);
+        std::string path(size_needed - 1, 0);
+        WideCharToMultiByte(CP_UTF8, 0, wpath, -1, &path[0], size_needed, nullptr, nullptr);
+
+        paths.push_back(path);
+    }
+
+    CloseClipboard();
+
+    for (size_t i = 0; i < paths.size(); ++i) {
+        result += paths[i];
+        if (i < paths.size() - 1)
+            result += ';';
+    }
+
+    return result;
+}
+
+void clearClipboard() {
+    if (OpenClipboard(NULL)) {
+        EmptyClipboard();
+        CloseClipboard();
+    }
+}

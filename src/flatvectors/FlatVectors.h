@@ -130,7 +130,7 @@ public:
 
     void clearClip(bool clip);
 
-    void text(const char* str, int32 strLen, float x, float y, float maxWidth, float maxHeight);
+    void text(const char* str, int32 strLen, float x, float y, float maxWidth, float maxHeight, bool mono);
 };
 
 

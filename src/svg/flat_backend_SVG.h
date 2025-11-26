@@ -490,6 +490,14 @@ JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawTextBuffer
 
 /*
  * Class:     flat_backend_SVG
+ * Method:    rawTextStyledBuffer
+ * Signature: (JFFLjava/nio/Buffer;IIFF)V
+ */
+JNIEXPORT void JNICALL Java_flat_backend_SVG_DrawTextStyledBuffer
+        (JNIEnv *, jclass, jlong, jfloat, jfloat, jobject, jint, jint, jfloat, jfloat);
+
+/*
+ * Class:     flat_backend_SVG
  * Method:    ReadImage
  * Signature: ([B[I)[B
  */

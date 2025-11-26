@@ -31,4 +31,8 @@ int getClipboardImage(Image& imagem);
 
 void setClipboardImage(Image& imagem);
 
+std::string getClipboardFileList();
+
+void clearClipboard();
+
 #endif //FLAT_SYSTEM_BASE_H

@@ -14,6 +14,10 @@ include_directories(include
         src/flatvectors
         ${JNI_INCLUDE_DIRS})
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -static-libgcc -static-libstdc++")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+
+
 if(WIN32)
     link_directories(lib/win)
     add_definitions(-DWINDOWS_PLATFORM)
@@ -54,7 +58,7 @@ add_library(Flat SHARED ${SOURCE_FILES})
 #add_executable(Flat ${SOURCE_FILES} main.cpp)
 
 if(WIN32)
-    target_link_libraries(Flat opengl32 gdi32 glfw3.a -static-libstdc++)
+    target_link_libraries(Flat opengl32 gdi32 glfw3.a)
 elseif(UNIX)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK3 REQUIRED gtk+-3.0)

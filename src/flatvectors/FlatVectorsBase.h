@@ -69,7 +69,7 @@ typedef struct fvTriangle {
 
 typedef struct fvUniform {
     // Buffer
-    float type;                 // [0] - Color, [1] - Grad, [2] - Image, [3] - Text
+    float type;                 // [0] - Color, [1] - Grad, [2] - BoxGrad, [3] - Image, [4] - Text
     float filter;               // [0] - Linear/Default, [1] - Nearest
     float cycleType;            // Clamp / Cycle / Reflect / Empty
     float stopCount;            // 0 -- 16

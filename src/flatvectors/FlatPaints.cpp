@@ -48,7 +48,7 @@ void FlatPaints::setColorPaint(fvUniform& uniform, int32 color) {
 
 void FlatPaints::setImagePaint(fvUniform& uniform, float* affineImg, int32 color, int32 cycleMethod, int32 nearest) {
     uniform = {};
-    uniform.type = 2;
+    uniform.type = 3;
     if (affineImg != 0) {
         for (int32 i = 0; i < 6; i++) {
             uniform.colorMat[i] = affineImg[i];
@@ -181,7 +181,7 @@ void FlatPaints::setRadialGradientPaint(fvUniform& uniform, float* affine,
 void FlatPaints::setBoxGradientPaint(fvUniform& uniform, float* affine,
                                      float x, float y, float w, float h, float r, float f, float a, int32 c) {
     uniform = {};
-    uniform.type = 1;
+    uniform.type = 2;
 
     uniform.colorMat[0] = 1.0f;
     uniform.colorMat[1] = 0.0f;

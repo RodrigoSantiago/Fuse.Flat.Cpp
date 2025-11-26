@@ -8,6 +8,7 @@
 #include "FlatText.h"
 #include "FlatVectors.h"
 #include "FlatEmoji.h"
+#include <iostream>
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
@@ -98,6 +99,7 @@ FlatFont::FlatFont(const void *data, int32 length, float size, int32 sdf)
             this->weight = this->bold ? 7 : 5;
         }
 
+        this->monoWidth = this->getGlyph('M').advance;
     }
 }
 
@@ -220,6 +222,10 @@ int32 FlatFont::getWeight() {
 
 float FlatFont::getSize() {
     return this->size;
+}
+
+float FlatFont::getMonoWidth() {
+    return this->monoWidth;
 }
 
 void FlatFont::setupRender(FlatRender* render) {

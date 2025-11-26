@@ -26,6 +26,7 @@ class FlatFont {
     bool coded;
     bool bold;
     bool italic;
+    float monoWidth;
     int32 weight;
     int32 invalidGlyphIndex;
 
@@ -64,6 +65,8 @@ public:
     int32 getWeight();
 
     float getSize();
+
+    float getMonoWidth();
 
     void setupRender(FlatRender* render);
 

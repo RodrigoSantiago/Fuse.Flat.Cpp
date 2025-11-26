@@ -88,3 +88,15 @@ void showOpenFolder(GLFWwindow* window, const char *sInitialFolder, jLambda<void
     });
     localThread.detach();
 }
+
+int getClipboardImage(Image& imagem) {
+
+}
+
+void setClipboardImage(Image& imagem) {
+
+}
+
+void clearClipboard() {
+
+}
